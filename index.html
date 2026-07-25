@@ -28,7 +28,13 @@ html,body{background:var(--bg)}
 .brand-name{font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;letter-spacing:.15em;font-size:1rem}
 .brand-name.brand-long{letter-spacing:.06em;font-size:.88rem}
 .reset-btn{background:none;border:none;color:var(--ink-faint);font-family:'Barlow',sans-serif;font-size:.78rem;letter-spacing:.04em;cursor:pointer;padding:6px}
-.app-footer{display:flex;justify-content:center;margin-top:34px;padding-top:16px;border-top:1px solid var(--line)}
+.version{text-align:center;font-size:.72rem;color:var(--ink-faint);letter-spacing:.06em;margin-top:30px;font-family:'Barlow Semi Condensed',sans-serif}
+.reset-link{background:none;border:none;color:var(--ink-faint);font-family:'Barlow',sans-serif;font-size:.82rem;cursor:pointer;padding:8px 2px;text-decoration:underline}
+.reset-box{background:rgba(229,106,84,.08);border:1px solid var(--warn);border-radius:var(--radius);padding:14px}
+.reset-warn{font-size:.82rem;color:var(--ink);line-height:1.5;margin-bottom:12px}
+.reset-actions{display:flex;gap:8px}
+.reset-actions .btn-solid{flex:1;padding:11px 0;text-align:center}
+.reset-confirm{flex:1;padding:11px 0;background:var(--warn);color:#1a0805;border:none;border-radius:10px;font-family:'Barlow',sans-serif;font-weight:700;cursor:pointer}
 .top-actions{display:flex;align-items:center;gap:10px}
 .save-btn{background:var(--accent);color:#1a1205;border:none;border-radius:8px;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.76rem;padding:8px 14px;cursor:pointer;transition:.14s;min-width:74px}
 .save-btn:active{transform:scale(.97)}
@@ -106,6 +112,7 @@ html,body{background:var(--bg)}
 
 .btn-log{width:100%;background:var(--accent);color:#1a1205;border:none;border-radius:10px;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:.95rem;padding:14px;cursor:pointer;transition:.12s}
 .btn-log:active{transform:scale(.99)}
+.btn-solid.flashed{background:var(--accent);color:#1a1205;border-color:var(--accent)}
 .btn-solid{background:var(--surface-2);border:1px solid var(--line);color:var(--ink);font-family:'Barlow',sans-serif;font-weight:600;font-size:.92rem;padding:0 16px;border-radius:10px;cursor:pointer}
 
 .set-list{list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:12px}
@@ -214,12 +221,13 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 <script>
 "use strict";
 
+var APP_VERSION = "1.1";
 var STORE_KEY = "block-tracker";
 
 /* ---------------------------------------------------------------
    Exercise library. `on` = enabled by default.
    unit/step mirror what the equipment actually moves in:
-     plate/barbell 1.25kg · dumbbells 2kg · machines & cables 5lb
+     plate/barbell 2.5kg · dumbbells 2kg · machines & cables 5lb
    body:true  -> added weight may be 0 (bodyweight move)
    timed:true -> reps are seconds; excluded from volume
 ----------------------------------------------------------------*/
@@ -230,31 +238,33 @@ var LIBRARY = [
   { name:"Cable internal rotation", type:"log", unit:"lb", step:5, note:"light", group:"Main", on:true },
   { name:"Cable front raise", type:"log", unit:"lb", step:5, note:"light", group:"Main", on:true },
   { name:"Seated row", type:"log", unit:"lb", step:5, group:"Main", on:true },
-  { name:"Bench press", type:"log", unit:"kg", step:1.25, group:"Main", on:true },
-  { name:"Preacher curl", type:"log", unit:"kg", step:1.25, group:"Main", on:true },
+  { name:"Seated Row Plates", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
+  { name:"Bench press", type:"log", unit:"kg", step:2.5, group:"Main", on:true },
+  { name:"Preacher curl", type:"log", unit:"kg", step:2.5, group:"Main", on:true },
   { name:"Skullcrushers", type:"log", unit:"kg", step:2, group:"Main", on:true },
   { name:"Dumbbell press", type:"log", unit:"kg", step:2, group:"Main", on:true },
   { name:"Seated dumbbell curl", type:"log", unit:"kg", step:2, group:"Main", on:true },
   { name:"Upright row (dumbbells)", type:"log", unit:"kg", step:2, group:"Main", on:true },
-  { name:"Leg press", type:"log", unit:"kg", step:1.25, group:"Main", on:true },
+  { name:"Leg press", type:"log", unit:"kg", step:2.5, group:"Main", on:true },
+  { name:"Lying leg press", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
   { name:"Hamstring curl", type:"log", unit:"lb", step:5, group:"Main", on:true },
   { name:"Lunge walk", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, group:"Main", on:true },
 
   { name:"Dead hang", type:"log", unit:"kg", step:2.5, body:true, timed:true, repLabel:"secs", repWord:"s", group:"Main", on:true },
   { name:"Chin ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, group:"Main", on:true },
   { name:"Pull ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, group:"Main", on:true },
-  { name:"Hip thrusters", type:"log", unit:"kg", step:1.25, group:"Main", on:true },
+  { name:"Hip thrusters", type:"log", unit:"kg", step:2.5, group:"Main", on:true },
   { name:"Leg raises", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.5, group:"Main", on:true },
 
   /* available, off by default */
   { name:"Cable crossovers", type:"log", unit:"lb", step:5, group:"Main", on:false },
   { name:"Pec deck", type:"log", unit:"lb", step:5, group:"Main", on:false },
   { name:"Dumbbell flys", type:"log", unit:"kg", step:2, group:"Main", on:false },
-  { name:"Decline bench press", type:"log", unit:"kg", step:1.25, group:"Main", on:false },
-  { name:"Incline bench press", type:"log", unit:"kg", step:1.25, group:"Main", on:false },
-  { name:"Shoulder press", type:"log", unit:"kg", step:1.25, group:"Main", on:false },
+  { name:"Decline bench press", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
+  { name:"Incline bench press", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
+  { name:"Shoulder press", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
   { name:"Lat pulldown", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Deadlift", type:"log", unit:"kg", step:1.25, group:"Main", on:false },
+  { name:"Deadlift", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
 
   /* bodyweight & floor work */
   { name:"Press-ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.65, group:"Main", on:true },
@@ -272,6 +282,7 @@ var LIBRARY = [
   { name:"Pallof press", type:"log", unit:"lb", step:5, group:"Main", on:false },
   { name:"Farmer carry", type:"log", unit:"kg", step:2, group:"Main", on:false },
   { name:"Step-ups", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, group:"Main", on:false },
+  { name:"Cable step-ups", type:"log", unit:"lb", step:5, group:"Main", on:false },
 
   { name:"Cool-down cardio", type:"cardio", note:"walk / jog / bike / row", group:"Cool", on:true },
   { name:"Stretch & mobility", type:"check", group:"Cool", on:true }
@@ -293,13 +304,13 @@ var METRICS = [
   { key: "systolic", label: "Blood pressure", unit: "mmHg systolic", good: "down", dp: 0, on:false, hint:"needs a home BP monitor" }
 ];
 
-var DEFAULTS = { "Bench press": 60, "Preacher curl": 30 };
+var DEFAULTS = { "Bench press": 60, "Preacher curl": 9 };
 
 var FRESH = ["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"];
 function freshColor(d){ return d==null ? "#3A444C" : FRESH[Math.min(d,7)]; }
 
 var UNIT_CHOICES = [
-  { label:"Barbell / plates · 1.25 kg", unit:"kg", step:1.25 },
+  { label:"Barbell / plates · 2.5 kg", unit:"kg", step:2.5 },
   { label:"Dumbbells · 2 kg", unit:"kg", step:2 },
   { label:"Machine / cable · 5 lb", unit:"lb", step:5 },
   { label:"Bodyweight · 2.5 kg added", unit:"kg", step:2.5, body:true }
@@ -347,6 +358,15 @@ function load(){
     Object.keys(s.enabled||{}).forEach(function(k){
       if(RENAMES[k]){ s.enabled[RENAMES[k]]=s.enabled[k]; delete s.enabled[k]; }
     });
+    /* one-time repair: custom plate exercises created before the 2.5kg fix */
+    (s.custom||[]).forEach(function(c){ if(c.unit==="kg" && c.step===1.25){ c.step=2.5; } });
+    /* de-dupe: drop any custom exercise that has since become a built-in (same name).
+       Logged sets stay; the built-in definition just takes over, and it becomes visible. */
+    var builtin={}; LIBRARY.forEach(function(e){ builtin[e.name]=1; });
+    s.custom=(s.custom||[]).filter(function(c){
+      if(builtin[c.name]){ if(!s.enabled) s.enabled={}; s.enabled[c.name]=true; return false; }
+      return true;
+    });
     return {
       blockStart: s.blockStart||base.blockStart,
       bodyweight: (s.bodyweight!=null? s.bodyweight : base.bodyweight),
@@ -370,7 +390,7 @@ var ui = {
   weight:20, reps:8,
   metricInputs:{},
   restoreText:"", backupOpen:false, backupMsg:"",
-  saveState:"idle", progEx:null, cal:0, guideOpen:false,
+  saveState:"idle", progEx:null, cal:0, guideOpen:false, flash:null, resetArmed:false,
   newName:"", newKind:0
 };
 METRICS.forEach(function(m){ ui.metricInputs[m.key]=""; });
@@ -697,18 +717,23 @@ function saveName(){
 }
 function saveHeight(){
   var el=document.getElementById("height-input");
-  var v=Number(el?el.value:NaN);
+  var v=Number(el? el.value : (ui.heightDraft!=null?ui.heightDraft:NaN));
   if(!v||v<=0) return;
   data.height=v;
+  ui.flash="height";
   commit();
+  setTimeout(function(){ if(ui.flash==="height"){ ui.flash=null; render(); } }, 1600);
 }
 function saveBodyweight(){
   var el=document.getElementById("bw-input");
-  var v=Number(el?el.value:NaN);
+  var v=Number(el? el.value : (ui.bwDraft!=null?ui.bwDraft:NaN));
   if(!v||v<=0) return;
+  ui.bwDraft=null;
   data.bodyweight=v;
   data.metrics.weight=data.metrics.weight.filter(function(p){return p.date!==todayISO();}).concat([{date:todayISO(),v:v}]);
+  ui.flash="bw";
   commit();
+  setTimeout(function(){ if(ui.flash==="bw"){ ui.flash=null; render(); } }, 1600);
 }
 function addMetric(key){
   var v=Number(ui.metricInputs[key]);
@@ -718,8 +743,11 @@ function addMetric(key){
   ui.metricInputs[key]="";
   commit();
 }
+function armReset(){ ui.resetArmed=true; render(); }
+function cancelReset(){ ui.resetArmed=false; render(); }
 function resetAll(){
-  if(confirm("Clear all logged data and start fresh?")){ data=seed(); ui.expanded=null; refreshCache(); save(); render(); }
+  if(!confirm("Erase EVERYTHING \u2014 all exercises, logged sets and measurements \u2014 and start from scratch? This can\u2019t be undone.")) return;
+  data=seed(); ui.expanded=null; ui.resetArmed=false; refreshCache(); save(); render();
 }
 function handleSave(){
   var ok=save();
@@ -796,7 +824,7 @@ function logView(){
     +'<div class="vc-value">'+dc.toLocaleString("en-GB")+'<span class="vc-unit">kcal</span></div></div>';
   html+='<div class="bw-row"><span class="date-label">Bodyweight</span>'
     +'<div class="bw-entry"><input id="bw-input" class="bw-input" inputmode="decimal" value="'+esc(data.bodyweight!=null?data.bodyweight:"")+'" placeholder="\u2014">'
-    +'<span class="bw-unit">kg</span><button class="btn-solid" data-action="savebw">Set</button></div></div>';
+    +'<span class="bw-unit">kg</span><button class="btn-solid'+(ui.flash==="bw"?" flashed":"")+'" data-action="savebw">'+(ui.flash==="bw"?"Saved \u2713":"Set")+'</button></div></div>';
 
   html+='<div class="legend"><span class="legend-txt">Just done</span>';
   FRESH.forEach(function(c){ html+='<span class="legend-swatch" style="background:'+c+'"></span>'; });
@@ -950,6 +978,16 @@ function setupView(){
     +'<div class="add-row"><select class="ex-select" data-action="newkind">';
   UNIT_CHOICES.forEach(function(k,i){ html+='<option value="'+i+'"'+(i===ui.newKind?" selected":"")+'>'+esc(k.label)+'</option>'; });
   html+='</select><button class="btn-solid" data-action="addcustom">Add</button></div></div>';
+
+  html+='<div class="section-head" style="margin-top:28px">Danger zone</div>';
+  if(!ui.resetArmed){
+    html+='<button class="reset-link" data-action="armreset">Reset all data\u2026</button>';
+  } else {
+    html+='<div class="reset-box"><div class="reset-warn">This wipes everything on this device \u2014 every exercise, all your logged sets, and your measurements. It cannot be undone. Back up first (Trends \u2192 Backup) if you\u2019re unsure.</div>'
+      +'<div class="reset-actions"><button class="btn-solid" data-action="cancelreset">Cancel</button>'
+      +'<button class="reset-confirm" data-action="reset">Erase everything</button></div></div>';
+  }
+  html+='<div class="version">Gym Tracker \u00b7 v'+APP_VERSION+'</div>';
   return html+'</main>';
 }
 
@@ -1014,7 +1052,7 @@ function trendsView(){
         html+='<div class="metric-caption">Waist-to-height <strong style="color:'+(ok?'var(--accent)':'var(--warn)')+'">'+whr.toFixed(2)+'</strong> \u00b7 under 0.50 is the usual healthy guide (that\u2019s a waist under '+Math.round(hgt*0.5)+' cm for you)</div>';
       } else {
         html+='<div class="metric-add"><input class="text-input" id="height-input" inputmode="decimal" placeholder="Your height in cm" value="'+esc(data.height||"")+'">'
-          +'<button class="btn-solid" data-action="saveheight">Set</button></div>'
+          +'<button class="btn-solid'+(ui.flash==="height"?" flashed":"")+'" data-action="saveheight">'+(ui.flash==="height"?"Saved \u2713":"Set")+'</button></div>'
           +'<div class="metric-caption">Add your height and this shows your waist-to-height ratio.</div>';
       }
     }
@@ -1072,7 +1110,7 @@ function render(){
     +'<button class="tab'+(ui.tab==="trends"?" on":"")+'" data-action="tab" data-arg="trends">Trends</button>'
     +'<button class="tab'+(ui.tab==="setup"?" on":"")+'" data-action="tab" data-arg="setup">Setup</button></nav>';
   html+= ui.tab==="log" ? logView() : (ui.tab==="trends" ? trendsView() : setupView());
-  html+='<footer class="app-footer"><button class="reset-btn" data-action="reset">Reset all data</button></footer></div>';
+  html+='</div>';
   document.getElementById("app").innerHTML=html;
 }
 
@@ -1084,7 +1122,7 @@ appEl.addEventListener("click",function(e){
   var a=el.dataset.action, arg=el.dataset.arg;
   switch(a){
     case "save": handleSave(); break;
-    case "tab": ui.tab=arg; ui.expanded=null; render(); break;
+    case "tab": ui.tab=arg; ui.expanded=null; ui.resetArmed=false; render(); break;
     case "check": toggleCheck(arg); break;
     case "expand": toggleExpand(arg); break;
     case "w-": case "w+": case "r-": case "r+": stepper(a); break;
@@ -1107,6 +1145,8 @@ appEl.addEventListener("click",function(e){
     case "emailsummary": emailSummary(); break;
     case "copysummary": copySummary(); break;
     case "restore": restoreBackup(); break;
+    case "armreset": armReset(); break;
+    case "cancelreset": cancelReset(); break;
     case "reset": resetAll(); break;
     default: break;
   }
@@ -1114,7 +1154,8 @@ appEl.addEventListener("click",function(e){
 appEl.addEventListener("input",function(e){
   var el=e.target;
   if(el.id==="cal-input") ui.cal=el.value;
-  else if(el.id==="height-input") data.height=el.value;
+  else if(el.id==="bw-input") ui.bwDraft=el.value;
+  else if(el.id==="height-input") ui.heightDraft=el.value;
   else if(el.id==="w-input") ui.weight=el.value;
   else if(el.id==="r-input") ui.reps=el.value;
   else if(el.id==="new-name") ui.newName=el.value;
