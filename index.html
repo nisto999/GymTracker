@@ -144,6 +144,8 @@ html,body{background:var(--bg)}
 .cons-bar{flex:1;height:8px;background:var(--surface-2);border-radius:5px;overflow:hidden}
 .cons-fill{height:100%;background:var(--ink-faint);border-radius:5px;transition:.3s}
 .cons-fill.hit{background:var(--accent)}
+.cons-fill.zero{background:var(--warn);opacity:.5}
+.ms-label{width:86px;font-size:.85rem}
 .cons-count{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.86rem;color:var(--ink-dim);width:34px;text-align:right}
 .cons-count.hit{color:var(--accent)}
 
@@ -221,7 +223,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 <script>
 "use strict";
 
-var APP_VERSION = "1.1";
+var APP_VERSION = "1.2";
 var STORE_KEY = "block-tracker";
 
 /* ---------------------------------------------------------------
@@ -239,8 +241,11 @@ var LIBRARY = [
   { name:"Cable front raise", type:"log", unit:"lb", step:5, note:"light", group:"Main", on:true },
   { name:"Seated row", type:"log", unit:"lb", step:5, group:"Main", on:true },
   { name:"Seated Row Plates", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
+  { name:"Cable reverse fly", type:"log", unit:"lb", step:5, group:"Main", on:false },
   { name:"Bench press", type:"log", unit:"kg", step:2.5, group:"Main", on:true },
   { name:"Preacher curl", type:"log", unit:"kg", step:2.5, group:"Main", on:true },
+  { name:"Barbell Curl", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
+  { name:"Dumbell Curl Reversed Bench", type:"log", unit:"kg", step:2, group:"Main", on:false },
   { name:"Skullcrushers", type:"log", unit:"kg", step:2, group:"Main", on:true },
   { name:"Dumbbell press", type:"log", unit:"kg", step:2, group:"Main", on:true },
   { name:"Seated dumbbell curl", type:"log", unit:"kg", step:2, group:"Main", on:true },
@@ -306,8 +311,42 @@ var METRICS = [
 
 var DEFAULTS = { "Bench press": 60, "Preacher curl": 9 };
 
+var MUSCLES = ["Chest","Back","Shoulders","Biceps","Triceps","Forearms","Quads","Hamstrings","Glutes","Calves","Core"];
+var MUSCLE_MAP = {
+  "Cable external rotation":{p:"Shoulders"}, "Cable internal rotation":{p:"Shoulders"}, "Cable front raise":{p:"Shoulders"},
+  "Seated row":{p:"Back",s:"Biceps"}, "Seated Row Plates":{p:"Back",s:"Biceps"},
+  "Bench press":{p:"Chest",s:"Triceps"}, "Preacher curl":{p:"Biceps"}, "Skullcrushers":{p:"Triceps"},
+  "Dumbbell press":{p:"Chest",s:"Triceps"}, "Seated dumbbell curl":{p:"Biceps"},
+  "Upright row (dumbbells)":{p:"Shoulders",s:"Biceps"}, "Leg press":{p:"Quads",s:"Glutes"}, "Lying leg press":{p:"Quads",s:"Glutes"},
+  "Hamstring curl":{p:"Hamstrings"}, "Lunge walk":{p:"Quads",s:"Glutes"},
+  "Dead hang":{p:"Forearms",s:"Back"}, "Chin ups":{p:"Back",s:"Biceps"}, "Pull ups":{p:"Back",s:"Biceps"},
+  "Hip thrusters":{p:"Glutes",s:"Hamstrings"}, "Leg raises":{p:"Core"},
+  "Cable crossovers":{p:"Chest"}, "Pec deck":{p:"Chest"}, "Dumbbell flys":{p:"Chest"},
+  "Decline bench press":{p:"Chest",s:"Triceps"}, "Incline bench press":{p:"Chest",s:"Triceps"},
+  "Shoulder press":{p:"Shoulders",s:"Triceps"}, "Lat pulldown":{p:"Back",s:"Biceps"}, "Deadlift":{p:"Back",s:"Hamstrings"},
+  "Calf raises":{p:"Calves"}, "Face pulls":{p:"Shoulders",s:"Back"}, "Rear delt fly":{p:"Shoulders",s:"Back"},
+  "Tricep pushdown":{p:"Triceps"}, "Pallof press":{p:"Core"}, "Farmer carry":{p:"Forearms",s:"Core"},
+  "Step-ups":{p:"Quads",s:"Glutes"}, "Cable step-ups":{p:"Quads",s:"Glutes"}, "Press-ups":{p:"Chest",s:"Triceps"},
+  "Squats":{p:"Quads",s:"Glutes"}, "Squat jumps":{p:"Quads",s:"Glutes"},
+  "Sit ups":{p:"Core"}, "Crunches":{p:"Core"}, "Plank":{p:"Core"},
+  "Cable reverse fly":{p:"Shoulders",s:"Back"}, "Barbell Curl":{p:"Biceps"},
+  "Dumbell Curl Reversed Bench":{p:"Biceps"}, "Cable Pull Through":{p:"Glutes",s:"Hamstrings"}
+};
+function muscleOf(name){
+  if(MUSCLE_MAP[name]) return MUSCLE_MAP[name];
+  var c=(data.custom||[]).filter(function(x){return x.name===name;})[0];
+  if(c && c.muscle) return {p:c.muscle, s:c.muscle2||null};
+  return null;
+}
 var FRESH = ["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"];
-function freshColor(d){ return d==null ? "#3A444C" : FRESH[Math.min(d,7)]; }
+function freshColor(d){
+  if(d==null || d>14) return "#3A444C";          // never done, or faded after 2 weeks
+  return FRESH[Math.min(7, Math.floor(d/2))];    // violet(today) -> red(~14 days)
+}
+function streakColor(d){                          // top strip: climbs to red and stays there
+  if(d==null) return "#3A444C";
+  return FRESH[Math.min(7, Math.floor(d/2))];
+}
 
 var UNIT_CHOICES = [
   { label:"Barbell / plates · 2.5 kg", unit:"kg", step:2.5 },
@@ -390,7 +429,7 @@ var ui = {
   weight:20, reps:8,
   metricInputs:{},
   restoreText:"", backupOpen:false, backupMsg:"",
-  saveState:"idle", progEx:null, cal:0, guideOpen:false, flash:null, resetArmed:false,
+  saveState:"idle", progEx:null, cal:0, guideOpen:false, flash:null, resetArmed:false, newMuscle:-1,
   newName:"", newKind:0
 };
 METRICS.forEach(function(m){ ui.metricInputs[m.key]=""; });
@@ -491,8 +530,8 @@ function stepsForGroup(key){
   if(key!=="Main") return list;
   return list.slice().sort(function(a,b){
     var da=daysSince(a.name), db=daysSince(b.name);
-    var ba = da==null ? 99 : Math.min(da,7);
-    var bb = db==null ? 99 : Math.min(db,7);
+    var ba = (da==null||da>14) ? 99 : da;
+    var bb = (db==null||db>14) ? 99 : db;
     if(ba!==bb) return ba-bb;
     return a.name.localeCompare(b.name);
   });
@@ -595,6 +634,20 @@ function copySummary(){
   else fail();
 }
 
+function muscleSets(win){
+  var end=todayISO(), start=daysAgoISO(win-1);
+  var c={}; MUSCLES.forEach(function(m){c[m]=0;});
+  var untagged=0;
+  data.sessions.forEach(function(sess){
+    if(sess.date<start||sess.date>end||!sess.sets.length) return;
+    var mm=muscleOf(sess.exercise);
+    if(!mm){ untagged+=sess.sets.length; return; }
+    var n=sess.sets.length;
+    if(mm.p && c[mm.p]!=null) c[mm.p]+=n;
+    if(mm.s && c[mm.s]!=null) c[mm.s]+=n*0.5;
+  });
+  return { counts:c, untagged:untagged };
+}
 function sparkline(series, good){
   if(!series || series.length<2) return '<div class="spark-empty">Add a second reading to see the trend</div>';
   var W=300,H=76,pad=8;
@@ -630,7 +683,8 @@ function addCustom(){
   if(EX_CACHE[nm]){ ui.newName=""; render(); return; }
   var k=UNIT_CHOICES[ui.newKind]||UNIT_CHOICES[0];
   data.custom=data.custom||[];
-  data.custom.push({ name:nm, unit:k.unit, step:k.step, body:!!k.body });
+  var pm=MUSCLES[ui.newMuscle]||null;
+  data.custom.push({ name:nm, unit:k.unit, step:k.step, body:!!k.body, muscle:pm });
   if(!data.enabled) data.enabled={};
   data.enabled[nm]=true;
   ui.newName="";
@@ -798,7 +852,7 @@ function statsView(){
   var wN=Object.keys(wdays).length;
   var total=0; data.sessions.forEach(function(s){ s.sets.forEach(function(x){ total+=setVolume(s.exercise,x); }); });
   var totalStr = total>=1000 ? (total/1000).toFixed(1)+' t' : Math.round(total)+' kg';
-  var dsw=daysSinceWorkout(), col=freshColor(dsw);
+  var dsw=daysSinceWorkout(), col=streakColor(dsw);
   var dswNum = dsw==null ? '\u2014' : dsw;
   var dswLabel = dsw==null ? 'No workouts yet' : (dsw===0 ? 'Trained today' : (dsw===1?'Day since last':'Days since last'));
   var lastTxt = lastWorkoutDate() ? 'Last workout '+fmtDate(lastWorkoutDate()) : 'Training since '+fmtDate(data.blockStart);
@@ -850,7 +904,7 @@ function logView(){
         if(openC){
           html+='<div class="sl-body"><div class="entry"><div class="entry-field" style="flex:1">'
             +'<div class="entry-label">Calories burned</div><div class="stepper">'
-            +'<button data-action="c-">\u2212</button><input id="cal-input" inputmode="numeric" value="'+esc(ui.cal)+'"><button data-action="c+">+</button>'
+            +'<button data-action="c-">\u2212</button><input id="cal-input" inputmode="numeric" onfocus="this.select()" value="'+esc(ui.cal)+'"><button data-action="c+">+</button>'
             +'</div><div class="entry-unit">kcal \u00b7 steps of 10 \u00b7 read it off the machine or your Watch</div></div></div>'
             +'<button class="btn-log" data-action="savecardio" data-arg="'+nm+'">Save</button></div>';
         }
@@ -977,7 +1031,11 @@ function setupView(){
     +'<input class="text-input" id="new-name" placeholder="Exercise name" value="'+esc(ui.newName)+'">'
     +'<div class="add-row"><select class="ex-select" data-action="newkind">';
   UNIT_CHOICES.forEach(function(k,i){ html+='<option value="'+i+'"'+(i===ui.newKind?" selected":"")+'>'+esc(k.label)+'</option>'; });
-  html+='</select><button class="btn-solid" data-action="addcustom">Add</button></div></div>';
+  html+='</select></div>';
+  html+='<select class="ex-select" data-action="newmuscle" style="width:100%;margin-top:9px"><option value="-1"'+(ui.newMuscle<0?" selected":"")+'>Main muscle (optional)\u2026</option>';
+  MUSCLES.forEach(function(m,i){ html+='<option value="'+i+'"'+(i===ui.newMuscle?" selected":"")+'>'+esc(m)+'</option>'; });
+  html+='</select>';
+  html+='<button class="btn-solid full" data-action="addcustom">Add exercise</button></div>';
 
   html+='<div class="section-head" style="margin-top:28px">Danger zone</div>';
   if(!ui.resetArmed){
@@ -1029,6 +1087,20 @@ function trendsView(){
   html+='<div class="metric-value-row"><span class="metric-value">'+Math.round(latestVol).toLocaleString("en-GB")+'</span></div>';
   html+= volSeries.length>=2 ? sparkline(volSeries,"up") : '<div class="spark-empty">Log another day to see the trend</div>';
   html+='<div class="metric-caption">Load \u00d7 reps, summed each day. Bodyweight moves count toward this; timed holds don\u2019t.</div></div>';
+
+  var msW=muscleSets(7);
+  html+='<div class="section-head">Muscle balance</div><div class="card">';
+  MUSCLES.forEach(function(m){
+    var n=msW.counts[m];
+    var disp = (n===Math.floor(n))? n : n.toFixed(1);
+    var pct=Math.min(n/12,1)*100;
+    var cls = n>=10 ? "hit" : (n===0 ? "zero" : "");
+    html+='<div class="cons-row"><span class="cons-label ms-label">'+esc(m)+'</span>'
+      +'<div class="cons-bar"><div class="cons-fill '+cls+'" style="width:'+pct+'%"></div></div>'
+      +'<span class="cons-count '+(n>=10?"hit":"")+'">'+disp+'</span></div>';
+  });
+  if(msW.untagged) html+='<div class="metric-caption">'+msW.untagged+' set(s) from untagged custom exercises aren\u2019t counted \u2014 set a muscle for them when adding.</div>';
+  html+='<div class="metric-caption">Sets per muscle over the last 7 days (a secondary muscle counts as half). Roughly 10+ builds, fewer maintains, 0 is a gap \u2014 a sanity-check, not a target to chase.</div></div>';
 
   var shownMetrics=METRICS.filter(function(m){return isMetricOn(m.key);});
   if(shownMetrics.length) html+='<div class="section-head">Metrics</div>';
@@ -1125,7 +1197,7 @@ appEl.addEventListener("click",function(e){
     case "tab": ui.tab=arg; ui.expanded=null; ui.resetArmed=false; render(); break;
     case "check": toggleCheck(arg); break;
     case "expand": toggleExpand(arg); break;
-    case "w-": case "w+": case "r-": case "r+": stepper(a); break;
+    case "w-": case "w+": case "r-": case "r+": case "c-": case "c+": stepper(a); break;
     case "logset": logSet(arg); break;
     case "delset": removeSet(arg, Number(el.dataset.idx)); break;
     case "metric": addMetric(arg); break;
@@ -1168,6 +1240,7 @@ appEl.addEventListener("change",function(e){
   if(!el) return;
   if(el.dataset.action==="progex"){ ui.progEx=el.value; render(); }
   else if(el.dataset.action==="newkind"){ ui.newKind=Number(el.value)||0; }
+  else if(el.dataset.action==="newmuscle"){ ui.newMuscle=Number(el.value); }
 });
 
 document.title = appTitle().replace(/\u2019/g,"'");
