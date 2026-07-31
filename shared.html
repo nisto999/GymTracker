@@ -529,11 +529,21 @@ function daysSince(name){
   if(!best) return null;
   return Math.max(0, daysBetween(best, todayISO()));
 }
+function sortRank(name){
+  /* days since last done BEFORE the day being logged — so logging today
+     doesn't make the row jump; the list only reshuffles between sessions */
+  var best=null;
+  function consider(d){ if(d < ui.logDate && (best==null || d>best)) best=d; }
+  data.sessions.forEach(function(s){ if(s.exercise===name && s.sets.length) consider(s.date); });
+  Object.keys(data.checks||{}).forEach(function(d){ if(data.checks[d][name]) consider(d); });
+  Object.keys(data.cardio||{}).forEach(function(d){ if(data.cardio[d][name]) consider(d); });
+  return best==null ? null : Math.max(0, daysBetween(best, todayISO()));
+}
 function stepsForGroup(key){
   var list=allExercises().filter(function(e){return e.group===key && isEnabled(e.name);});
   if(key!=="Main") return list;
   return list.slice().sort(function(a,b){
-    var da=daysSince(a.name), db=daysSince(b.name);
+    var da=sortRank(a.name), db=sortRank(b.name);
     var ba = (da==null||da>14) ? 99 : da;
     var bb = (db==null||db>14) ? 99 : db;
     if(ba!==bb) return ba-bb;

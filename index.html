@@ -29,6 +29,13 @@ html,body{background:var(--bg)}
 .brand-name.brand-long{letter-spacing:.06em;font-size:.88rem}
 .reset-btn{background:none;border:none;color:var(--ink-faint);font-family:'Barlow',sans-serif;font-size:.78rem;letter-spacing:.04em;cursor:pointer;padding:6px}
 .version{text-align:center;font-size:.72rem;color:var(--ink-faint);letter-spacing:.06em;margin-top:30px;font-family:'Barlow Semi Condensed',sans-serif}
+.day-filter{display:flex;gap:5px;margin-bottom:10px}
+.df-btn{flex:1;background:var(--surface);border:1px solid var(--line);color:var(--ink-dim);font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:.78rem;letter-spacing:.04em;padding:9px 4px;border-radius:9px;cursor:pointer}
+.df-btn.on{background:var(--surface-2);border-color:var(--accent);color:var(--accent)}
+.day-chip{flex:none;width:44px;padding:6px 0;border-radius:8px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-dim);font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.72rem;cursor:pointer}
+.day-chip.day-A{color:#6EA8FE;border-color:#33507a}
+.day-chip.day-B{color:#F2A93B;border-color:#7a5a1a}
+.day-chip.day-both{color:var(--ink-dim)}
 .reset-link{background:none;border:none;color:var(--ink-faint);font-family:'Barlow',sans-serif;font-size:.82rem;cursor:pointer;padding:8px 2px;text-decoration:underline}
 .reset-box{background:rgba(229,106,84,.08);border:1px solid var(--warn);border-radius:var(--radius);padding:14px}
 .reset-warn{font-size:.82rem;color:var(--ink);line-height:1.5;margin-bottom:12px}
@@ -263,7 +270,7 @@ var LIBRARY = [
 
   /* available, off by default */
   { name:"Cable crossovers", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Pec deck", type:"log", unit:"lb", step:5, group:"Main", on:false },
+  { name:"Pec deck", type:"log", unit:"lb", step:5, group:"Main", on:true },
   { name:"Dumbbell flys", type:"log", unit:"kg", step:2, group:"Main", on:false },
   { name:"Decline bench press", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
   { name:"Incline bench press", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
@@ -280,11 +287,11 @@ var LIBRARY = [
   { name:"Plank", type:"log", unit:"kg", step:2.5, body:true, timed:true, repLabel:"secs", repWord:"s", group:"Main", on:true },
 
   /* filling the gaps \u2014 off until you want them */
-  { name:"Calf raises", type:"log", unit:"lb", step:5, group:"Main", on:false },
+  { name:"Calf raises", type:"log", unit:"lb", step:5, group:"Main", on:true },
   { name:"Face pulls", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Rear delt fly", type:"log", unit:"kg", step:2, group:"Main", on:false },
+  { name:"Rear delt fly", type:"log", unit:"kg", step:2, group:"Main", on:true },
   { name:"Tricep pushdown", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Pallof press", type:"log", unit:"lb", step:5, group:"Main", on:false },
+  { name:"Pallof press", type:"log", unit:"lb", step:5, group:"Main", on:true },
   { name:"Farmer carry", type:"log", unit:"kg", step:2, group:"Main", on:false },
   { name:"Step-ups", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, group:"Main", on:false },
   { name:"Cable step-ups", type:"log", unit:"lb", step:5, group:"Main", on:false },
@@ -311,6 +318,20 @@ var METRICS = [
 
 var DEFAULTS = { "Bench press": 60, "Preacher curl": 9 };
 
+var DAY_DEFAULT = {
+  "Bench press":"A", "Pec deck":"A", "Skullcrushers":"A", "Leg press":"A", "Pallof press":"A", "Dumbbell press":"A",
+  "Seated Row Plates":"B", "Seated row":"B", "Rear delt fly":"B", "Face pulls":"B", "Barbell Curl":"B",
+  "Preacher curl":"B", "Seated dumbbell curl":"B", "Dumbell Curl Reversed Bench":"B",
+  "Cable Pull Through":"B", "Hamstring curl":"B", "Leg raises":"B", "Lunge walk":"B",
+  "Cable external rotation":"both", "Cable internal rotation":"both", "Cable front raise":"both",
+  "Cable reverse fly":"both", "Calf raises":"both"
+};
+function dayOf(name){
+  if(data.dayPlan && data.dayPlan[name]) return data.dayPlan[name];
+  return DAY_DEFAULT[name] || "both";
+}
+function setDay(name, d){ if(!data.dayPlan) data.dayPlan={}; data.dayPlan[name]=d; commit(); }
+function cycleDay(name){ var o={A:"B",B:"both",both:"A"}; setDay(name, o[dayOf(name)]||"A"); }
 var MUSCLES = ["Chest","Back","Shoulders","Biceps","Triceps","Forearms","Quads","Hamstrings","Glutes","Calves","Core"];
 var MUSCLE_MAP = {
   "Cable external rotation":{p:"Shoulders"}, "Cable internal rotation":{p:"Shoulders"}, "Cable front raise":{p:"Shoulders"},
@@ -370,7 +391,7 @@ function seed(){
     height: 185,
     userName: null,
     sessions: [], habits: {}, checks: {}, cardio: {},
-    enabled: {}, metricsOn: {}, custom: [],
+    enabled: {}, metricsOn: {}, custom: [], dayPlan: {},
     admin: { bloodwork: false },
     metrics: {
       weight: [{date:"2026-02-15",v:95.5},{date:"2026-07-15",v:98.5}],
@@ -412,7 +433,7 @@ function load(){
       height: (s.height!=null? s.height : base.height),
       userName: (s.userName!=null? s.userName : base.userName),
       sessions: s.sessions||[], habits: s.habits||{}, checks: s.checks||{}, cardio: s.cardio||{},
-      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[],
+      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], dayPlan: s.dayPlan||{},
       admin: Object.assign({},base.admin,s.admin||{}),
       metrics: Object.assign({},base.metrics,s.metrics||{})
     };
@@ -425,7 +446,7 @@ function save(){
 
 var data = load() || seed();
 var ui = {
-  tab:"log", expanded:null, logDate: todayISO(),
+  tab:"log", expanded:null, logDate: todayISO(), dayFilter:"all",
   weight:20, reps:8,
   metricInputs:{},
   restoreText:"", backupOpen:false, backupMsg:"",
@@ -525,11 +546,21 @@ function daysSince(name){
   if(!best) return null;
   return Math.max(0, daysBetween(best, todayISO()));
 }
+function sortRank(name){
+  /* days since last done BEFORE the day being logged — so logging today
+     doesn't make the row jump; the list only reshuffles between sessions */
+  var best=null;
+  function consider(d){ if(d < ui.logDate && (best==null || d>best)) best=d; }
+  data.sessions.forEach(function(s){ if(s.exercise===name && s.sets.length) consider(s.date); });
+  Object.keys(data.checks||{}).forEach(function(d){ if(data.checks[d][name]) consider(d); });
+  Object.keys(data.cardio||{}).forEach(function(d){ if(data.cardio[d][name]) consider(d); });
+  return best==null ? null : Math.max(0, daysBetween(best, todayISO()));
+}
 function stepsForGroup(key){
   var list=allExercises().filter(function(e){return e.group===key && isEnabled(e.name);});
   if(key!=="Main") return list;
   return list.slice().sort(function(a,b){
-    var da=daysSince(a.name), db=daysSince(b.name);
+    var da=sortRank(a.name), db=sortRank(b.name);
     var ba = (da==null||da>14) ? 99 : da;
     var bb = (db==null||db>14) ? 99 : db;
     if(ba!==bb) return ba-bb;
@@ -839,7 +870,7 @@ function restoreBackup(){
     height:(parsed.height!=null?parsed.height:base.height),
     userName:(parsed.userName!=null?parsed.userName:base.userName),
     sessions: parsed.sessions||[], habits: parsed.habits||{}, checks: parsed.checks||{}, cardio: parsed.cardio||{},
-    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[],
+    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], dayPlan: parsed.dayPlan||{},
     admin: Object.assign({},base.admin,parsed.admin||{}),
     metrics: Object.assign({},base.metrics,parsed.metrics||{})
   };
@@ -884,10 +915,21 @@ function logView(){
   FRESH.forEach(function(c){ html+='<span class="legend-swatch" style="background:'+c+'"></span>'; });
   html+='<span class="legend-txt">7d+</span></div>';
 
+  html+='<div class="day-filter">'
+    +'<button class="df-btn'+(ui.dayFilter==="all"?" on":"")+'" data-action="dayfilter" data-arg="all">All</button>'
+    +'<button class="df-btn'+(ui.dayFilter==="A"?" on":"")+'" data-action="dayfilter" data-arg="A">Day A · push</button>'
+    +'<button class="df-btn'+(ui.dayFilter==="B"?" on":"")+'" data-action="dayfilter" data-arg="B">Day B · pull</button></div>';
+
   GROUPS.forEach(function(g){
     var steps=stepsForGroup(g.key);
+    // filter Main exercises by the selected day; warm-up & cool-down always show
+    if(g.key==="Main" && ui.dayFilter!=="all"){
+      steps=steps.filter(function(e){ var d=dayOf(e.name); return d==="both" || d===ui.dayFilter; });
+    }
     if(!steps.length) return;
-    html+='<div class="section-head">'+esc(g.label)+'</div><div class="step-list">';
+    var head=esc(g.label);
+    if(g.key==="Main" && ui.dayFilter!=="all") head+=' \u00b7 '+(ui.dayFilter==="A"?"push":"pull");
+    html+='<div class="section-head">'+head+'</div><div class="step-list">';
     steps.forEach(function(step){
       var nm=esc(step.name);
       var noteHtml = step.note ? ' <em>\u00b7 '+esc(step.note)+'</em>' : '';
@@ -1001,7 +1043,7 @@ function setupView(){
     +'<input class="text-input" id="name-input" placeholder="e.g. Nick" value="'+esc(data.userName||"")+'">'
     +'<button class="btn-solid full" data-action="savename">Set title</button>'
     +'<div class="metric-caption">Puts your name on the app: \u201c'+esc(appTitle())+'\u201d. Stays on this device.</div></div>';
-  html+='<div class="setup-note" style="margin-top:16px">Switch things on to show them, off to hide them. Turning something off never deletes what you\u2019ve logged \u2014 switch it back on and your history is still there.</div>';
+  html+='<div class="setup-note" style="margin-top:16px">Switch things on to show them, off to hide them. The A / B / A+B chip sets which session an exercise belongs to \u2014 tap it to cycle. Turning something off never deletes what you\u2019ve logged \u2014 switch it back on and your history is still there.</div>';
   GROUPS.forEach(function(g){
     var list=allExercises().filter(function(e){return e.group===g.key;})
       .sort(function(a,b){return a.name.localeCompare(b.name);});
@@ -1011,9 +1053,11 @@ function setupView(){
       var on=isEnabled(e.name);
       var meta = e.type==="check" ? "tick to complete"
         : (e.unit+" \u00b7 steps of "+e.step+(e.body?" \u00b7 bodyweight":""));
+      var dayBtn = (g.key==="Main" && on) ? '<button class="day-chip day-'+dayOf(e.name)+'" data-action="cycleday" data-arg="'+esc(e.name)+'">'+(dayOf(e.name)==="both"?"A+B":dayOf(e.name))+'</button>' : '';
       html+='<div class="lib-row"><div class="lib-main"><div class="lib-name">'+esc(e.name)+'</div>'
         +'<div class="lib-meta">'+esc(meta)+(e.custom?" \u00b7 yours":"")+'</div>'
         +'</div>'
+        +dayBtn
         +(e.custom?'<button class="lib-del" data-action="delcustom" data-arg="'+esc(e.name)+'">\u00d7</button>':'')
         +'<button class="toggle'+(on?" on":"")+'" data-action="toggleex" data-arg="'+esc(e.name)+'" aria-pressed="'+on+'"><span class="toggle-knob"></span></button></div>';
     });
@@ -1207,6 +1251,8 @@ appEl.addEventListener("click",function(e){
     case "savecardio": saveCardio(arg); break;
     case "admin": toggleAdmin(); break;
     case "toggleex": toggleEnabled(arg); break;
+    case "dayfilter": ui.dayFilter=arg; ui.expanded=null; render(); break;
+    case "cycleday": cycleDay(arg); break;
     case "togglemetric": toggleMetric(arg); break;
     case "addcustom": addCustom(); break;
     case "delcustom": removeCustom(arg); break;
