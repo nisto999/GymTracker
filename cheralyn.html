@@ -257,6 +257,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 "use strict";
 
 var APP_VERSION = "1.4";
+var FILE_NAME = "Cheralyn";
 var STORE_KEY = "gym-tracker-shared";
 
 /* ---------------------------------------------------------------
@@ -428,7 +429,7 @@ var UNIT_CHOICES = [
 
 function todayISO(){ return new Date().toISOString().slice(0,10); }
 function appTitle(){
-  var n=(data.userName||"").trim();
+  var n=(data.userName||FILE_NAME||"").trim();
   if(!n) return "GYM TRACKER";
   var last=n.charAt(n.length-1).toLowerCase();
   return n + (last==="s" ? "\u2019" : "\u2019s") + " GYM TRACKER";

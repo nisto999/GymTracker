@@ -5,18 +5,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Gym Tracker">
-<meta name="theme-color" content="#14171A">
+<meta name="theme-color" content="#FDF4EE">
+<link rel="apple-touch-icon" href="caitlyn-icon.png">
+<link rel="icon" type="image/png" href="caitlyn-icon.png">
 <title>Gym Tracker</title>
 <style>
 
 @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap');
 
 :root{
-  --bg:#14171A; --surface:#1B2126; --surface-2:#222A30; --line:#2C353C;
-  --ink:#EDF1F3; --ink-dim:#8B97A0; --ink-faint:#5A656D;
-  --accent:#F2A93B; --accent-deep:#C77D1A; --warn:#E56A54; --radius:12px;
+  --bg:#FDF4EE; --surface:#FFFFFF; --surface-2:#FCEAF1; --line:#F0DBE4;
+  --ink:#4A3540; --ink-dim:#9B8790; --ink-faint:#C4B2BB;
+  --accent:#E87BA6; --accent-deep:#D45C8C; --warn:#E0607A; --radius:12px;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg)}
@@ -34,12 +36,12 @@ html,body{background:var(--bg)}
 .reset-warn{font-size:.82rem;color:var(--ink);line-height:1.5;margin-bottom:12px}
 .reset-actions{display:flex;gap:8px}
 .reset-actions .btn-solid{flex:1;padding:11px 0;text-align:center}
-.reset-confirm{flex:1;padding:11px 0;background:var(--warn);color:#1a0805;border:none;border-radius:10px;font-family:'Barlow',sans-serif;font-weight:700;cursor:pointer}
+.reset-confirm{flex:1;padding:11px 0;background:var(--warn);color:#3A1226;border:none;border-radius:10px;font-family:'Barlow',sans-serif;font-weight:700;cursor:pointer}
 .top-actions{display:flex;align-items:center;gap:10px}
-.save-btn{background:var(--accent);color:#1a1205;border:none;border-radius:8px;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.76rem;padding:8px 14px;cursor:pointer;transition:.14s;min-width:74px}
+.save-btn{background:var(--accent);color:#3A1226;border:none;border-radius:8px;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.76rem;padding:8px 14px;cursor:pointer;transition:.14s;min-width:74px}
 .save-btn:active{transform:scale(.97)}
 .save-btn.saved{background:transparent;color:var(--accent);border:1px solid var(--accent)}
-.save-btn.error{background:var(--warn);color:#1a0805}
+.save-btn.error{background:var(--warn);color:#3A1226}
 
 .stats-card{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 14px 16px;margin-bottom:14px}
 .stats-strip{position:absolute;top:0;left:0;right:0;height:4px;transition:background .3s}
@@ -78,7 +80,7 @@ html,body{background:var(--bg)}
 
 .step-list{display:flex;flex-direction:column;gap:8px}
 .step-check{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px;cursor:pointer;min-height:50px;transition:.14s}
-.step-check.on{background:rgba(242,169,59,.1);border-color:var(--accent)}
+.step-check.on{background:rgba(232,123,166,.12);border-color:var(--accent)}
 .sc-box{flex:none;width:22px;height:22px;border-radius:6px;border:1.5px solid var(--line);display:grid;place-items:center;color:var(--bg);font-size:.85rem}
 .step-check.on .sc-box{background:var(--accent);border-color:var(--accent)}
 .sc-name{font-weight:600;font-size:.98rem;color:var(--ink)}
@@ -110,9 +112,9 @@ html,body{background:var(--bg)}
 .stepper input:focus{outline:none}
 .entry-unit{font-size:.7rem;color:var(--ink-faint);margin-top:5px}
 
-.btn-log{width:100%;background:var(--accent);color:#1a1205;border:none;border-radius:10px;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:.95rem;padding:14px;cursor:pointer;transition:.12s}
+.btn-log{width:100%;background:var(--accent);color:#3A1226;border:none;border-radius:10px;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:.95rem;padding:14px;cursor:pointer;transition:.12s}
 .btn-log:active{transform:scale(.99)}
-.btn-solid.flashed{background:var(--accent);color:#1a1205;border-color:var(--accent)}
+.btn-solid.flashed{background:var(--accent);color:#3A1226;border-color:var(--accent)}
 .btn-solid{background:var(--surface-2);border:1px solid var(--line);color:var(--ink);font-family:'Barlow',sans-serif;font-weight:600;font-size:.92rem;padding:0 16px;border-radius:10px;cursor:pointer}
 
 .set-list{list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:12px}
@@ -125,7 +127,7 @@ html,body{background:var(--bg)}
 
 .chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .chip{display:flex;align-items:center;gap:7px;justify-content:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;color:var(--ink-dim);font-family:'Barlow',sans-serif;font-weight:600;font-size:.92rem;padding:13px 8px;cursor:pointer;transition:.14s;min-height:48px}
-.chip-on{background:rgba(242,169,59,.12);border-color:var(--accent);color:var(--ink)}
+.chip-on{background:rgba(232,123,166,.14);border-color:var(--accent);color:var(--ink)}
 .chip-tick{width:16px;height:16px;border-radius:4px;display:grid;place-items:center;font-size:.72rem;color:var(--bg);background:var(--accent);opacity:0;transition:.14s}
 .chip-on .chip-tick{opacity:1}
 .chip:not(.chip-on) .chip-tick{background:transparent;border:1.5px solid var(--line)}
@@ -169,7 +171,7 @@ html,body{background:var(--bg)}
 .spark-empty{font-size:.82rem;color:var(--ink-faint);padding:14px 0 4px;font-style:italic}
 
 .admin{width:100%;display:flex;align-items:flex-start;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;cursor:pointer;transition:.14s}
-.admin-done{background:rgba(242,169,59,.1);border-color:var(--accent)}
+.admin-done{background:rgba(232,123,166,.12);border-color:var(--accent)}
 .admin-tick{flex:none;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;border:1.5px solid var(--line);color:var(--bg);font-size:.85rem;margin-top:1px}
 .admin-done .admin-tick{background:var(--accent);border-color:var(--accent)}
 .admin-text{display:flex;flex-direction:column;gap:3px;color:var(--ink);font-weight:600;font-size:.98rem}
@@ -225,13 +227,13 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .toggle{flex:none;width:50px;height:28px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);position:relative;cursor:pointer;transition:.16s}
 .toggle.on{background:var(--accent);border-color:var(--accent)}
 .toggle-knob{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:var(--ink-faint);transition:.16s}
-.toggle.on .toggle-knob{left:24px;background:#1a1205}
+.toggle.on .toggle-knob{left:24px;background:#3A1226}
 .lib-del{flex:none;background:none;border:none;color:var(--ink-faint);font-size:1.2rem;cursor:pointer;padding:4px 6px}
 .add-form{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px}
 .add-form .text-input{width:100%;margin-bottom:9px}
 .add-row{display:flex;gap:8px}
 .add-row .ex-select{flex:1}
-.firstrun{font-size:.84rem;color:var(--ink);background:rgba(242,169,59,.1);border:1px solid var(--accent);border-radius:10px;padding:13px;margin:8px 0 4px;line-height:1.5}
+.firstrun{font-size:.84rem;color:var(--ink);background:rgba(232,123,166,.12);border:1px solid var(--accent);border-radius:10px;padding:13px;margin:8px 0 4px;line-height:1.5}
 .firstrun strong{display:block;font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.75rem;color:var(--accent);margin-bottom:8px}
 .fr-list{margin:0;padding-left:18px;color:var(--ink-dim)}
 .fr-list li{margin-bottom:6px}
@@ -257,6 +259,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 "use strict";
 
 var APP_VERSION = "1.4";
+var FILE_NAME = "Caitlyn";
 var STORE_KEY = "gym-tracker-shared";
 
 /* ---------------------------------------------------------------
@@ -428,7 +431,7 @@ var UNIT_CHOICES = [
 
 function todayISO(){ return new Date().toISOString().slice(0,10); }
 function appTitle(){
-  var n=(data.userName||"").trim();
+  var n=(data.userName||FILE_NAME||"").trim();
   if(!n) return "GYM TRACKER";
   var last=n.charAt(n.length-1).toLowerCase();
   return n + (last==="s" ? "\u2019" : "\u2019s") + " GYM TRACKER";
