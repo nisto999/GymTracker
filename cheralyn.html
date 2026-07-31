@@ -412,7 +412,7 @@ function muscleOf(name){
   if(c && c.muscle) return {p:c.muscle, s:c.muscle2||null};
   return null;
 }
-var FRESH = ["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"];
+var FRESH = ["#636F65","#6E7A63","#8A8A5C","#B07C34","#A96A4A","#A85D5A","#8F4038","#7C2E2C"];  // Farrow & Ball earth tones: Green Smoke -> Picture Gallery Red
 function freshColor(d){
   if(d==null || d>14) return "#3A444C";          // never done, or faded after 2 weeks
   return FRESH[Math.min(7, Math.floor(d/2))];    // violet(today) -> red(~14 days)
