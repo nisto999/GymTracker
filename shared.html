@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Gym Tracker">
 <meta name="theme-color" content="#14171A">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
 <title>Gym Tracker</title>
 <style>
 
@@ -16,8 +18,18 @@
 :root{
   --bg:#14171A; --surface:#1B2126; --surface-2:#222A30; --line:#2C353C;
   --ink:#EDF1F3; --ink-dim:#8B97A0; --ink-faint:#5A656D;
-  --accent:#F2A93B; --accent-deep:#C77D1A; --warn:#E56A54; --radius:12px;
+  --accent:#F2A93B; --accent-deep:#C77D1A; --warn:#E56A54; --radius:12px; --accent-soft:rgba(242,169,59,.12); --on-accent:#1a1205; --on-warn:#1a0805;
 }
+html[data-theme="pink"]{--bg:#FDF4EE;--surface:#FFFFFF;--surface-2:#FCEAF1;--line:#F0DBE4;--ink:#4A3540;--ink-dim:#9B8790;--ink-faint:#C4B2BB;--accent:#E87BA6;--accent-deep:#B23A6E;--warn:#C67B5C;--accent-soft:rgba(232,123,166,.12);--on-accent:#161616;--on-warn:#161616}
+html[data-theme="putty"]{--bg:#EDE4D6;--surface:#F7F1E7;--surface-2:#E6DBC9;--line:#D7C9B4;--ink:#4A4038;--ink-dim:#8C7F70;--ink-faint:#B4A793;--accent:#7E5B58;--accent-deep:#6F4E4B;--warn:#B57A72;--accent-soft:rgba(126,91,88,.14);--on-accent:#ffffff;--on-warn:#161616}
+html[data-theme="slate"]{--bg:#10151B;--surface:#182029;--surface-2:#212D38;--line:#2E3B48;--ink:#E7EEF3;--ink-dim:#8A99A6;--ink-faint:#566470;--accent:#3FB8A6;--accent-deep:#4FD0BC;--warn:#E0785F;--accent-soft:rgba(63,184,166,.13);--on-accent:#161616;--on-warn:#161616}
+html[data-theme="sage"]{--bg:#F3F5F1;--surface:#FBFCF9;--surface-2:#E8ECE3;--line:#D8DDD0;--ink:#33372F;--ink-dim:#6E7568;--ink-faint:#A2A899;--accent:#3E8E63;--accent-deep:#2F6E4C;--warn:#C67B5C;--accent-soft:rgba(62,142,99,.13);--on-accent:#161616;--on-warn:#161616}
+html[data-theme="ink"]{--bg:#FFFFFF;--surface:#F7F8FA;--surface-2:#EDEFF3;--line:#DDE1E8;--ink:#14181F;--ink-dim:#5A6472;--ink-faint:#9098A5;--accent:#2563EB;--accent-deep:#1D4FD0;--warn:#E0603F;--accent-soft:rgba(37,99,235,.12);--on-accent:#ffffff;--on-warn:#161616}
+html[data-theme="military"]{--bg:#15180F;--surface:#1C2015;--surface-2:#262B1C;--line:#343A27;--ink:#E9E7D4;--ink-dim:#9EA187;--ink-faint:#676B51;--accent:#C2A24E;--accent-deep:#D8BE6E;--warn:#D2795A;--accent-soft:rgba(194,162,78,.13);--on-accent:#161616;--on-warn:#161616}
+html[data-theme="midnight"]{--bg:#0E1220;--surface:#161B2C;--surface-2:#1F2740;--line:#2C3654;--ink:#E6E9F2;--ink-dim:#8B93A8;--ink-faint:#565F76;--accent:#E0B24C;--accent-deep:#EFC96E;--warn:#E0785F;--accent-soft:rgba(224,178,76,.13);--on-accent:#161616;--on-warn:#161616}
+html[data-theme="graphite"]{--bg:#131313;--surface:#1C1C1D;--surface-2:#262627;--line:#363638;--ink:#ECECEC;--ink-dim:#9A9A9C;--ink-faint:#636365;--accent:#B0B0B6;--accent-deep:#D2D2D8;--warn:#CC6B5A;--accent-soft:rgba(176,176,182,.14);--on-accent:#161616;--on-warn:#161616}
+html[data-theme="violet"]{--bg:#FCFCFD;--surface:#F4F5F8;--surface-2:#EBEDF2;--line:#DBDFE7;--ink:#16181D;--ink-dim:#59606C;--ink-faint:#9198A4;--accent:#7C3AED;--accent-deep:#5B21B6;--warn:#E11D48;--accent-soft:rgba(124,58,237,.12);--on-accent:#ffffff;--on-warn:#ffffff}
+
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg)}
 .root{font-family:'Barlow',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;max-width:520px;margin:0 auto;padding:0 16px calc(56px + env(safe-area-inset-bottom));-webkit-font-smoothing:antialiased}
@@ -30,16 +42,16 @@ html,body{background:var(--bg)}
 .reset-btn{background:none;border:none;color:var(--ink-faint);font-family:'Barlow',sans-serif;font-size:.78rem;letter-spacing:.04em;cursor:pointer;padding:6px}
 .version{text-align:center;font-size:.72rem;color:var(--ink-faint);letter-spacing:.06em;margin-top:30px;font-family:'Barlow Semi Condensed',sans-serif}
 .reset-link{background:none;border:none;color:var(--ink-faint);font-family:'Barlow',sans-serif;font-size:.82rem;cursor:pointer;padding:8px 2px;text-decoration:underline}
-.reset-box{background:rgba(229,106,84,.08);border:1px solid var(--warn);border-radius:var(--radius);padding:14px}
+.reset-box{background:var(--surface-2);border:1px solid var(--warn);border-radius:var(--radius);padding:14px}
 .reset-warn{font-size:.82rem;color:var(--ink);line-height:1.5;margin-bottom:12px}
 .reset-actions{display:flex;gap:8px}
 .reset-actions .btn-solid{flex:1;padding:11px 0;text-align:center}
-.reset-confirm{flex:1;padding:11px 0;background:var(--warn);color:#1a0805;border:none;border-radius:10px;font-family:'Barlow',sans-serif;font-weight:700;cursor:pointer}
+.reset-confirm{flex:1;padding:11px 0;background:var(--warn);color:var(--on-warn);border:none;border-radius:10px;font-family:'Barlow',sans-serif;font-weight:700;cursor:pointer}
 .top-actions{display:flex;align-items:center;gap:10px}
-.save-btn{background:var(--accent);color:#1a1205;border:none;border-radius:8px;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.76rem;padding:8px 14px;cursor:pointer;transition:.14s;min-width:74px}
+.save-btn{background:var(--accent);color:var(--on-accent);border:none;border-radius:8px;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.76rem;padding:8px 14px;cursor:pointer;transition:.14s;min-width:74px}
 .save-btn:active{transform:scale(.97)}
 .save-btn.saved{background:transparent;color:var(--accent);border:1px solid var(--accent)}
-.save-btn.error{background:var(--warn);color:#1a0805}
+.save-btn.error{background:var(--warn);color:var(--on-warn)}
 
 .stats-card{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 14px 16px;margin-bottom:14px}
 .stats-strip{position:absolute;top:0;left:0;right:0;height:4px;transition:background .3s}
@@ -47,6 +59,9 @@ html,body{background:var(--bg)}
 .stat{flex:1;text-align:center}
 .stat-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.55rem;line-height:1;color:var(--ink)}
 .stat-label{font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.62rem;color:var(--ink-dim);margin-top:7px;line-height:1.25}
+.stat-tap{flex:1;text-align:center;background:none;border:none;padding:0;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.stat-tap:active{opacity:.55}
+.tap-cyc{color:var(--accent);margin-left:3px;font-size:.9em}
 .stat-div{width:1px;align-self:stretch;background:var(--line);margin:0 6px}
 .stats-since{text-align:center;font-size:.72rem;color:var(--ink-faint);margin-top:13px;font-family:'Barlow Semi Condensed',sans-serif;letter-spacing:.05em}
 
@@ -78,7 +93,7 @@ html,body{background:var(--bg)}
 
 .step-list{display:flex;flex-direction:column;gap:8px}
 .step-check{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px;cursor:pointer;min-height:50px;transition:.14s}
-.step-check.on{background:rgba(242,169,59,.1);border-color:var(--accent)}
+.step-check.on{background:var(--accent-soft);border-color:var(--accent)}
 .sc-box{flex:none;width:22px;height:22px;border-radius:6px;border:1.5px solid var(--line);display:grid;place-items:center;color:var(--bg);font-size:.85rem}
 .step-check.on .sc-box{background:var(--accent);border-color:var(--accent)}
 .sc-name{font-weight:600;font-size:.98rem;color:var(--ink)}
@@ -110,9 +125,9 @@ html,body{background:var(--bg)}
 .stepper input:focus{outline:none}
 .entry-unit{font-size:.7rem;color:var(--ink-faint);margin-top:5px}
 
-.btn-log{width:100%;background:var(--accent);color:#1a1205;border:none;border-radius:10px;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:.95rem;padding:14px;cursor:pointer;transition:.12s}
+.btn-log{width:100%;background:var(--accent);color:var(--on-accent);border:none;border-radius:10px;font-family:'Barlow Semi Condensed',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:.95rem;padding:14px;cursor:pointer;transition:.12s}
 .btn-log:active{transform:scale(.99)}
-.btn-solid.flashed{background:var(--accent);color:#1a1205;border-color:var(--accent)}
+.btn-solid.flashed{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .btn-solid{background:var(--surface-2);border:1px solid var(--line);color:var(--ink);font-family:'Barlow',sans-serif;font-weight:600;font-size:.92rem;padding:0 16px;border-radius:10px;cursor:pointer}
 
 .set-list{list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:12px}
@@ -122,10 +137,15 @@ html,body{background:var(--bg)}
 .set-x{color:var(--ink-faint);margin:0 3px;font-weight:500}
 .set-unit{font-size:.72rem;color:var(--ink-faint);font-weight:500;margin-left:5px}
 .set-del{background:none;border:none;color:var(--ink-faint);font-size:1.2rem;cursor:pointer;line-height:1}
+.metric-log{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.metric-log li{display:flex;align-items:center;gap:12px;background:var(--surface-2);border-radius:8px;padding:7px 12px}
+.mlog-date{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--ink-faint);min-width:54px}
+.mlog-val{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1rem;flex:1}
+.mlog-del{background:none;border:none;color:var(--ink-faint);font-size:1.2rem;cursor:pointer;line-height:1;padding:0 2px}
 
 .chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
 .chip{display:flex;align-items:center;gap:7px;justify-content:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;color:var(--ink-dim);font-family:'Barlow',sans-serif;font-weight:600;font-size:.92rem;padding:13px 8px;cursor:pointer;transition:.14s;min-height:48px}
-.chip-on{background:rgba(242,169,59,.12);border-color:var(--accent);color:var(--ink)}
+.chip-on{background:var(--accent-soft);border-color:var(--accent);color:var(--ink)}
 .chip-tick{width:16px;height:16px;border-radius:4px;display:grid;place-items:center;font-size:.72rem;color:var(--bg);background:var(--accent);opacity:0;transition:.14s}
 .chip-on .chip-tick{opacity:1}
 .chip:not(.chip-on) .chip-tick{background:transparent;border:1.5px solid var(--line)}
@@ -169,7 +189,7 @@ html,body{background:var(--bg)}
 .spark-empty{font-size:.82rem;color:var(--ink-faint);padding:14px 0 4px;font-style:italic}
 
 .admin{width:100%;display:flex;align-items:flex-start;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;cursor:pointer;transition:.14s}
-.admin-done{background:rgba(242,169,59,.1);border-color:var(--accent)}
+.admin-done{background:var(--accent-soft);border-color:var(--accent)}
 .admin-tick{flex:none;width:22px;height:22px;border-radius:6px;display:grid;place-items:center;border:1.5px solid var(--line);color:var(--bg);font-size:.85rem;margin-top:1px}
 .admin-done .admin-tick{background:var(--accent);border-color:var(--accent)}
 .admin-text{display:flex;flex-direction:column;gap:3px;color:var(--ink);font-weight:600;font-size:.98rem}
@@ -191,6 +211,10 @@ html,body{background:var(--bg)}
 .timer-set{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
 .timer-display{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:2.6rem;line-height:1;color:var(--accent);margin-bottom:10px}
 .timer-display.over{color:var(--warn)}
+.timer-display.working{color:var(--ink)}
+.timer-display.met{color:var(--accent)}
+.timer-status{font-size:.8rem;color:var(--ink-dim);font-weight:600;margin:-2px 0 10px}
+.timer-status.met{color:var(--accent)}
 .timer-stop{background:var(--warn)}
 .timer-hint{font-size:.72rem;color:var(--ink-faint);margin-top:8px}
 .base-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px;padding-top:11px;border-top:1px solid var(--line)}
@@ -225,17 +249,17 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .toggle{flex:none;width:50px;height:28px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);position:relative;cursor:pointer;transition:.16s}
 .toggle.on{background:var(--accent);border-color:var(--accent)}
 .toggle-knob{position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:var(--ink-faint);transition:.16s}
-.toggle.on .toggle-knob{left:24px;background:#1a1205}
+.toggle.on .toggle-knob{left:24px;background:var(--on-accent)}
 .lib-del{flex:none;background:none;border:none;color:var(--ink-faint);font-size:1.2rem;cursor:pointer;padding:4px 6px}
 .add-form{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px}
 .add-form .text-input{width:100%;margin-bottom:9px}
 .add-row{display:flex;gap:8px}
 .add-row .ex-select{flex:1}
-.firstrun{font-size:.84rem;color:var(--ink);background:rgba(242,169,59,.1);border:1px solid var(--accent);border-radius:10px;padding:13px;margin:8px 0 4px;line-height:1.5}
-.firstrun strong{display:block;font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.75rem;color:var(--accent);margin-bottom:8px}
+.firstrun{font-size:.84rem;color:var(--ink);background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:13px;margin:8px 0 4px;line-height:1.5}
+.firstrun strong{display:block;font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.75rem;color:var(--accent-deep);margin-bottom:8px}
 .fr-list{margin:0;padding-left:18px;color:var(--ink-dim)}
 .fr-list li{margin-bottom:6px}
-.fr-list em{font-style:normal;color:var(--accent);font-weight:600}
+.fr-list em{font-style:normal;color:var(--accent-deep);font-weight:600}
 .fr-foot{color:var(--ink-faint);font-size:.78rem;margin-top:9px}
 .wk-block{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
 .wk-h{font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:.7rem;color:var(--accent);margin-bottom:8px}
@@ -248,7 +272,13 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .guide-item:last-child{margin-bottom:0}
 .guide-h{font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem;color:var(--accent);margin-bottom:5px}
 .guide-p{font-size:.85rem;color:var(--ink-dim);line-height:1.55}
+.help-chip{display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--ink-dim);font-family:'Barlow Semi Condensed',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;padding:0;margin-left:7px;flex:none;line-height:1;vertical-align:middle;position:relative;top:-1px}
+.help-chip.open{border-color:var(--accent);color:var(--ink)}
+.help-tip{font-size:.82rem;color:var(--ink);line-height:1.55;background:var(--surface-2);border-left:2px solid var(--accent);border-radius:8px;padding:10px 12px;margin:2px 2px 12px}
 .setup-note{font-size:.78rem;color:var(--ink-dim);line-height:1.5;margin:0 2px 10px}
+.theme-pick{display:flex;align-items:center;gap:10px;margin:4px 0 2px}
+.theme-select{flex:1}
+.theme-dot{width:13px;height:13px;border-radius:50%;margin-right:10px;flex:none;border:1px solid rgba(128,128,128,.3)}
 </style>
 </head>
 <body>
@@ -256,7 +286,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 <script>
 "use strict";
 
-var APP_VERSION = "1.4";
+var APP_VERSION = "2.5";
 var STORE_KEY = "gym-tracker-shared";
 
 /* ---------------------------------------------------------------
@@ -409,7 +439,17 @@ function muscleOf(name){
   if(c && c.muscle) return {p:c.muscle, s:c.muscle2||null};
   return null;
 }
-var FRESH = ["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"];
+var FRESH_SCALES={charcoal:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],pink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],putty:["#636F65","#6E7A63","#8A8A5C","#B07C34","#A96A4A","#A85D5A","#8F4038","#7C2E2C"],slate:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],sage:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],ink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],military:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],midnight:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],graphite:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],violet:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"]};
+var THEMES=[{k:"auto",name:"Auto (match phone)"},{k:"charcoal",name:"Charcoal & Amber"},{k:"pink",name:"Pink & Cream"},{k:"putty",name:"Putty & Rose"},{k:"slate",name:"Slate & Teal"},{k:"sage",name:"Sage & Chalk"},{k:"ink",name:"Ink & Electric"},{k:"military",name:"Olive & Brass"},{k:"midnight",name:"Midnight & Gold"},{k:"graphite",name:"Graphite & Silver"},{k:"violet",name:"Violet & Snow"}];
+var THEME_ACCENT={charcoal:"#F2A93B",pink:"#E87BA6",putty:"#7E5B58",slate:"#3FB8A6",sage:"#3E8E63",ink:"#2563EB",military:"#C2A24E",midnight:"#E0B24C",graphite:"#B0B0B6",violet:"#7C3AED"};
+var THEME_BG={charcoal:"#14171A",pink:"#FDF4EE",putty:"#EDE4D6",slate:"#10151B",sage:"#F3F5F1",ink:"#FFFFFF",military:"#15180F",midnight:"#0E1220",graphite:"#131313",violet:"#FCFCFD"};
+var THEME_KEY=STORE_KEY+"-theme";
+var currentTheme=(function(){try{return localStorage.getItem(THEME_KEY)||"charcoal";}catch(e){return "charcoal";}})();
+var FRESH=FRESH_SCALES.charcoal;
+function resolveTheme(){if(currentTheme==="auto"){var d=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;return d?"charcoal":"ink";}return FRESH_SCALES[currentTheme]?currentTheme:"charcoal";}
+function applyTheme(t){if(t){currentTheme=t;try{localStorage.setItem(THEME_KEY,t);}catch(e){}}var eff=resolveTheme();document.documentElement.setAttribute("data-theme",eff);FRESH=FRESH_SCALES[eff]||FRESH_SCALES.charcoal;var mc=document.querySelector('meta[name="theme-color"]');if(mc){mc.setAttribute("content",THEME_BG[eff]||"#14171A");}}
+applyTheme(currentTheme);
+if(window.matchMedia){try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(currentTheme==="auto"){applyTheme();if(typeof render==="function")render();}});}catch(e){}}
 function freshColor(d){
   if(d==null || d>14) return "#3A444C";          // never done, or faded after 2 weeks
   return FRESH[Math.min(7, Math.floor(d/2))];    // violet(today) -> red(~14 days)
@@ -493,14 +533,30 @@ function save(){
 
 var data = load() || seed();
 var ui = {
-  tab:"log", expanded:null, logDate: todayISO(), timer:{active:false}, dayFilter:"all",
+  tab:"log", expanded:null, logDate: todayISO(), timer:{active:false}, dayFilter:"all", woScope:"all",
   weight:20, reps:8,
   metricInputs:{},
   restoreText:"", backupOpen:false, backupMsg:"",
-  saveState:"idle", progEx:null, cal:0, guideOpen:false, flash:null, resetArmed:false, newMuscle:-1,
+  saveState:"idle", progEx:null, cal:0, guideOpen:false, help:{}, flash:null, resetArmed:false, newMuscle:-1,
   newName:"", newKind:0
 };
 METRICS.forEach(function(m){ ui.metricInputs[m.key]=""; });
+/* ---- contextual help ---- */
+var HELP={
+  colours:"Each exercise shows how long since you last did it \u2014 violet today, fading through blue, green and yellow to red at a week or more, then grey. Freshest sit at the top of the list.",
+  bodyweight:"Sets the load for bodyweight moves like press-ups, and feeds your weight trend in Trends. Update it whenever you weigh in.",
+  plan:"Filter to one session\u2019s exercises, or show All. You choose which exercises belong to which session in Setup; anything in no session shows every time.",
+  volume:"Every set\u2019s weight \u00d7 reps, added up. Machine sets logged in lb convert to kg so the total stays consistent. It\u2019s a workload measure \u2014 rising over time means you\u2019re doing more.",
+  muscle:"Sets per muscle over the last 7 days \u2014 a primary muscle counts 1, a supporting one \u00bd. A zero (in the warn colour) is a gap worth filling.",
+  measurements:"Track any of these every week or two and follow the trend, not one reading. Waist beats the scale for the fat that matters. VO\u2082max is cardio fitness: short hard intervals (say 4\u20135 \u00d7 3 min hard, easy between) raise it \u2014 steady easy work won\u2019t. Grip is a quiet marker of overall strength.",
+  e1rm:"The heaviest single you\u2019d likely manage, estimated from your best set \u2014 so 60\u00d78 and 65\u00d75 compare as one number. Trust the trend; it reads a little high above ~12\u201315 reps.",
+  backup:"Download or copy a snapshot you keep yourself. It\u2019s the only copy that doesn\u2019t live inside this app \u2014 worth doing now and then."
+};
+function helpQ(key){ return HELP[key] ? '<button class="help-chip'+(ui.help[key]?' open':'')+'" data-action="help" data-arg="'+key+'" aria-label="What\u2019s this?">?</button>' : ''; }
+function helpA(key){ return (HELP[key] && ui.help[key]) ? '<div class="help-tip">'+HELP[key]+'</div>' : ''; }
+
+
+
 
 /* ---- exercise access ---- */
 function allExercises(){
@@ -833,6 +889,16 @@ function removeSet(name,idx){
   if(sess){ sess.sets.splice(idx,1); if(!sess.sets.length) data.sessions=data.sessions.filter(function(s){return s!==sess;}); }
   commit();
 }
+
+function removeMetricEntry(key,date){
+  if(!data.metrics[key]) return;
+  data.metrics[key]=data.metrics[key].filter(function(p){return p.date!==date;});
+  if(key==="weight"){
+    var w=data.metrics.weight.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
+    data.bodyweight=w.length?w[w.length-1].v:0;
+  }
+  commit();
+}
 function saveCardio(name){
   var el=document.getElementById("cal-input");
   var v=Math.max(0, Math.round(Number(el?el.value:ui.cal)||0));
@@ -848,7 +914,9 @@ function saveName(){
   var v=(el?el.value:"").trim();
   data.userName = v || null;
   document.title = appTitle().replace(/\u2019/g,"'");
+  ui.flash="name";
   commit();
+  setTimeout(function(){ if(ui.flash==="name"){ ui.flash=null; render(); } }, 1600);
 }
 function saveHeight(){
   var el=document.getElementById("height-input");
@@ -859,15 +927,22 @@ function saveHeight(){
   commit();
   setTimeout(function(){ if(ui.flash==="height"){ ui.flash=null; render(); } }, 1600);
 }
+
+function clearHeight(){ data.height=null; commit(); }
 var timerHandle=null;
 function timerTick(){
   var el=document.getElementById("timer-display");
   if(!el){ return; }
   var elapsed=Math.floor((Date.now()-ui.timer.startMs)/1000);
-  var remaining=ui.timer.target-elapsed;
   ui.timer.held=elapsed;
-  if(remaining>=0){ el.textContent=remaining+"s"; el.className="timer-display"; }
-  else { el.textContent="+"+(-remaining)+"s"; el.className="timer-display over"; }
+  var met=elapsed>=ui.timer.target;
+  el.textContent=elapsed+"s";
+  el.className="timer-display"+(met?" met":" working");
+  var st=document.getElementById("timer-status");
+  if(st){
+    st.textContent=met ? ("\u2713 Target met ("+ui.timer.target+"s)") : ("Target "+ui.timer.target+"s");
+    st.className="timer-status"+(met?" met":"");
+  }
 }
 function startTimer(name){
   var inp=document.getElementById("timer-target");
@@ -962,15 +1037,23 @@ function restoreBackup(){
 /* ---- views ---- */
 function statsView(){
   var wdays={}; data.sessions.forEach(function(s){ if(s.sets.length) wdays[s.date]=1; });
-  var wN=Object.keys(wdays).length;
+  var dates=Object.keys(wdays), today=todayISO(), scope=ui.woScope||"all";
+  function inScope(d){
+    if(scope==="year") return d.slice(0,4)===today.slice(0,4);
+    if(scope==="month") return d.slice(0,7)===today.slice(0,7);
+    if(scope==="week") return d>=daysAgoISO(6) && d<=today;
+    return true;
+  }
+  var wN=dates.filter(inScope).length;
+  var scopeLabel = scope==="year"?"This year" : scope==="month"?"This month" : scope==="week"?"This week" : "Total workouts";
   var total=0; data.sessions.forEach(function(s){ s.sets.forEach(function(x){ total+=setVolume(s.exercise,x); }); });
   var totalStr = total>=1000 ? (total/1000).toFixed(1)+' t' : Math.round(total)+' kg';
   var dsw=daysSinceWorkout(), col=streakColor(dsw);
   var dswNum = dsw==null ? '\u2014' : dsw;
-  var dswLabel = dsw==null ? 'No workouts yet' : (dsw===0 ? 'Trained today' : (dsw===1?'Day since last':'Days since last'));
+  var dswLabel = dsw==null ? 'No workouts yet' : (dsw===1?'Day off':'Days off');
   var lastTxt = lastWorkoutDate() ? 'Last workout '+fmtDate(lastWorkoutDate()) : 'Training since '+fmtDate(data.blockStart);
   return '<section class="stats-card"><div class="stats-strip" style="background:'+col+'"></div><div class="stats-row">'
-    +'<div class="stat"><div class="stat-num">'+wN+'</div><div class="stat-label">Workouts</div></div>'
+    +'<button class="stat stat-tap" data-action="woscope"><div class="stat-num">'+wN+'</div><div class="stat-label">'+scopeLabel+'<span class="tap-cyc">\u27f3</span></div></button>'
     +'<div class="stat-div"></div>'
     +'<div class="stat"><div class="stat-num">'+totalStr+'</div><div class="stat-label">Total lifted</div></div>'
     +'<div class="stat-div"></div>'
@@ -993,20 +1076,24 @@ function logView(){
     +'<ol class="fr-list"><li>Open the <em>Setup</em> tab and switch on the exercises you actually do and the metrics you want to track \u2014 switch off the rest. You can add your own exercises at the bottom.</li>'
     +'<li>Set your bodyweight below. It works out the load in bodyweight exercises like press-ups.</li></ol>'
     +'<div class="fr-foot">Nothing you enter leaves this device.</div></div>';
-  html+='<div class="bw-row"><span class="date-label">Bodyweight</span>'
+  html+='<div class="bw-row"><span class="date-label">Bodyweight'+helpQ('bodyweight')+'</span>'
     +'<div class="bw-entry"><input id="bw-input" class="bw-input" inputmode="decimal" value="'+esc(data.bodyweight!=null?data.bodyweight:"")+'" placeholder="\u2014">'
     +'<span class="bw-unit">kg</span><button class="btn-solid'+(ui.flash==="bw"?" flashed":"")+'" data-action="savebw">'+(ui.flash==="bw"?"Saved \u2713":"Set")+'</button></div></div>';
 
+  html+=helpA('bodyweight');
+
   html+='<div class="legend"><span class="legend-txt">Just done</span>';
   FRESH.forEach(function(c){ html+='<span class="legend-swatch" style="background:'+c+'"></span>'; });
-  html+='<span class="legend-txt">7d+</span></div>';
+  html+='<span class="legend-txt">7d+</span>'+helpQ('colours')+'</div>';
+  html+=helpA('colours');
 
   html+='<div class="day-filter">'
     +'<button class="df-btn'+(ui.dayFilter==="all"?" on":"")+'" data-action="dayfilter" data-arg="all">All</button>';
   planLabels().forEach(function(lb){
     html+='<button class="df-btn'+(ui.dayFilter===lb?" on":"")+'" data-action="dayfilter" data-arg="'+lb+'">'+esc(lb)+'</button>';
   });
-  html+='</div>';
+  html+=helpQ('plan')+'</div>';
+  html+=helpA('plan');
 
   GROUPS.forEach(function(g){
     var steps=stepsForGroup(g.key);
@@ -1067,9 +1154,10 @@ function logView(){
         if(step.timed){
           var lastSecs = (recentEntry(step.name)||{}).r || 30;
           if(ui.timer && ui.timer.active && ui.timer.name===step.name){
-            html+='<div class="timer-box"><div id="timer-display" class="timer-display">'+ui.timer.target+'s</div>'
+            html+='<div class="timer-box"><div id="timer-display" class="timer-display working">0s</div>'
+              +'<div id="timer-status" class="timer-status">Target '+ui.timer.target+'s</div>'
               +'<button class="btn-log timer-stop" data-action="stoptimer">Stop &amp; use time</button>'
-              +'<div class="timer-hint">Counts down, then keeps going \u2014 hold as long as you can.</div></div>';
+              +'<div class="timer-hint">Counts up \u2014 the target lights up when you reach it. Keep holding, then Stop &amp; use time.</div></div>';
           } else {
             html+='<div class="timer-box"><div class="timer-set"><span class="entry-label">Target</span>'
               +'<input id="timer-target" inputmode="numeric" class="base-input" value="'+esc(lastSecs)+'"><span class="base-unit">secs</span></div>'
@@ -1108,29 +1196,6 @@ function logView(){
     html+='</div>';
   });
 
-  html+='<div class="section-head">Guide</div><div class="card">'
-    +'<button class="backup-toggle" data-action="guidetoggle"><span>What everything here means</span>'
-    +'<span class="sl-chev">'+(ui.guideOpen?"\u25be":"\u25b8")+'</span></button>';
-  if(ui.guideOpen){
-    var g=[
-      ["The colours","Violet means you did it today, shading through blue, green and yellow to red at 7+ days. The strip at the top does the same for your last workout of any kind, so one glance tells you how long it\u2019s been. Main exercises sort by it too \u2014 freshest at the top, never-logged in grey at the bottom."],
-      ["Volume","Every set\u2019s load \u00d7 reps, added up for the day. Machines logged in lb are converted to kg so the total stays consistent. Bodyweight moves count a share of your bodyweight (press-ups ~65%, squats ~85%, sit-ups ~40%, crunches ~30%) \u2014 rough figures, but they keep the trend honest. Timed holds like the plank and dead hang sit outside it, since seconds aren\u2019t reps."],
-      ["Estimated 1-rep max","The heaviest single you\u2019d likely manage, worked back from your best set. It lets 60kg\u00d78 and 65kg\u00d75 be compared as one number, so progress shows even when your reps wander. It drifts optimistic above about 12\u201315 reps \u2014 trust the trend more than the figure."],
-      ["Intervals","Hard efforts with easy recovery between \u2014 say 4\u20135 rounds of 3\u20134 minutes working hard on the bike or rower, easy in between. This is the specific stimulus that lifts cardio fitness (VO\u2082max); steady easy work won\u2019t do it on its own. One or two a week is plenty."],
-      ["Easy moves","Anything at a conversational pace \u2014 a walk, an easy bike ride, a canoe paddle. The test is whether you could hold a conversation while doing it. It builds your aerobic base and aids recovery without adding fatigue, which is why it belongs on the days between gym sessions rather than being pushed hard."],
-      ["The measurements","Waist is the one worth having alongside weight \u2014 it tracks the fat that matters for long-term health far better than the scale does, and it keeps moving when your weight stalls. Waist-to-height under 0.50 is the usual healthy guide. Body fat % (from a scale or calipers) tells you how much of your weight is lean mass, which is the part worth protecting. Grip strength is a quiet one: it reflects overall strength and is among the better predictors of healthy ageing. Blood pressure is the number nothing on your wrist measures \u2014 a cheap home monitor covers it. Every couple of weeks is plenty for any of these; follow the trend, not a single reading."],
-      ["Bodyweight","Used to work out the load in bodyweight exercises, and it feeds the weight trend in Trends. Update it whenever you weigh yourself."],
-      ["Cardio calories","Read it off the machine or your Watch. It\u2019s a rough figure \u2014 useful for consistency with yourself rather than as an exact truth."],
-      ["Backing up","Trends \u2192 Backup & restore gives you a copy you keep. Worth doing now and then; it\u2019s the only copy that doesn\u2019t depend on this app."]
-    ];
-    html+='<div class="backup-body">';
-    g.forEach(function(item){
-      html+='<div class="guide-item"><div class="guide-h">'+esc(item[0])+'</div><div class="guide-p">'+item[1]+'</div></div>';
-    });
-    html+='</div>';
-  }
-  html+='</div>';
-
   var recent=data.sessions.slice().sort(function(a,b){return b.date.localeCompare(a.date);}).slice(0,6);
   if(recent.length){
     html+='<div class="section-head">Recent sessions</div><div class="card recent">';
@@ -1147,19 +1212,25 @@ function setupView(){
   var html='<main>';
   html+='<div class="section-head">Your name</div><div class="add-form">'
     +'<input class="text-input" id="name-input" placeholder="e.g. Nick" value="'+esc(data.userName||"")+'">'
-    +'<button class="btn-solid full" data-action="savename">Set title</button>'
+    +'<button class="btn-solid full'+(ui.flash==="name"?" flashed":"")+'" data-action="savename">'+(ui.flash==="name"?"Saved \u2713":"Save Name")+'</button>'
     +'<div class="metric-caption">Puts your name on the app: \u201c'+esc(appTitle())+'\u201d. Stays on this device.</div></div>';
-  var pc=planCfg();
-  html+='<div class="section-head" style="margin-top:6px">Session plan</div><div class="add-form">';
-  html+='<div class="plan-row"><span class="plan-lbl">Label sessions by</span><div class="seg">'
-    +'<button class="seg-btn'+(pc.mode==="letters"?" on":"")+'" data-action="planmode" data-arg="letters">A / B / C</button>'
-    +'<button class="seg-btn'+(pc.mode==="weekdays"?" on":"")+'" data-action="planmode" data-arg="weekdays">Days</button></div></div>';
-  html+='<div class="plan-row"><span class="plan-lbl">How many sessions</span><div class="plan-count">'
-    +'<button class="btn-solid" data-action="planminus">\u2212</button>'
-    +'<span class="plan-n">'+pc.count+'</span>'
-    +'<button class="btn-solid" data-action="planplus">+</button></div></div>';
-  html+='<div class="metric-caption">Your sessions: '+planLabels().join(" \u00b7 ")+'. Assign each exercise to one or more below (none = every session).</div></div>';
-
+  html+='<div class="section-head">Your weight (kg)</div><div class="add-form">'
+    +'<input class="text-input" id="bw-input" inputmode="decimal" placeholder="e.g. 82" value="'+esc(data.bodyweight!=null?data.bodyweight:"")+'">'
+    +'<button class="btn-solid full'+(ui.flash==="bw"?" flashed":"")+'" data-action="savebw">'+(ui.flash==="bw"?"Saved \u2713":"Set weight")+'</button>'
+    +'<div class="metric-caption">Used for bodyweight moves like press-ups, and your weight trend. In kg.</div></div>';
+  var wSorted=(data.metrics.weight||[]).slice().sort(function(a,b){return a.date.localeCompare(b.date);});
+  var wLast=wSorted[wSorted.length-1];
+  if(wLast) html+='<ul class="metric-log"><li><span class="mlog-val">'+wLast.v.toFixed(1)+' kg</span><button class="mlog-del" data-action="delmetric" data-arg="weight" data-date="'+wLast.date+'" aria-label="Delete saved weight">\u00d7</button></li></ul>';
+  html+='<div class="section-head">Your height (cm)</div><div class="add-form">'
+    +'<input class="text-input" id="height-input" inputmode="decimal" placeholder="e.g. 178" value="'+esc(data.height||"")+'">'
+    +'<button class="btn-solid full'+(ui.flash==="height"?" flashed":"")+'" data-action="saveheight">'+(ui.flash==="height"?"Saved \u2713":"Set height")+'</button>'
+    +'<div class="metric-caption">Set once \u2014 used for your waist-to-height ratio.</div></div>';
+  if(data.height) html+='<ul class="metric-log"><li><span class="mlog-val">'+data.height+' cm</span><button class="mlog-del" data-action="delheight" aria-label="Clear saved height">\u00d7</button></li></ul>';
+  html+='<div class="section-head">Colour scheme</div><div class="theme-pick">';
+  html+= (currentTheme==="auto" ? '<span class="theme-dot" style="background:linear-gradient(90deg,#14171A 50%,#F3F5F1 50%)"></span>' : '<span class="theme-dot" style="background:'+(THEME_ACCENT[currentTheme]||"#888")+'"></span>');
+  html+='<select class="text-input theme-select" data-action="settheme">';
+  THEMES.forEach(function(t){ html+='<option value="'+t.k+'"'+(currentTheme===t.k?' selected':'')+'>'+esc(t.name)+'</option>'; });
+  html+='</select></div><div class="setup-note">Applies straight away. \u201cAuto\u201d follows your phone\u2019s light/dark setting.</div>';
   html+='<div class="setup-note" style="margin-top:16px">Switch things on to show them, off to hide them. The pills under each exercise set which session it belongs to \u2014 tap to include or exclude. None lit means it shows in every session. Turning something off never deletes what you\u2019ve logged.</div>';
   GROUPS.forEach(function(g){
     var list=allExercises().filter(function(e){return e.group===g.key;})
@@ -1187,6 +1258,18 @@ function setupView(){
         +'<button class="toggle'+(on?" on":"")+'" data-action="toggleex" data-arg="'+esc(e.name)+'" aria-pressed="'+on+'"><span class="toggle-knob"></span></button></div>';
     });
   });
+
+  var pc=planCfg();
+  html+='<div class="section-head" style="margin-top:6px">Sessions</div><div class="add-form">';
+  html+='<div class="plan-row"><span class="plan-lbl">Label sessions by</span><div class="seg">'
+    +'<button class="seg-btn'+(pc.mode==="letters"?" on":"")+'" data-action="planmode" data-arg="letters">A / B / C</button>'
+    +'<button class="seg-btn'+(pc.mode==="weekdays"?" on":"")+'" data-action="planmode" data-arg="weekdays">Days</button></div></div>';
+  html+='<div class="plan-row"><span class="plan-lbl">How many sessions</span><div class="plan-count">'
+    +'<button class="btn-solid" data-action="planminus">\u2212</button>'
+    +'<span class="plan-n">'+pc.count+'</span>'
+    +'<button class="btn-solid" data-action="planplus">+</button></div></div>';
+  html+='<div class="metric-caption">Your sessions: '+planLabels().join(" \u00b7 ")+'. Assign each exercise to one or more below (none = every session).</div></div>';
+
 
   html+='<div class="section-head">Metrics</div>';
   METRICS.forEach(function(m){
@@ -1251,14 +1334,14 @@ function trendsView(){
   var vdates={}; data.sessions.forEach(function(s){ vdates[s.date]=1; });
   var volSeries=Object.keys(vdates).map(function(d){return {date:d,v:dayVolume(d)};}).filter(function(p){return p.v>0;}).sort(function(a,b){return a.date.localeCompare(b.date);});
   var latestVol=volSeries.length?volSeries[volSeries.length-1].v:0;
-  html+='<div class="section-head">Training volume</div><div class="card metric">';
+  html+='<div class="section-head">Training volume'+helpQ('volume')+'</div>'+helpA('volume')+'<div class="card metric">';
   html+='<div class="metric-head"><span class="metric-label">Daily volume</span><span class="metric-unit">kg</span></div>';
   html+='<div class="metric-value-row"><span class="metric-value">'+Math.round(latestVol).toLocaleString("en-GB")+'</span></div>';
   html+= volSeries.length>=2 ? sparkline(volSeries,"up") : '<div class="spark-empty">Log another day to see the trend</div>';
   html+='<div class="metric-caption">Load \u00d7 reps, summed each day. Bodyweight moves count toward this; timed holds don\u2019t.</div></div>';
 
   var msW=muscleSets(7);
-  html+='<div class="section-head">Muscle balance</div><div class="card">';
+  html+='<div class="section-head">Muscle balance'+helpQ('muscle')+'</div>'+helpA('muscle')+'<div class="card">';
   MUSCLES.forEach(function(m){
     var n=msW.counts[m];
     var disp = (n===Math.floor(n))? n : n.toFixed(1);
@@ -1272,7 +1355,7 @@ function trendsView(){
   html+='<div class="metric-caption">Sets per muscle over the last 7 days (a secondary muscle counts as half). Roughly 10+ builds, fewer maintains, 0 is a gap \u2014 a sanity-check, not a target to chase.</div></div>';
 
   var shownMetrics=METRICS.filter(function(m){return isMetricOn(m.key);});
-  if(shownMetrics.length) html+='<div class="section-head">Metrics</div>';
+  if(shownMetrics.length) html+='<div class="section-head">Metrics'+helpQ('measurements')+'</div>'+helpA('measurements');
   shownMetrics.forEach(function(m){
     var series=data.metrics[m.key]||(data.metrics[m.key]=[]);
     var sorted=series.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
@@ -1285,16 +1368,23 @@ function trendsView(){
     html+='</div>'+sparkline(series,m.good);
     html+='<div class="metric-add"><input class="text-input" id="metric-'+m.key+'" inputmode="decimal" placeholder="Add today\u2019s '+esc(m.label.toLowerCase())+'" value="'+esc(ui.metricInputs[m.key])+'">'
       +'<button class="btn-solid" data-action="metric" data-arg="'+m.key+'">Save</button></div>';
+    var mlog=sorted.slice(-6).reverse();
+    if(mlog.length){
+      html+='<ul class="metric-log">';
+      mlog.forEach(function(p){
+        var td=p.date===todayISO();
+        html+='<li><span class="mlog-date">'+(td?"Today":fmtDate(p.date))+'</span><span class="mlog-val">'+p.v.toFixed(m.dp)+'</span><button class="mlog-del" data-action="delmetric" data-arg="'+m.key+'" data-date="'+p.date+'" aria-label="Delete reading from '+(td?"today":fmtDate(p.date))+'">\u00d7</button></li>';
+      });
+      html+='</ul>';
+    }
     if(m.key==="waist"){
       var hgt=Number(data.height)||0;
       if(hgt && latest){
         var whr=latest.v/hgt;
         var ok=whr<0.5;
         html+='<div class="metric-caption">Waist-to-height <strong style="color:'+(ok?'var(--accent)':'var(--warn)')+'">'+whr.toFixed(2)+'</strong> \u00b7 under 0.50 is the usual healthy guide (that\u2019s a waist under '+Math.round(hgt*0.5)+' cm for you)</div>';
-      } else {
-        html+='<div class="metric-add"><input class="text-input" id="height-input" inputmode="decimal" placeholder="Your height in cm" value="'+esc(data.height||"")+'">'
-          +'<button class="btn-solid'+(ui.flash==="height"?" flashed":"")+'" data-action="saveheight">'+(ui.flash==="height"?"Saved \u2713":"Set")+'</button></div>'
-          +'<div class="metric-caption">Add your height and this shows your waist-to-height ratio.</div>';
+      } else if(!hgt){
+        html+='<div class="metric-caption">Set your height in Setup to see your waist-to-height ratio.</div>';
       }
     }
     html+='</div>';
@@ -1305,7 +1395,7 @@ function trendsView(){
   if(!ui.progEx || opts.indexOf(ui.progEx)<0) ui.progEx=opts[0]||null;
   if(ui.progEx){
     var pe=exOf(ui.progEx), isBody=!!pe.body;
-    html+='<div class="section-head">'+(isBody?'Best set':'Estimated 1-rep max')+'</div><div class="card metric">';
+    html+='<div class="section-head">'+(isBody?'Best set':'Estimated 1-rep max')+helpQ('e1rm')+'</div>'+helpA('e1rm')+'<div class="card metric">';
     html+='<select class="ex-select full" data-action="progex">';
     opts.forEach(function(ex){ html+='<option value="'+esc(ex)+'"'+(ex===ui.progEx?" selected":"")+'>'+esc(ex)+'</option>'; });
     html+='</select>';
@@ -1319,8 +1409,8 @@ function trendsView(){
       :'Estimated max from your best set \u2014 tracks strength even as your reps vary')+'</div></div>';
   }
 
-  html+='<div class="section-head">Backup &amp; restore</div><div class="card">';
-  html+='<button class="backup-toggle" data-action="backuptoggle"><span>Keep your training safe outside the app</span><span class="sl-chev">'+(ui.backupOpen?"\u25be":"\u25b8")+'</span></button>';
+  html+='<div class="section-head">Backup &amp; restore'+helpQ('backup')+'</div>'+helpA('backup')+'<div class="card">';
+  html+='<button class="backup-toggle" data-action="backuptoggle"><span>Save or restore your data</span><span class="sl-chev">'+(ui.backupOpen?"\u25be":"\u25b8")+'</span></button>';
   if(ui.backupOpen){
     html+='<div class="backup-body"><p class="backup-note">Export saves a copy of everything you\u2019ve logged. Keep it in Notes, email, or a file \u2014 then you can restore it here anytime, or on a new phone.</p>';
     html+='<div class="backup-row"><button class="btn-solid" data-action="download">Download file</button><button class="btn-solid" data-action="copy">Copy backup</button></div>';
@@ -1365,6 +1455,8 @@ appEl.addEventListener("click",function(e){
     case "w-": case "w+": case "r-": case "r+": case "c-": case "c+": stepper(a); break;
     case "logset": logSet(arg); break;
     case "delset": removeSet(arg, Number(el.dataset.idx)); break;
+    case "delmetric": removeMetricEntry(arg, el.dataset.date); break;
+    case "delheight": clearHeight(); break;
     case "metric": addMetric(arg); break;
     case "savebw": saveBodyweight(); break;
     case "savebase": saveBase(el.dataset.arg); break;
@@ -1376,6 +1468,7 @@ appEl.addEventListener("click",function(e){
     case "admin": toggleAdmin(); break;
     case "toggleex": toggleEnabled(arg); break;
     case "dayfilter": ui.dayFilter=arg; ui.expanded=null; render(); break;
+    case "woscope": { var wo=["all","year","month","week"]; ui.woScope=wo[(wo.indexOf(ui.woScope||"all")+1)%wo.length]; render(); break; }
     case "toggleday": toggleDayMember(arg, el.dataset.day); break;
     case "planmode": setPlan(el.dataset.arg, planCfg().count); break;
     case "planplus": setPlan(planCfg().mode, planCfg().count+1); break;
@@ -1385,6 +1478,7 @@ appEl.addEventListener("click",function(e){
     case "delcustom": removeCustom(arg); break;
     case "backuptoggle": ui.backupOpen=!ui.backupOpen; render(); break;
     case "guidetoggle": ui.guideOpen=!ui.guideOpen; render(); break;
+    case "help": ui.help[arg]=!ui.help[arg]; render(); break;
     case "download": downloadBackup(); break;
     case "copy": copyBackup(); break;
     case "emailsummary": emailSummary(); break;
@@ -1411,12 +1505,14 @@ appEl.addEventListener("change",function(e){
   if(e.target.id==="log-date"){ ui.logDate=e.target.value||todayISO(); ui.expanded=null; render(); return; }
   var el=e.target.closest("[data-action]");
   if(!el) return;
+  if(el.dataset.action==="settheme"){ applyTheme(el.value); render(); return; }
   if(el.dataset.action==="progex"){ ui.progEx=el.value; render(); }
   else if(el.dataset.action==="newkind"){ ui.newKind=Number(el.value)||0; }
   else if(el.dataset.action==="newmuscle"){ ui.newMuscle=Number(el.value); }
 });
 
 document.title = appTitle().replace(/\u2019/g,"'");
+if(!Number(data.bodyweight) && !(data.userName||"").trim() && !data.sessions.length){ ui.tab="setup"; }
 render();
 </script>
 </body>
