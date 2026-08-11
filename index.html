@@ -22,10 +22,10 @@
 }
 html[data-theme="pink"]{--bg:#FDF4EE;--surface:#FFFFFF;--surface-2:#FCEAF1;--line:#F0DBE4;--ink:#4A3540;--ink-dim:#9B8790;--ink-faint:#C4B2BB;--accent:#E87BA6;--accent-deep:#B23A6E;--warn:#C67B5C;--accent-soft:rgba(232,123,166,.12);--on-accent:#161616;--on-warn:#161616}
 html[data-theme="putty"]{--bg:#EDE4D6;--surface:#F7F1E7;--surface-2:#E6DBC9;--line:#D7C9B4;--ink:#4A4038;--ink-dim:#8C7F70;--ink-faint:#B4A793;--accent:#7E5B58;--accent-deep:#6F4E4B;--warn:#B57A72;--accent-soft:rgba(126,91,88,.14);--on-accent:#ffffff;--on-warn:#161616}
-html[data-theme="slate"]{--bg:#10151B;--surface:#182029;--surface-2:#212D38;--line:#2E3B48;--ink:#E7EEF3;--ink-dim:#8A99A6;--ink-faint:#566470;--accent:#3FB8A6;--accent-deep:#4FD0BC;--warn:#E0785F;--accent-soft:rgba(63,184,166,.13);--on-accent:#161616;--on-warn:#161616}
+html[data-theme="slate"]{--bg:#052526;--surface:#00393B;--surface-2:#0A4C4E;--line:#14605F;--ink:#F1F6F5;--ink-dim:#9FBBBA;--ink-faint:#628180;--accent:#1FB9AB;--accent-deep:#4AD8C9;--warn:#E8836A;--accent-soft:rgba(31,185,171,.14);--on-accent:#062625;--on-warn:#161616}
 html[data-theme="sage"]{--bg:#F3F5F1;--surface:#FBFCF9;--surface-2:#E8ECE3;--line:#D8DDD0;--ink:#33372F;--ink-dim:#6E7568;--ink-faint:#A2A899;--accent:#3E8E63;--accent-deep:#2F6E4C;--warn:#C67B5C;--accent-soft:rgba(62,142,99,.13);--on-accent:#161616;--on-warn:#161616}
 html[data-theme="ink"]{--bg:#FFFFFF;--surface:#F7F8FA;--surface-2:#EDEFF3;--line:#DDE1E8;--ink:#14181F;--ink-dim:#5A6472;--ink-faint:#9098A5;--accent:#2563EB;--accent-deep:#1D4FD0;--warn:#E0603F;--accent-soft:rgba(37,99,235,.12);--on-accent:#ffffff;--on-warn:#161616}
-html[data-theme="military"]{--bg:#15180F;--surface:#1C2015;--surface-2:#262B1C;--line:#343A27;--ink:#E9E7D4;--ink-dim:#9EA187;--ink-faint:#676B51;--accent:#C2A24E;--accent-deep:#D8BE6E;--warn:#D2795A;--accent-soft:rgba(194,162,78,.13);--on-accent:#161616;--on-warn:#161616}
+html[data-theme="military"]{--bg:#14170E;--surface:#1E2415;--surface-2:#2B331D;--line:#3C4728;--ink:#E7E5CD;--ink-dim:#A3A17C;--ink-faint:#6E6D4D;--accent:#BFA23F;--accent-deep:#DAC162;--warn:#B0502E;--accent-soft:rgba(191,162,63,.14);--on-accent:#161616;--on-warn:#ffffff}
 html[data-theme="midnight"]{--bg:#0E1220;--surface:#161B2C;--surface-2:#1F2740;--line:#2C3654;--ink:#E6E9F2;--ink-dim:#8B93A8;--ink-faint:#565F76;--accent:#E0B24C;--accent-deep:#EFC96E;--warn:#E0785F;--accent-soft:rgba(224,178,76,.13);--on-accent:#161616;--on-warn:#161616}
 html[data-theme="graphite"]{--bg:#131313;--surface:#1C1C1D;--surface-2:#262627;--line:#363638;--ink:#ECECEC;--ink-dim:#9A9A9C;--ink-faint:#636365;--accent:#B0B0B6;--accent-deep:#D2D2D8;--warn:#CC6B5A;--accent-soft:rgba(176,176,182,.14);--on-accent:#161616;--on-warn:#161616}
 html[data-theme="violet"]{--bg:#FCFCFD;--surface:#F4F5F8;--surface-2:#EBEDF2;--line:#DBDFE7;--ink:#16181D;--ink-dim:#59606C;--ink-faint:#9198A4;--accent:#7C3AED;--accent-deep:#5B21B6;--warn:#E11D48;--accent-soft:rgba(124,58,237,.12);--on-accent:#ffffff;--on-warn:#ffffff}
@@ -87,9 +87,6 @@ html,body{background:var(--bg)}
 .vc-value{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.5rem;color:var(--ink)}
 .vc-unit{font-size:.8rem;color:var(--ink-faint);margin-left:4px;font-weight:500}
 
-.legend{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:11px 13px;background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:10px}
-.legend-txt{font-size:.7rem;color:var(--ink-faint);font-family:'Barlow Semi Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase}
-.legend-swatch{width:15px;height:8px;border-radius:2px}
 
 .step-list{display:flex;flex-direction:column;gap:8px}
 .step-check{width:100%;display:flex;align-items:center;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px;cursor:pointer;min-height:50px;transition:.14s}
@@ -184,9 +181,17 @@ html,body{background:var(--bg)}
 
 .ex-select{width:100%;appearance:none;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);font-family:'Barlow',sans-serif;font-weight:600;font-size:1.02rem;padding:13px 38px 13px 13px;border-radius:10px;cursor:pointer;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path d='M2 4l4 4 4-4' stroke='%238B97A0' stroke-width='1.6' fill='none' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 13px center}
 
-.spark{width:100%;height:76px;display:block;margin-top:4px}
+.spark{width:100%;height:auto;display:block;margin-top:4px}
 .spark-base{stroke:var(--line);stroke-width:1}
 .spark-empty{font-size:.82rem;color:var(--ink-faint);padding:14px 0 4px;font-style:italic}
+.chart-win{display:flex;gap:4px;margin:2px 0 8px}
+.cw-btn{flex:1;padding:5px 0;font-size:.72rem;font-family:'JetBrains Mono',monospace;background:var(--surface-2);color:var(--ink-dim);border:1px solid var(--line);border-radius:6px;cursor:pointer}
+.cw-btn.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:700}
+.grid-line{stroke:var(--line);stroke-width:1;opacity:.55}
+.axis-line{stroke:var(--line);stroke-width:1}
+.axis-lbl{fill:var(--ink-faint);font-family:'JetBrains Mono',monospace;font-size:9px}
+.data-toggle{width:100%;margin-top:10px;padding:8px 0;font-size:.76rem;font-family:'Barlow Semi Condensed',sans-serif;letter-spacing:.05em;text-transform:uppercase;background:var(--surface-2);color:var(--ink-dim);border:1px solid var(--line);border-radius:8px;cursor:pointer}
+.metric-log.scroll{max-height:196px;overflow-y:auto}
 
 .admin{width:100%;display:flex;align-items:flex-start;gap:12px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:15px;cursor:pointer;transition:.14s}
 .admin-done{background:var(--accent-soft);border-color:var(--accent)}
@@ -286,7 +291,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 <script>
 "use strict";
 
-var APP_VERSION = "2.5";
+var APP_VERSION = "2.7";
 var STORE_KEY = "block-tracker";
 
 /* ---------------------------------------------------------------
@@ -447,9 +452,9 @@ function muscleOf(name){
   return null;
 }
 var FRESH_SCALES={charcoal:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],pink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],putty:["#636F65","#6E7A63","#8A8A5C","#B07C34","#A96A4A","#A85D5A","#8F4038","#7C2E2C"],slate:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],sage:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],ink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],military:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],midnight:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],graphite:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],violet:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"]};
-var THEMES=[{k:"auto",name:"Auto (match phone)"},{k:"charcoal",name:"Charcoal & Amber"},{k:"pink",name:"Pink & Cream"},{k:"putty",name:"Putty & Rose"},{k:"slate",name:"Slate & Teal"},{k:"sage",name:"Sage & Chalk"},{k:"ink",name:"Ink & Electric"},{k:"military",name:"Olive & Brass"},{k:"midnight",name:"Midnight & Gold"},{k:"graphite",name:"Graphite & Silver"},{k:"violet",name:"Violet & Snow"}];
-var THEME_ACCENT={charcoal:"#F2A93B",pink:"#E87BA6",putty:"#7E5B58",slate:"#3FB8A6",sage:"#3E8E63",ink:"#2563EB",military:"#C2A24E",midnight:"#E0B24C",graphite:"#B0B0B6",violet:"#7C3AED"};
-var THEME_BG={charcoal:"#14171A",pink:"#FDF4EE",putty:"#EDE4D6",slate:"#10151B",sage:"#F3F5F1",ink:"#FFFFFF",military:"#15180F",midnight:"#0E1220",graphite:"#131313",violet:"#FCFCFD"};
+var THEMES=[{k:"auto",name:"Auto (match phone)"},{k:"charcoal",name:"Charcoal & Amber"},{k:"pink",name:"Pink & Cream"},{k:"putty",name:"Putty & Rose"},{k:"slate",name:"Petrol & Aqua"},{k:"sage",name:"Sage & Chalk"},{k:"ink",name:"Ink & Electric"},{k:"military",name:"Olive & Brass"},{k:"midnight",name:"Midnight & Gold"},{k:"graphite",name:"Graphite & Silver"},{k:"violet",name:"Violet & Snow"}];
+var THEME_ACCENT={charcoal:"#F2A93B",pink:"#E87BA6",putty:"#7E5B58",slate:"#1FB9AB",sage:"#3E8E63",ink:"#2563EB",military:"#C2A24E",midnight:"#E0B24C",graphite:"#B0B0B6",violet:"#7C3AED"};
+var THEME_BG={charcoal:"#14171A",pink:"#FDF4EE",putty:"#EDE4D6",slate:"#052526",sage:"#F3F5F1",ink:"#FFFFFF",military:"#15180F",midnight:"#0E1220",graphite:"#131313",violet:"#FCFCFD"};
 var THEME_KEY=STORE_KEY+"-theme";
 var currentTheme=(function(){try{return localStorage.getItem(THEME_KEY)||"charcoal";}catch(e){return "charcoal";}})();
 var FRESH=FRESH_SCALES.charcoal;
@@ -791,24 +796,55 @@ function muscleSets(win){
   });
   return { counts:c, untagged:untagged };
 }
-function sparkline(series, good){
-  if(!series || series.length<2) return '<div class="spark-empty">Add a second reading to see the trend</div>';
-  var W=300,H=76,pad=8;
-  var pts=series.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
-  var ys=pts.map(function(p){return p.v;});
-  var min=Math.min.apply(null,ys), max=Math.max.apply(null,ys);
-  if(min===max){min-=1;max+=1;}
-  var span=max-min;
-  function x(i){return pad+(i/(pts.length-1))*(W-pad*2);}
-  function y(v){return pad+(1-(v-min)/span)*(H-pad*2);}
-  var path=pts.map(function(p,i){return (i?"L":"M")+x(i)+","+y(p.v);}).join(" ");
+function niceNum(range, round){
+  if(range<=0) range=1;
+  var exp=Math.floor(Math.log(range)/Math.LN10), frac=range/Math.pow(10,exp);
+  var nf = round ? (frac<1.5?1:frac<3?2:frac<7?5:10) : (frac<=1?1:frac<=2?2:frac<=5?5:10);
+  return nf*Math.pow(10,exp);
+}
+function niceScale(mn,mx,ticks){
+  var range=niceNum(mx-mn,false), step=niceNum(range/(ticks-1),true);
+  return {min:Math.floor(mn/step)*step, max:Math.ceil(mx/step)*step, step:step};
+}
+function chMs(iso){ return new Date(iso+"T00:00:00").getTime(); }
+function chIso(ms){ var d=new Date(ms); return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
+function sparkline(series, good, key){
+  if(!ui.chartWin) ui.chartWin={};
+  var win = ui.chartWin[key] || "month";
+  var WINS=[["day","D"],["week","W"],["month","M"],["year","Y"],["max","Max"]];
+  var ctrl='<div class="chart-win">'+WINS.map(function(w){ return '<button class="cw-btn'+(win===w[0]?" on":"")+'" data-action="chartwin" data-arg="'+key+'" data-win="'+w[0]+'">'+w[1]+'</button>'; }).join("")+'</div>';
+  var all=(series||[]).slice().sort(function(a,b){return a.date.localeCompare(b.date);});
+  if(all.length<2) return ctrl+'<div class="spark-empty">Add a second reading to see the trend</div>';
+  var DAY=86400000, todayMs=chMs(todayISO());
+  var winDays={day:1,week:7,month:30,year:365}[win];
+  var xMax=todayMs, xMin = win==="max" ? chMs(all[0].date) : todayMs-winDays*DAY;
+  if(xMin>=xMax) xMin=xMax-DAY;
+  var pts=all.filter(function(p){var t=chMs(p.date); return t>=xMin-1 && t<=xMax+1;});
+  if(!pts.length) return ctrl+'<div class="spark-empty">No readings in this range \u2014 try a wider one</div>';
+  var W=328,H=150,padL=36,padR=10,padT=10,padB=22, plotW=W-padL-padR, plotH=H-padT-padB;
+  var ys=pts.map(function(p){return p.v;}), dmin=Math.min.apply(null,ys), dmax=Math.max.apply(null,ys);
+  if(dmin===dmax){ dmin-=1; dmax+=1; }
+  var sc=niceScale(dmin,dmax,4);
+  function y(v){ return padT+(1-(v-sc.min)/(sc.max-sc.min))*plotH; }
+  function x(ms){ return padL+((ms-xMin)/(xMax-xMin))*plotW; }
+  var dp = sc.step<1?(sc.step<0.1?2:1):0, grid="", ylab="", nT=Math.round((sc.max-sc.min)/sc.step);
+  for(var i=0;i<=nT;i++){ var v=sc.min+i*sc.step, yy=y(v);
+    grid+='<line x1="'+padL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+yy.toFixed(1)+'" class="grid-line"/>';
+    ylab+='<text x="'+(padL-5)+'" y="'+(yy+3).toFixed(1)+'" class="axis-lbl" text-anchor="end">'+v.toFixed(dp)+'</text>';
+  }
+  var xlab='<text x="'+padL+'" y="'+(H-6)+'" class="axis-lbl" text-anchor="start">'+fmtDate(chIso(xMin))+'</text>'
+    +'<text x="'+((padL+W-padR)/2).toFixed(1)+'" y="'+(H-6)+'" class="axis-lbl" text-anchor="middle">'+fmtDate(chIso((xMin+xMax)/2))+'</text>'
+    +'<text x="'+(W-padR)+'" y="'+(H-6)+'" class="axis-lbl" text-anchor="end">'+fmtDate(chIso(xMax))+'</text>';
   var last=pts[pts.length-1], delta=last.v-pts[0].v;
   var improving = delta===0?null:(good==="up"?delta>0:delta<0);
   var stroke = improving===null?"var(--ink-dim)":(improving?"var(--accent)":"var(--warn)");
-  return '<svg class="spark" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'
-    +'<line x1="'+pad+'" y1="'+(H-pad)+'" x2="'+(W-pad)+'" y2="'+(H-pad)+'" class="spark-base"/>'
-    +'<path d="'+path+'" fill="none" stroke="'+stroke+'" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>'
-    +'<circle cx="'+x(pts.length-1)+'" cy="'+y(last.v)+'" r="4.5" fill="'+stroke+'"/></svg>';
+  var line = pts.length>=2 ? '<path d="'+pts.map(function(p,i){return (i?"L":"M")+x(chMs(p.date)).toFixed(1)+","+y(p.v).toFixed(1);}).join(" ")+'" fill="none" stroke="'+stroke+'" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>' : '';
+  var svg='<svg class="spark" viewBox="0 0 '+W+' '+H+'">'
+    +'<line x1="'+padL+'" y1="'+padT+'" x2="'+padL+'" y2="'+(H-padB)+'" class="axis-line"/>'
+    +'<line x1="'+padL+'" y1="'+(H-padB)+'" x2="'+(W-padR)+'" y2="'+(H-padB)+'" class="axis-line"/>'
+    +grid+ylab+xlab+line
+    +'<circle cx="'+x(chMs(last.date)).toFixed(1)+'" cy="'+y(last.v).toFixed(1)+'" r="4" fill="'+stroke+'"/></svg>';
+  return ctrl+svg;
 }
 
 /* ---- mutations ---- */
@@ -1089,10 +1125,6 @@ function logView(){
 
   html+=helpA('bodyweight');
 
-  html+='<div class="legend"><span class="legend-txt">Just done</span>';
-  FRESH.forEach(function(c){ html+='<span class="legend-swatch" style="background:'+c+'"></span>'; });
-  html+='<span class="legend-txt">7d+</span>'+helpQ('colours')+'</div>';
-  html+=helpA('colours');
 
   html+='<div class="day-filter">'
     +'<button class="df-btn'+(ui.dayFilter==="all"?" on":"")+'" data-action="dayfilter" data-arg="all">All</button>';
@@ -1344,7 +1376,7 @@ function trendsView(){
   html+='<div class="section-head">Training volume'+helpQ('volume')+'</div>'+helpA('volume')+'<div class="card metric">';
   html+='<div class="metric-head"><span class="metric-label">Daily volume</span><span class="metric-unit">kg</span></div>';
   html+='<div class="metric-value-row"><span class="metric-value">'+Math.round(latestVol).toLocaleString("en-GB")+'</span></div>';
-  html+= volSeries.length>=2 ? sparkline(volSeries,"up") : '<div class="spark-empty">Log another day to see the trend</div>';
+  html+= volSeries.length>=2 ? sparkline(volSeries,"up","_vol") : '<div class="spark-empty">Log another day to see the trend</div>';
   html+='<div class="metric-caption">Load \u00d7 reps, summed each day. Bodyweight moves count toward this; timed holds don\u2019t.</div></div>';
 
   var msW=muscleSets(7);
@@ -1372,17 +1404,21 @@ function trendsView(){
     html+='<div class="card metric"><div class="metric-head"><span class="metric-label">'+esc(m.label)+'</span><span class="metric-unit">'+esc(m.unit)+'</span></div>';
     html+='<div class="metric-value-row"><span class="metric-value">'+(latest?latest.v.toFixed(m.dp):"\u2014")+'</span>';
     if(delta!==0) html+='<span class="metric-delta '+(improving?"good":"bad")+'">'+(delta>0?"+":"")+delta+' since start</span>';
-    html+='</div>'+sparkline(series,m.good);
+    html+='</div>'+sparkline(series,m.good,m.key);
     html+='<div class="metric-add"><input class="text-input" id="metric-'+m.key+'" inputmode="decimal" placeholder="Add today\u2019s '+esc(m.label.toLowerCase())+'" value="'+esc(ui.metricInputs[m.key])+'">'
       +'<button class="btn-solid" data-action="metric" data-arg="'+m.key+'">Save</button></div>';
-    var mlog=sorted.slice(-6).reverse();
-    if(mlog.length){
-      html+='<ul class="metric-log">';
-      mlog.forEach(function(p){
-        var td=p.date===todayISO();
-        html+='<li><span class="mlog-date">'+(td?"Today":fmtDate(p.date))+'</span><span class="mlog-val">'+p.v.toFixed(m.dp)+'</span><button class="mlog-del" data-action="delmetric" data-arg="'+m.key+'" data-date="'+p.date+'" aria-label="Delete reading from '+(td?"today":fmtDate(p.date))+'">\u00d7</button></li>';
-      });
-      html+='</ul>';
+    if(sorted.length){
+      if(!ui.dataOpen) ui.dataOpen={};
+      var dOpen=ui.dataOpen[m.key];
+      html+='<button class="data-toggle" data-action="datatoggle" data-arg="'+m.key+'">'+(dOpen?"Hide readings":"Show readings")+' ('+sorted.length+')</button>';
+      if(dOpen){
+        html+='<ul class="metric-log scroll">';
+        sorted.slice().reverse().forEach(function(p){
+          var td=p.date===todayISO();
+          html+='<li><span class="mlog-date">'+(td?"Today":fmtDate(p.date))+'</span><span class="mlog-val">'+p.v.toFixed(m.dp)+'</span><button class="mlog-del" data-action="delmetric" data-arg="'+m.key+'" data-date="'+p.date+'" aria-label="Delete reading from '+(td?"today":fmtDate(p.date))+'">\u00d7</button></li>';
+        });
+        html+='</ul>';
+      }
     }
     if(m.key==="waist"){
       var hgt=Number(data.height)||0;
@@ -1411,7 +1447,7 @@ function trendsView(){
       .sort(function(a,b){return a.date.localeCompare(b.date);});
     var latestE=prog.length?prog[prog.length-1].v:0;
     html+='<div class="metric-value-row"><span class="metric-value">'+(latestE?latestE:"\u2014")+'</span><span class="metric-unit">'+(isBody?(pe.repLabel||"reps"):unitOf(ui.progEx)+" est.")+'</span></div>';
-    html+= prog.length>=2 ? sparkline(prog,"up") : '<div class="spark-empty">Log this across two sessions to see it climb</div>';
+    html+= prog.length>=2 ? sparkline(prog,"up","_e1rm") : '<div class="spark-empty">Log this across two sessions to see it climb</div>';
     html+='<div class="metric-caption">'+(isBody?'Best set of the day \u2014 the simplest progress marker for bodyweight work'
       :'Estimated max from your best set \u2014 tracks strength even as your reps vary')+'</div></div>';
   }
@@ -1464,6 +1500,8 @@ appEl.addEventListener("click",function(e){
     case "delset": removeSet(arg, Number(el.dataset.idx)); break;
     case "delmetric": removeMetricEntry(arg, el.dataset.date); break;
     case "delheight": clearHeight(); break;
+    case "chartwin": if(!ui.chartWin)ui.chartWin={}; ui.chartWin[arg]=el.dataset.win; render(); break;
+    case "datatoggle": if(!ui.dataOpen)ui.dataOpen={}; ui.dataOpen[arg]=!ui.dataOpen[arg]; render(); break;
     case "metric": addMetric(arg); break;
     case "savebw": saveBodyweight(); break;
     case "savebase": saveBase(el.dataset.arg); break;
