@@ -20,7 +20,7 @@
   --ink:#EDF1F3; --ink-dim:#8B97A0; --ink-faint:#5A656D;
   --accent:#F2A93B; --accent-deep:#C77D1A; --warn:#E56A54; --radius:12px; --accent-soft:rgba(242,169,59,.12); --on-accent:#1a1205; --on-warn:#1a0805;
 }
-html[data-theme="pink"]{--bg:#FDF4EE;--surface:#FFFFFF;--surface-2:#FCEAF1;--line:#F0DBE4;--ink:#4A3540;--ink-dim:#9B8790;--ink-faint:#C4B2BB;--accent:#E87BA6;--accent-deep:#B23A6E;--warn:#C67B5C;--accent-soft:rgba(232,123,166,.12);--on-accent:#161616;--on-warn:#161616}
+html[data-theme="pink"]{--bg:#FFD9EE;--surface:#FFECF6;--surface-2:#FFC6E4;--line:#F7ABD5;--ink:#421029;--ink-dim:#8A4A68;--ink-faint:#B57C98;--accent:#DA1884;--accent-deep:#B0155F;--warn:#DB6048;--accent-soft:rgba(218,24,132,.14);--on-accent:#FFFFFF;--on-warn:#161616}
 html[data-theme="putty"]{--bg:#EDE4D6;--surface:#F7F1E7;--surface-2:#E6DBC9;--line:#D7C9B4;--ink:#4A4038;--ink-dim:#8C7F70;--ink-faint:#B4A793;--accent:#7E5B58;--accent-deep:#6F4E4B;--warn:#B57A72;--accent-soft:rgba(126,91,88,.14);--on-accent:#ffffff;--on-warn:#161616}
 html[data-theme="slate"]{--bg:#052526;--surface:#00393B;--surface-2:#0A4C4E;--line:#14605F;--ink:#F1F6F5;--ink-dim:#9FBBBA;--ink-faint:#628180;--accent:#1FB9AB;--accent-deep:#4AD8C9;--warn:#E8836A;--accent-soft:rgba(31,185,171,.14);--on-accent:#062625;--on-warn:#161616}
 html[data-theme="sage"]{--bg:#F3F5F1;--surface:#FBFCF9;--surface-2:#E8ECE3;--line:#D8DDD0;--ink:#33372F;--ink-dim:#6E7568;--ink-faint:#A2A899;--accent:#3E8E63;--accent-deep:#2F6E4C;--warn:#C67B5C;--accent-soft:rgba(62,142,99,.13);--on-accent:#161616;--on-warn:#161616}
@@ -284,7 +284,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .mm-figs{display:flex;gap:10px;justify-content:center}
 .mm-fig{flex:1;max-width:180px;text-align:center}
 .mm-svg{width:100%;height:auto;display:block}
-.mm-poly{stroke:rgba(233,238,242,0.13);stroke-width:0.4}
+.mm-poly{stroke-width:0.4}
 .mm-flabel{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);margin-top:6px;font-weight:600}
 .mm-scale{margin-top:18px}
 .mm-bar{height:9px;border-radius:5px;background:linear-gradient(to right,var(--bg),var(--accent));border:1px solid var(--line)}
@@ -303,7 +303,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 <script>
 "use strict";
 
-var APP_VERSION = "3.0";
+var APP_VERSION = "3.1";
 var STORE_KEY = "gym-tracker-shared";
 var FILE_NAME = "Caitlyn";
 
@@ -458,9 +458,9 @@ function muscleOf(name){
   return null;
 }
 var FRESH_SCALES={charcoal:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],pink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],putty:["#636F65","#6E7A63","#8A8A5C","#B07C34","#A96A4A","#A85D5A","#8F4038","#7C2E2C"],slate:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],sage:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],ink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],military:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],midnight:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],graphite:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],violet:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"]};
-var THEMES=[{k:"auto",name:"Auto (match phone)"},{k:"charcoal",name:"Charcoal & Amber"},{k:"pink",name:"Pink & Cream"},{k:"putty",name:"Putty & Rose"},{k:"slate",name:"Petrol & Aqua"},{k:"sage",name:"Sage & Chalk"},{k:"ink",name:"Ink & Electric"},{k:"military",name:"Olive & Brass"},{k:"midnight",name:"Midnight & Gold"},{k:"graphite",name:"Graphite & Silver"},{k:"violet",name:"Violet & Snow"}];
-var THEME_ACCENT={charcoal:"#F2A93B",pink:"#E87BA6",putty:"#7E5B58",slate:"#1FB9AB",sage:"#3E8E63",ink:"#2563EB",military:"#C2A24E",midnight:"#E0B24C",graphite:"#B0B0B6",violet:"#7C3AED"};
-var THEME_BG={charcoal:"#14171A",pink:"#FDF4EE",putty:"#EDE4D6",slate:"#052526",sage:"#F3F5F1",ink:"#FFFFFF",military:"#15180F",midnight:"#0E1220",graphite:"#131313",violet:"#FCFCFD"};
+var THEMES=[{k:"auto",name:"Auto (match phone)"},{k:"charcoal",name:"Charcoal & Amber"},{k:"pink",name:"Bubblegum"},{k:"putty",name:"Putty & Rose"},{k:"slate",name:"Petrol & Aqua"},{k:"sage",name:"Sage & Chalk"},{k:"ink",name:"Ink & Electric"},{k:"military",name:"Olive & Brass"},{k:"midnight",name:"Midnight & Gold"},{k:"graphite",name:"Graphite & Silver"},{k:"violet",name:"Violet & Snow"}];
+var THEME_ACCENT={charcoal:"#F2A93B",pink:"#DA1884",putty:"#7E5B58",slate:"#1FB9AB",sage:"#3E8E63",ink:"#2563EB",military:"#C2A24E",midnight:"#E0B24C",graphite:"#B0B0B6",violet:"#7C3AED"};
+var THEME_BG={charcoal:"#14171A",pink:"#FFD9EE",putty:"#EDE4D6",slate:"#052526",sage:"#F3F5F1",ink:"#FFFFFF",military:"#15180F",midnight:"#0E1220",graphite:"#131313",violet:"#FCFCFD"};
 var THEME_KEY=STORE_KEY+"-theme";
 var currentTheme=(function(){try{return localStorage.getItem(THEME_KEY)||"pink";}catch(e){return "charcoal";}})();
 var FRESH=FRESH_SCALES.charcoal;
@@ -798,7 +798,7 @@ function muscleMap(counts){
   function lerp(a,b,t){ return "rgb("+a.map(function(x,i){return Math.round(x+(b[i]-x)*t);}).join(",")+")"; }
   function heat(v){ var t=FLOOR+(1-FLOOR)*Math.max(0,Math.min(1,(v||0)/HI)); return lerp(BG,AC,t); }
   var NEUTRAL=lerp(BG,INK,0.13);
-  function fig(polys){ var s='<svg class="mm-svg" viewBox="0 0 100 200">'; polys.forEach(function(p){ s+='<polygon class="mm-poly" points="'+p[1]+'" fill="'+(p[0]?heat(counts[p[0]]):NEUTRAL)+'"/>'; }); return s+"</svg>"; }
+  function fig(polys){ var STK="rgba("+INK.join(",")+",0.2)"; var s='<svg class="mm-svg" viewBox="0 0 100 200">'; polys.forEach(function(p){ s+='<polygon class="mm-poly" points="'+p[1]+'" fill="'+(p[0]?heat(counts[p[0]]):NEUTRAL)+'" stroke="'+STK+'"/>'; }); return s+"</svg>"; }
   function rows(list){ return list.map(function(m){ var v=counts[m]||0, disp=(v===Math.floor(v))?v:v.toFixed(1); return '<div class="mm-row"><span class="mm-dot" style="background:'+heat(v)+'"></span><span class="mm-name">'+m+'</span><span class="mm-val">'+disp+'</span></div>'; }).join(""); }
   var FL=["Shoulders","Chest","Biceps","Forearms","Core","Quads"], BL=["Back","Triceps","Glutes","Hamstrings","Calves"];
   return '<div class="mm-figs"><div class="mm-fig">'+fig(BODY_FRONT)+'<div class="mm-flabel">Front</div></div><div class="mm-fig">'+fig(BODY_BACK)+'<div class="mm-flabel">Back</div></div></div>'
