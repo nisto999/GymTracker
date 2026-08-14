@@ -343,10 +343,6 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .fb-btn{display:block;text-align:center;text-decoration:none;padding:12px 0;background:var(--surface-2);color:var(--ink);border:1px solid var(--line);border-radius:10px;font-weight:600;margin-top:4px}
 .disclaimer{margin-top:22px;padding:14px 15px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-size:.75rem;color:var(--ink-dim);line-height:1.55}
 .disclaimer strong{display:block;font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem;color:var(--ink-faint);margin-bottom:6px;font-weight:700}
-.inc-pills{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:8px}
-.inc-lbl{font-size:.62rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-right:3px}
-.inc-pill{min-width:34px;padding:5px 7px;border-radius:7px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-faint);font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.7rem;cursor:pointer}
-.inc-pill.on{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
@@ -354,7 +350,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 <script>
 "use strict";
 
-var APP_VERSION = "3.17";
+var APP_VERSION = "3.18";
 var STORE_KEY = "gym-tracker-shared";
 var FILE_NAME = "Caitlyn";
 
@@ -531,6 +527,7 @@ function streakColor(d){                          // top strip: climbs to red an
 var UNIT_CHOICES = [
   { label:"Barbell / plates · 2.5 kg", unit:"kg", step:2.5 },
   { label:"Dumbbells · 2 kg", unit:"kg", step:2 },
+  { label:"Dumbbells · 2.5 kg", unit:"kg", step:2.5 },
   { label:"Machine / cable · 5 lb", unit:"lb", step:5 },
   { label:"Bodyweight · 2.5 kg added", unit:"kg", step:2.5, body:true }
 ];
@@ -550,7 +547,7 @@ function seed(){
     height: null,
     userName: null,
     sessions: [], habits: {}, checks: {}, cardio: {}, cardioUnit: "kcal",
-    enabled: {}, metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, dayPlan: {}, plan: {mode:"letters",count:2},
+    enabled: {}, metricsOn: {}, custom: [], baseWeight: {}, dayPlan: {}, plan: {mode:"letters",count:2},
     admin: { bloodwork: false },
     metrics: {
       weight: [], rhr: [], vo2max: [], waist: [], bodyfat: [], grip: [], systolic: []
@@ -591,7 +588,7 @@ function load(){
       height: (s.height!=null? s.height : base.height),
       userName: (s.userName!=null? s.userName : base.userName),
       sessions: s.sessions||[], habits: s.habits||{}, checks: s.checks||{}, cardio: s.cardio||{}, cardioUnit: s.cardioUnit||"kcal",
-      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, dayPlan: s.dayPlan||{}, plan: s.plan||{mode:"letters",count:2},
+      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, dayPlan: s.dayPlan||{}, plan: s.plan||{mode:"letters",count:2},
       admin: Object.assign({},base.admin,s.admin||{}),
       metrics: _mw
     };
@@ -669,7 +666,7 @@ function daysBetween(a,b){ return Math.round((new Date(b+"T00:00:00") - new Date
 function mondayOf(d){ var x=new Date(d+"T00:00:00"); var day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return x.toISOString().slice(0,10); }
 function fmtDate(iso){ return new Date(iso+"T00:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"}); }
 function unitOf(name){ return exOf(name).unit || "kg"; }
-function stepOf(name){ return Number((data.stepOverride||{})[name]) || exOf(name).step || 2.5; }
+function stepOf(name){ return exOf(name).step || 2.5; }
 function toKg(name,w){ return unitOf(name)==="lb" ? w*0.45359237 : w; }
 
 function setsSummary(name,sets){
@@ -1140,7 +1137,7 @@ function restoreBackup(){
     height:(parsed.height!=null?parsed.height:base.height),
     userName:(parsed.userName!=null?parsed.userName:base.userName),
     sessions: parsed.sessions||[], habits: parsed.habits||{}, checks: parsed.checks||{}, cardio: parsed.cardio||{}, cardioUnit: parsed.cardioUnit||"kcal",
-    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, dayPlan: parsed.dayPlan||{}, plan: parsed.plan||{mode:"letters",count:2},
+    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, dayPlan: parsed.dayPlan||{}, plan: parsed.plan||{mode:"letters",count:2},
     admin: Object.assign({},base.admin,parsed.admin||{}),
     metrics: Object.assign({},base.metrics,parsed.metrics||{})
   };
@@ -1384,7 +1381,7 @@ function setupView(){
     list.forEach(function(e){
       var on=isEnabled(e.name);
       var meta = e.type==="check" ? "tick to complete"
-        : (e.unit+" \u00b7 steps of "+stepOf(e.name)+(e.body?" \u00b7 bodyweight":""));
+        : (e.unit+" \u00b7 steps of "+e.step+(e.body?" \u00b7 bodyweight":""));
       var dayBtn='';
       if(g.key==="Main" && on){
         var mem=dayMembership(e.name).filter(function(m){return planLabels().indexOf(m)>=0;});
@@ -1394,11 +1391,9 @@ function setupView(){
         });
         dayBtn+='</div>';
       }
-      var incBtn='';
-      if(e.type==="log" && !e.timed && on){ var _io=(e.unit==="lb")?[2.5,5,10]:[1,2,2.5,5]; incBtn='<div class="inc-pills"><span class="inc-lbl">step</span>'; _io.forEach(function(v){ incBtn+='<button class="inc-pill'+(stepOf(e.name)===v?" on":"")+'" data-action="setstep" data-arg="'+esc(e.name)+'" data-step="'+v+'">'+v+'</button>'; }); incBtn+='</div>'; }
-      html+='<div class="lib-row"><div class="lib-main"><div class="lib-name">'+esc(e.name)+'</div>\'
+      html+='<div class="lib-row"><div class="lib-main"><div class="lib-name">'+esc(e.name)+'</div>'
         +'<div class="lib-meta">'+esc(meta)+(e.custom?" \u00b7 yours":"")+'</div>'
-        +dayBtn+incBtn
+        +dayBtn
         +'</div>'
         +(e.custom?'<button class="lib-del" data-action="delcustom" data-arg="'+esc(e.name)+'">\u00d7</button>':'')
         +'<button class="toggle'+(on?" on":"")+'" data-action="toggleex" data-arg="'+esc(e.name)+'" aria-pressed="'+on+'"><span class="toggle-knob"></span></button></div>';
@@ -1694,7 +1689,6 @@ appEl.addEventListener("click",function(e){
     case "datatoggle": if(!ui.dataOpen)ui.dataOpen={}; ui.dataOpen[arg]=!ui.dataOpen[arg]; render(); break;
     case "metric": addMetric(arg); break;
     case "savebase": saveBase(el.dataset.arg); break;
-    case "setstep": { if(!data.stepOverride)data.stepOverride={}; var _s=Number(el.dataset.step); if(_s===(exOf(arg).step||2.5)) delete data.stepOverride[arg]; else data.stepOverride[arg]=_s; commit(); break; }
     case "starttimer": startTimer(arg); break;
     case "stoptimer": stopTimer(); break;
     case "ivstart": ivStart(); break;
