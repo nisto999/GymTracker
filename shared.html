@@ -57,7 +57,9 @@ html,body{background:var(--bg)}
 .stats-strip{position:absolute;top:0;left:0;right:0;height:4px;transition:background .3s}
 .stats-row{display:flex;align-items:center}
 .stat{flex:1;text-align:center}
-.stat-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.55rem;line-height:1;color:var(--ink)}
+.stat-hero{flex:1.4}
+.stat-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.55rem;line-height:1;color:var(--ink);white-space:nowrap}
+.stat-unit{font-size:.58em;font-weight:600;color:var(--ink-dim);margin-left:1px}
 .stat-label{font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.62rem;color:var(--ink-dim);margin-top:7px;line-height:1.25}
 .stat-tap{flex:1;text-align:center;background:none;border:none;padding:0;font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .stat-tap:active{opacity:.55}
@@ -124,7 +126,10 @@ html,body{background:var(--bg)}
 .btn-solid{background:var(--surface-2);border:1px solid var(--line);color:var(--ink);font-family:'Barlow',sans-serif;font-weight:600;font-size:.92rem;padding:0 16px;border-radius:10px;cursor:pointer}
 
 .set-list{list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:12px}
-.set-row{display:flex;align-items:center;gap:12px;background:var(--surface-2);border-radius:8px;padding:9px 12px}
+.set-row{display:flex;align-items:center;gap:12px;background:var(--surface-2);border-radius:8px;padding:9px 12px;border-left:4px solid transparent}
+.set-row.rag-g{border-left-color:#4E9E5A}
+.set-row.rag-a{border-left-color:#D19A3B}
+.set-row.rag-r{border-left-color:#CB584C}
 .set-idx{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--ink-faint);width:18px}
 .set-num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.15rem;flex:1}
 .set-x{color:var(--ink-faint);margin:0 3px;font-weight:500}
@@ -336,6 +341,12 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .cu-btn{flex:1;padding:10px 0;font-size:.85rem;font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;letter-spacing:.03em;background:var(--surface);color:var(--ink-dim);border:1px solid var(--line);border-radius:9px;cursor:pointer}
 .cu-btn.on{background:var(--surface-2);border-color:var(--accent);color:var(--accent)}
 .fb-btn{display:block;text-align:center;text-decoration:none;padding:12px 0;background:var(--surface-2);color:var(--ink);border:1px solid var(--line);border-radius:10px;font-weight:600;margin-top:4px}
+.disclaimer{margin-top:22px;padding:14px 15px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-size:.75rem;color:var(--ink-dim);line-height:1.55}
+.disclaimer strong{display:block;font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem;color:var(--ink-faint);margin-bottom:6px;font-weight:700}
+.inc-pills{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-top:8px}
+.inc-lbl{font-size:.62rem;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-right:3px}
+.inc-pill{min-width:34px;padding:5px 7px;border-radius:7px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-faint);font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.7rem;cursor:pointer}
+.inc-pill.on{border-color:var(--accent);color:var(--accent)}
 </style>
 </head>
 <body>
@@ -343,7 +354,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 <script>
 "use strict";
 
-var APP_VERSION = "3.11";
+var APP_VERSION = "3.17";
 var STORE_KEY = "gym-tracker-shared";
 
 /* ---------------------------------------------------------------
@@ -538,7 +549,7 @@ function seed(){
     height: null,
     userName: null,
     sessions: [], habits: {}, checks: {}, cardio: {}, cardioUnit: "kcal",
-    enabled: {}, metricsOn: {}, custom: [], baseWeight: {}, dayPlan: {}, plan: {mode:"letters",count:2},
+    enabled: {}, metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, dayPlan: {}, plan: {mode:"letters",count:2},
     admin: { bloodwork: false },
     metrics: {
       weight: [], rhr: [], vo2max: [], waist: [], bodyfat: [], grip: [], systolic: []
@@ -579,7 +590,7 @@ function load(){
       height: (s.height!=null? s.height : base.height),
       userName: (s.userName!=null? s.userName : base.userName),
       sessions: s.sessions||[], habits: s.habits||{}, checks: s.checks||{}, cardio: s.cardio||{}, cardioUnit: s.cardioUnit||"kcal",
-      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, dayPlan: s.dayPlan||{}, plan: s.plan||{mode:"letters",count:2},
+      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, dayPlan: s.dayPlan||{}, plan: s.plan||{mode:"letters",count:2},
       admin: Object.assign({},base.admin,s.admin||{}),
       metrics: _mw
     };
@@ -657,7 +668,7 @@ function daysBetween(a,b){ return Math.round((new Date(b+"T00:00:00") - new Date
 function mondayOf(d){ var x=new Date(d+"T00:00:00"); var day=(x.getDay()+6)%7; x.setDate(x.getDate()-day); return x.toISOString().slice(0,10); }
 function fmtDate(iso){ return new Date(iso+"T00:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"}); }
 function unitOf(name){ return exOf(name).unit || "kg"; }
-function stepOf(name){ return exOf(name).step || 2.5; }
+function stepOf(name){ return Number((data.stepOverride||{})[name]) || exOf(name).step || 2.5; }
 function toKg(name,w){ return unitOf(name)==="lb" ? w*0.45359237 : w; }
 
 function setsSummary(name,sets){
@@ -986,13 +997,15 @@ function stepper(action){
 function logSet(name){
   var w=Number(ui.weight), r=Number(ui.reps), e=exOf(name);
   if(isNaN(w)||w<0||!r) return;
-  if(!e.body && !w) return;
+  if(!e.body && !w && !baseOf(name)) return;
   var t=ui.logDate;
   var sess=data.sessions.filter(function(s){return s.date===t&&s.exercise===name;})[0];
   if(!sess){ sess={id:t+"-"+name+"-"+Date.now(),date:t,exercise:name,sets:[]}; data.sessions.push(sess); }
   sess.sets.push({w:w,r:r});
   commit();
 }
+function ragStep(cur,dir){ var order=["g","a","r"]; var i = cur==null ? (dir<0?0:2) : order.indexOf(cur)+(dir<0?-1:1); i=Math.max(0,Math.min(2,i)); return order[i]; }
+function ragSet(name,idx,dir){ var sess=data.sessions.filter(function(s){return s.date===ui.logDate&&s.exercise===name;})[0]; if(!sess||!sess.sets[idx]) return; sess.sets[idx].rag=ragStep(sess.sets[idx].rag,dir); commit(); }
 function removeSet(name,idx){
   var sess=data.sessions.filter(function(s){return s.date===ui.logDate&&s.exercise===name;})[0];
   if(sess){ sess.sets.splice(idx,1); if(!sess.sets.length) data.sessions=data.sessions.filter(function(s){return s!==sess;}); }
@@ -1126,7 +1139,7 @@ function restoreBackup(){
     height:(parsed.height!=null?parsed.height:base.height),
     userName:(parsed.userName!=null?parsed.userName:base.userName),
     sessions: parsed.sessions||[], habits: parsed.habits||{}, checks: parsed.checks||{}, cardio: parsed.cardio||{}, cardioUnit: parsed.cardioUnit||"kcal",
-    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, dayPlan: parsed.dayPlan||{}, plan: parsed.plan||{mode:"letters",count:2},
+    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, dayPlan: parsed.dayPlan||{}, plan: parsed.plan||{mode:"letters",count:2},
     admin: Object.assign({},base.admin,parsed.admin||{}),
     metrics: Object.assign({},base.metrics,parsed.metrics||{})
   };
@@ -1135,6 +1148,14 @@ function restoreBackup(){
 }
 
 /* ---- views ---- */
+function fmtLifted(kg){
+  if(kg<1000) return {num:Math.round(kg).toLocaleString("en-GB"), unit:"kg"};
+  var t=kg/1000;
+  if(t<1000) return {num:t.toFixed(1), unit:"t"};
+  if(t<10000) return {num:Math.round(t).toLocaleString("en-GB"), unit:"t"};
+  return {num:(t/1000).toFixed(1), unit:"kt"};
+}
+function liftedHTML(kg){ var l=fmtLifted(kg); return l.num+'<span class="stat-unit">'+l.unit+'</span>'; }
 function statsView(){
   var wdays={}; data.sessions.forEach(function(s){ if(s.sets.length) wdays[s.date]=1; });
   var dates=Object.keys(wdays), today=todayISO(), scope=ui.woScope||"all";
@@ -1147,7 +1168,7 @@ function statsView(){
   var wN=dates.filter(inScope).length;
   var scopeLabel = scope==="year"?"This year" : scope==="month"?"This month" : scope==="week"?"This week" : "Total workouts";
   var total=0; data.sessions.forEach(function(s){ s.sets.forEach(function(x){ total+=setVolume(s.exercise,x); }); });
-  var totalStr = total>=1000 ? (total/1000).toFixed(1)+' t' : Math.round(total)+' kg';
+  var totalStr = liftedHTML(total);
   var dsw=daysSinceWorkout(), col=streakColor(dsw);
   var dswNum = dsw==null ? '\u2014' : dsw;
   var dswLabel = dsw==null ? 'No workouts yet' : (dsw===1?'Day off':'Days off');
@@ -1155,7 +1176,7 @@ function statsView(){
   return '<section class="stats-card"><div class="stats-strip" style="background:'+col+'"></div><div class="stats-row">'
     +'<button class="stat stat-tap" data-action="woscope"><div class="stat-num">'+wN+'</div><div class="stat-label">'+scopeLabel+'<span class="tap-cyc">\u27f3</span></div></button>'
     +'<div class="stat-div"></div>'
-    +'<div class="stat"><div class="stat-num">'+totalStr+'</div><div class="stat-label">Total lifted</div></div>'
+    +'<div class="stat stat-hero"><div class="stat-num">'+totalStr+'</div><div class="stat-label">Total lifted</div></div>'
     +'<div class="stat-div"></div>'
     +'<div class="stat"><div class="stat-num" style="color:'+col+'">'+dswNum+'</div><div class="stat-label">'+dswLabel+'</div></div>'
     +'</div><div class="stats-since">'+lastTxt+'</div></section>';
@@ -1308,7 +1329,7 @@ function logView(){
           sess.sets.forEach(function(s,si){
             var body = (step.body && !s.w) ? s.r+'<span class="set-unit">'+(step.repWord||"reps")+'</span>'
                                            : s.w+'<span class="set-unit">'+u+'</span><span class="set-x">\u00d7</span>'+s.r;
-            html+='<li class="set-row"><span class="set-idx">'+(si+1)+'</span><span class="set-num">'+body+'</span>'
+            html+='<li class="set-row'+(s.rag?" rag-"+s.rag:"")+'" data-ex="'+esc(nm)+'" data-setidx="'+si+'"><span class="set-idx">'+(si+1)+'</span><span class="set-num">'+body+'</span>'
               +'<button class="set-del" data-action="delset" data-arg="'+nm+'" data-idx="'+si+'">\u00d7</button></li>';
           });
           html+='</ul>';
@@ -1362,7 +1383,7 @@ function setupView(){
     list.forEach(function(e){
       var on=isEnabled(e.name);
       var meta = e.type==="check" ? "tick to complete"
-        : (e.unit+" \u00b7 steps of "+e.step+(e.body?" \u00b7 bodyweight":""));
+        : (e.unit+" \u00b7 steps of "+stepOf(e.name)+(e.body?" \u00b7 bodyweight":""));
       var dayBtn='';
       if(g.key==="Main" && on){
         var mem=dayMembership(e.name).filter(function(m){return planLabels().indexOf(m)>=0;});
@@ -1372,9 +1393,11 @@ function setupView(){
         });
         dayBtn+='</div>';
       }
-      html+='<div class="lib-row"><div class="lib-main"><div class="lib-name">'+esc(e.name)+'</div>'
+      var incBtn='';
+      if(e.type==="log" && !e.timed && on){ var _io=(e.unit==="lb")?[2.5,5,10]:[1,2,2.5,5]; incBtn='<div class="inc-pills"><span class="inc-lbl">step</span>'; _io.forEach(function(v){ incBtn+='<button class="inc-pill'+(stepOf(e.name)===v?" on":"")+'" data-action="setstep" data-arg="'+esc(e.name)+'" data-step="'+v+'">'+v+'</button>'; }); incBtn+='</div>'; }
+      html+='<div class="lib-row"><div class="lib-main"><div class="lib-name">'+esc(e.name)+'</div>\'
         +'<div class="lib-meta">'+esc(meta)+(e.custom?" \u00b7 yours":"")+'</div>'
-        +dayBtn
+        +dayBtn+incBtn
         +'</div>'
         +(e.custom?'<button class="lib-del" data-action="delcustom" data-arg="'+esc(e.name)+'">\u00d7</button>':'')
         +'<button class="toggle'+(on?" on":"")+'" data-action="toggleex" data-arg="'+esc(e.name)+'" aria-pressed="'+on+'"><span class="toggle-knob"></span></button></div>';
@@ -1419,6 +1442,7 @@ function setupView(){
       +'<div class="reset-actions"><button class="btn-solid" data-action="cancelreset">Cancel</button>'
       +'<button class="reset-confirm" data-action="reset">Erase everything</button></div></div>';
   }
+  html+='<div class="disclaimer"><strong>Disclaimer</strong>Niten is a personal tracker \u2014 not medical, physiotherapy, or coaching advice. Exercise carries risk: train within your limits, use good form, and stop if something hurts. Talk to a doctor or qualified coach before starting or changing a programme, especially with any injury or health condition. Estimated 1-rep max, calorie figures and the like are rough approximations, not precise measurements. Everything you log stays on this device.</div>';
   html+='<div class="version">Niten \u00b7 v'+APP_VERSION+'</div>';
   return html+'</main>';
 }
@@ -1431,7 +1455,7 @@ function trendsView(){
   html+='<div class="stats-row" style="margin-bottom:4px">'
     +'<div class="stat"><div class="stat-num">'+W.workouts+'</div><div class="stat-label">Workouts</div></div>'
     +'<div class="stat-div"></div>'
-    +'<div class="stat"><div class="stat-num">'+(W.volume>=1000?(W.volume/1000).toFixed(1)+' t':W.volume+' kg')+'</div><div class="stat-label">Volume</div></div>'
+    +'<div class="stat"><div class="stat-num">'+liftedHTML(W.volume)+'</div><div class="stat-label">Volume</div></div>'
     +(W.kcal?'<div class="stat-div"></div><div class="stat"><div class="stat-num">'+W.kcal.toLocaleString("en-GB")+'</div><div class="stat-label">Cardio kcal</div></div>':'')
     +'</div>';
   if(W.bests.length){
@@ -1669,6 +1693,7 @@ appEl.addEventListener("click",function(e){
     case "datatoggle": if(!ui.dataOpen)ui.dataOpen={}; ui.dataOpen[arg]=!ui.dataOpen[arg]; render(); break;
     case "metric": addMetric(arg); break;
     case "savebase": saveBase(el.dataset.arg); break;
+    case "setstep": { if(!data.stepOverride)data.stepOverride={}; var _s=Number(el.dataset.step); if(_s===(exOf(arg).step||2.5)) delete data.stepOverride[arg]; else data.stepOverride[arg]=_s; commit(); break; }
     case "starttimer": startTimer(arg); break;
     case "stoptimer": stopTimer(); break;
     case "ivstart": ivStart(); break;
@@ -1730,6 +1755,9 @@ appEl.addEventListener("change",function(e){
   else if(el.dataset.action==="newmuscle"){ ui.newMuscle=Number(el.value); }
 });
 
+var _swEl=null,_swX=0,_swY=0;
+appEl.addEventListener("touchstart",function(e){ var r=e.target.closest(".set-row"); if(r&&r.dataset.setidx!=null){ _swEl=r; _swX=e.touches[0].clientX; _swY=e.touches[0].clientY; } },{passive:true});
+appEl.addEventListener("touchend",function(e){ if(!_swEl) return; var t=e.changedTouches[0], dx=t.clientX-_swX, dy=t.clientY-_swY; if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)*1.4){ ragSet(_swEl.dataset.ex, Number(_swEl.dataset.setidx), dx<0?-1:1); } _swEl=null; },{passive:true});
 document.title = appTitle().replace(/\u2019/g,"'");
 if(!currentWeight() && !(data.userName||"").trim() && !data.sessions.length){ ui.tab="setup"; }
 render();
