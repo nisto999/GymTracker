@@ -244,6 +244,9 @@ html,body{background:var(--bg)}
 .seg-btn.on{border-color:var(--accent);color:var(--accent)}
 .plan-count{display:flex;align-items:center;gap:10px}
 .plan-count .btn-solid{padding:6px 14px}
+.lbl-edits{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;flex:1}
+.lbl-input{background:var(--surface-2);border:1px solid var(--line);border-radius:8px;color:var(--ink);font-family:'Barlow',sans-serif;font-size:.9rem;padding:7px 8px;width:80px;text-align:center}
+.lbl-input:focus{outline:none;border-color:var(--accent)}
 .plan-n{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:1.2rem;min-width:20px;text-align:center}
 button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -352,7 +355,7 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 <script>
 "use strict";
 
-var APP_VERSION = "3.25";
+var APP_VERSION = "3.26";
 var STORE_KEY = "block-tracker";
 
 /* ---------------------------------------------------------------
@@ -458,9 +461,12 @@ var DAY_DEFAULT = {
 var WEEKDAYS=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
 function planCfg(){ var p=data.plan||{}; return { mode:p.mode||"letters", count:Math.min(7,Math.max(2,p.count||2)) }; }
 function planLabels(){
-  var c=planCfg();
-  if(c.mode==="weekdays") return WEEKDAYS.slice(0,c.count);
-  return "ABCDEFG".slice(0,c.count).split("");
+  var c=planCfg(), p=data.plan||{};
+  var base = c.mode==="weekdays" ? WEEKDAYS.slice(0,c.count) : "ABCDEFG".slice(0,c.count).split("");
+  var lab = Array.isArray(p.labels) ? p.labels : [];
+  var out=[];
+  for(var i=0;i<c.count;i++){ out.push((lab[i]!=null && String(lab[i]).trim()!=="") ? String(lab[i]) : base[i]); }
+  return out;
 }
 function dayMembership(name){
   if(data.dayPlan && data.dayPlan[name]!=null){
@@ -486,8 +492,45 @@ function toggleDayMember(name,label){
   data.dayPlan[name]=mem;
   commit();
 }
+function migrateLabels(oldL,newL){
+  if(!data.dayPlan) return;
+  var ren={},drop={};
+  for(var i=0;i<oldL.length;i++){ if(i<newL.length){ if(oldL[i]!==newL[i]) ren[oldL[i]]=newL[i]; } else drop[oldL[i]]=1; }
+  Object.keys(data.dayPlan).forEach(function(ex){
+    var m=data.dayPlan[ex];
+    var arr=Array.isArray(m)?m.slice():((m==="both"||m==null)?[]:[m]);
+    arr=arr.filter(function(x){return !drop[x];}).map(function(x){return ren[x]||x;});
+    var seen={},out=[]; arr.forEach(function(x){ if(!seen[x]){seen[x]=1;out.push(x);} });
+    data.dayPlan[ex]=out;
+  });
+}
+function setLabel(i,val){
+  val=(val||"").trim();
+  var oldL=planLabels();
+  if(i<0||i>=oldL.length){ render(); return; }
+  if(!val){ render(); return; }
+  for(var j=0;j<oldL.length;j++){ if(j!==i && oldL[j]===val){ render(); return; } }
+  if(val===oldL[i]){ render(); return; }
+  var newL=oldL.slice(); newL[i]=val;
+  var p=data.plan||{mode:"letters",count:2};
+  var arr=Array.isArray(p.labels)?p.labels.slice():[];
+  for(var q=0;q<oldL.length;q++){ if(arr[q]==null||String(arr[q]).trim()==="") arr[q]=oldL[q]; }
+  arr[i]=val; p.labels=arr; data.plan=p;
+  migrateLabels(oldL,newL);
+  if(ui.dayFilter!=="all" && planLabels().indexOf(ui.dayFilter)<0) ui.dayFilter="all";
+  commit();
+}
 function setPlan(mode,count){
-  data.plan={ mode:mode, count:Math.min(7,Math.max(2,count)) };
+  count=Math.min(7,Math.max(2,count));
+  var oldL=planLabels();
+  var p=data.plan||{mode:"letters",count:2};
+  var modeChanged=(p.mode||"letters")!==mode;
+  p.mode=mode; p.count=count;
+  if(modeChanged) delete p.labels;
+  else if(Array.isArray(p.labels)) p.labels=p.labels.slice(0,count);
+  data.plan=p;
+  var newL=planLabels();
+  migrateLabels(oldL,newL);
   if(ui.dayFilter!=="all" && planLabels().indexOf(ui.dayFilter)<0) ui.dayFilter="all";
   commit();
 }
@@ -1440,7 +1483,10 @@ function setupView(){
     +'<button class="btn-solid" data-action="planminus">\u2212</button>'
     +'<span class="plan-n">'+pc.count+'</span>'
     +'<button class="btn-solid" data-action="planplus">+</button></div></div>';
-  html+='<div class="metric-caption">Your sessions: '+planLabels().join(" \u00b7 ")+'. Assign each exercise to one or more below (none = every session).</div></div>';
+  html+='<div class="plan-row"><span class="plan-lbl">Session names</span><div class="lbl-edits">';
+  planLabels().forEach(function(lb,i){ html+='<input class="lbl-input" data-action="setlabel" data-idx="'+i+'" value="'+esc(lb)+'" maxlength="8" aria-label="Session name '+(i+1)+'">'; });
+  html+='</div></div>';
+  html+='<div class="metric-caption">Assign each exercise to one or more sessions below (none = every session).</div></div>';
 
 
   html+='<div class="section-head">Metrics</div>';
@@ -1776,6 +1822,7 @@ appEl.addEventListener("input",function(e){
   else if(el.id==="iv-reps"){ if(!ui.ivDraft)ui.ivDraft={aMin:0,aSec:30,bMin:0,bSec:15,reps:8,inf:false}; ui.ivDraft.reps=el.value; }
 });
 appEl.addEventListener("change",function(e){
+  var _lt=e.target; if(_lt&&_lt.dataset&&_lt.dataset.action==="setlabel"){ setLabel(Number(_lt.dataset.idx),_lt.value); return; }
   if(e.target.id==="log-date"){ ui.logDate=e.target.value||todayISO(); ui.expanded=null; render(); return; }
   var el=e.target.closest("[data-action]");
   if(!el) return;
