@@ -342,14 +342,16 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .milestone{font-size:.86rem;color:var(--ink);background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:12px 36px 12px 14px;margin:8px 0 4px;line-height:1.5;position:relative}
 .mile-x{position:absolute;top:7px;right:7px;width:26px;height:26px;background:transparent;border:none;color:var(--ink-dim);font-size:1.2rem;line-height:1;cursor:pointer;padding:0}
 .milestone strong{display:block;font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.75rem;color:var(--accent-deep);margin-bottom:4px}
-html[data-theme="puregym"] .milestone{background:#E7B53E;border-color:#CF9A22;color:#16383E}
+html[data-theme="puregym"] .milestone{background:#E7B53E;border-color:#CF9A22;color:#084E58}
 html[data-theme="puregym"] .milestone strong{color:#0D4E4B}
 html[data-theme="puregym"] .milestone .mile-x{color:#33544F}
-html[data-theme="puregym"] .topbar{background:#4CACBF;margin:0 -16px;padding-left:16px;padding-right:16px}
-html[data-theme="puregym"] .topbar .brand-mark,html[data-theme="puregym"] .topbar .brand-name{color:#0B2F35}
-html[data-theme="puregym"] .topbar .save-btn{background:#0B2F35;color:#FFFFFF}
-html[data-theme="puregym"] .topbar .save-btn.saved{background:rgba(11,47,53,.12);color:#0B2F35;border:1px solid #0B2F35}
-html[data-theme="puregym"] .section-head::before{content:"\00BB";color:var(--accent);margin-right:6px;font-weight:800}
+html[data-theme="puregym"] .topbar{background:#0E7480;margin:0 -16px;padding-left:16px;padding-right:16px}
+html[data-theme="puregym"] .topbar .brand-mark,html[data-theme="puregym"] .topbar .brand-name{color:#FFFFFF}
+html[data-theme="puregym"] .topbar .save-btn{background:#E7B53E;color:#084E58}
+html[data-theme="puregym"] .topbar .save-btn.saved{background:transparent;color:#FFFFFF;border:1px solid rgba(255,255,255,.7)}
+html[data-theme="puregym"] .section-head::before{content:"\00BB";color:#C9982B;margin-right:6px;font-weight:800}
+html[data-theme="puregym"] .section-head{color:var(--accent)}
+html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 .cu-toggle{display:flex;gap:6px;margin:4px 0 2px}
 .cu-btn{flex:1;padding:10px 0;font-size:.85rem;font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;letter-spacing:.03em;background:var(--surface);color:var(--ink-dim);border:1px solid var(--line);border-radius:9px;cursor:pointer}
 .cu-btn.on{background:var(--surface-2);border-color:var(--accent);color:var(--accent)}
@@ -364,7 +366,7 @@ html[data-theme="puregym"] .section-head::before{content:"\00BB";color:var(--acc
 <script>
 "use strict";
 
-var APP_VERSION = "3.30";
+var APP_VERSION = "3.34";
 var STORE_KEY = "gym-tracker-shared";
 var FILE_NAME = "Caitlyn";
 
@@ -564,7 +566,7 @@ function muscleOf(name){
   if(c && c.muscle) return {p:c.muscle, s:c.muscle2||null};
   return null;
 }
-var FRESH_SCALES={charcoal:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],pink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],putty:["#636F65","#6E7A63","#8A8A5C","#B07C34","#A96A4A","#A85D5A","#8F4038","#7C2E2C"],slate:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],puregym:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],sage:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],ink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],military:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],midnight:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],graphite:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],violet:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"]};
+var FRESH_SCALES={charcoal:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],pink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],putty:["#636F65","#6E7A63","#8A8A5C","#B07C34","#A96A4A","#A85D5A","#8F4038","#7C2E2C"],slate:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],puregym:["#E0AC46","#CBA75E","#AE9E7E","#8B9698","#5E8388","#3B6B73","#1E555F","#0B3A42"],sage:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],ink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],military:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],midnight:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],graphite:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],violet:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"]};
 var THEMES=[{k:"auto",name:"Auto (match phone)"},{k:"charcoal",name:"Charcoal & Amber"},{k:"pink",name:"Bubblegum"},{k:"putty",name:"Putty & Rose"},{k:"slate",name:"Petrol & Aqua"},{k:"puregym",name:"Pure"},{k:"sage",name:"Sage & Chalk"},{k:"ink",name:"Ink & Electric"},{k:"military",name:"Olive & Brass"},{k:"midnight",name:"Midnight & Gold"},{k:"graphite",name:"Graphite & Silver"},{k:"violet",name:"Violet & Snow"}];
 var THEME_ACCENT={charcoal:"#F2A93B",pink:"#DA1884",putty:"#7E5B58",slate:"#1FB9AB",puregym:"#0B6470",sage:"#3E8E63",ink:"#2563EB",military:"#C2A24E",midnight:"#E0B24C",graphite:"#B0B0B6",violet:"#7C3AED"};
 var THEME_BG={charcoal:"#14171A",pink:"#FFD9EE",putty:"#EDE4D6",slate:"#052526",puregym:"#EBE8E0",sage:"#F3F5F1",ink:"#FFFFFF",military:"#15180F",midnight:"#0E1220",graphite:"#131313",violet:"#FCFCFD"};
