@@ -216,13 +216,27 @@ html,body{background:var(--bg)}
 
 .timer-box{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:13px;margin-bottom:12px;text-align:center}
 .timer-set{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
-.timer-display{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:2.6rem;line-height:1;color:var(--accent);margin-bottom:10px}
-.timer-display.over{color:var(--warn)}
+.timer-display{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:2.6rem;line-height:1;color:var(--accent);margin-bottom:10px;border-radius:12px;transition:background .15s,color .15s,transform .15s}
+.timer-display.countin{color:var(--accent-deep);font-size:3.6rem}
 .timer-display.working{color:var(--ink)}
-.timer-display.met{color:var(--accent)}
+.timer-display.met{color:var(--on-accent);background:var(--accent);padding:6px 0;transform:scale(1.04)}
 .timer-status{font-size:.8rem;color:var(--ink-dim);font-weight:600;margin:-2px 0 10px}
-.timer-status.met{color:var(--accent)}
-.timer-stop{background:var(--warn)}
+.timer-status.met{color:var(--accent-deep);font-weight:700}
+.tgt-stepper{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.tgt-stepper input{width:64px;text-align:center}
+.tgt-stepper button{min-width:38px;padding:9px 0;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);border-radius:8px;font-family:'Barlow',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer}
+.timer-btns{display:flex;gap:8px}
+.timer-btns .btn-solid{flex:0 0 38%}
+.timer-btns .btn-log{flex:1}
+.sh-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.reorder-btn{background:var(--surface-2);border:1px solid var(--line);color:var(--accent-deep);font-family:'Barlow',sans-serif;font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;padding:5px 10px;border-radius:8px;cursor:pointer;white-space:nowrap}
+.reorder-btn.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.ro-list{margin-bottom:12px}
+.ro-row{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:6px}
+.ro-name{flex:1;font-weight:600;font-size:.95rem;color:var(--ink)}
+.ro-btn{min-width:44px;padding:8px 0;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);border-radius:8px;font-size:1rem;cursor:pointer}
+.ro-btn:disabled{opacity:.3}
+.ro-hint{font-size:.72rem;color:var(--ink-faint);margin-top:8px;line-height:1.5}
 .timer-hint{font-size:.72rem;color:var(--ink-faint);margin-top:8px}
 .base-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:11px;padding-top:11px;border-top:1px solid var(--line)}
 .base-lbl{font-size:.74rem;color:var(--ink-faint);font-family:'Barlow Semi Condensed',sans-serif;letter-spacing:.04em}
@@ -366,7 +380,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.34";
+var APP_VERSION = "3.36";
 var STORE_KEY = "gym-tracker-shared";
 
 /* ---------------------------------------------------------------
@@ -379,59 +393,65 @@ var STORE_KEY = "gym-tracker-shared";
 var LIBRARY = [
   { name:"Warm-up cardio", type:"cardio", note:"walk / jog / bike / row / elliptical", group:"Warm", on:true },
 
-  { name:"Cable external rotation", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Cable internal rotation", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Cable front raise", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Seated row", type:"log", unit:"lb", step:5, group:"Main", on:true },
-  { name:"Seated Row Plates", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
-  { name:"Cable reverse fly", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Bench press", type:"log", unit:"kg", step:2.5, group:"Main", on:true },
-  { name:"Preacher curl", type:"log", unit:"kg", step:2.5, group:"Main", on:true },
-  { name:"Barbell Curl", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
-  { name:"Dumbell Curl Reversed Bench", type:"log", unit:"kg", step:2, group:"Main", on:false },
-  { name:"Skullcrushers", type:"log", unit:"kg", step:2, group:"Main", on:false },
-  { name:"Dumbbell press", type:"log", unit:"kg", step:2, group:"Main", on:true },
-  { name:"Seated dumbbell curl", type:"log", unit:"kg", step:2, group:"Main", on:false },
-  { name:"Upright row (dumbbells)", type:"log", unit:"kg", step:2, group:"Main", on:false },
-  { name:"Leg press", type:"log", unit:"kg", step:2.5, group:"Main", on:true },
-  { name:"Lying leg press", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
-  { name:"Hamstring curl", type:"log", unit:"lb", step:5, group:"Main", on:true },
-  { name:"Lunge walk", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, group:"Main", on:true },
+  { name:"Cable external rotation", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
+  { name:"Cable internal rotation", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
+  { name:"Cable front raise", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
+  { name:"Seated row", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:true },
+  { name:"Seated Row Plates", type:"log", unit:"kg", step:2.5, equip:"Machine", group:"Main", on:false },
+  { name:"Cable reverse fly", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
+  { name:"Bench press", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:true },
+  { name:"Preacher curl", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:true },
+  { name:"Barbell Curl", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
+  { name:"Dumbell Curl Reversed Bench", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Skullcrushers", type:"log", unit:"kg", step:2, equip:"Barbell", group:"Main", on:false },
+  { name:"Dumbbell press", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:true },
+  { name:"Seated dumbbell curl", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Upright row (dumbbells)", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Leg press", type:"log", unit:"kg", step:2.5, equip:"Machine", group:"Main", on:true },
+  { name:"Lying leg press", type:"log", unit:"kg", step:2.5, equip:"Machine", group:"Main", on:false },
+  { name:"Hamstring curl", type:"log", unit:"lb", step:10, equip:"Machine", group:"Main", on:true },
+  { name:"Lunge walk", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:true },
 
-  { name:"Dead hang", type:"log", unit:"kg", step:2.5, body:true, timed:true, repLabel:"secs", repWord:"s", group:"Main", on:false },
-  { name:"Chin ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, group:"Main", on:true },
-  { name:"Pull ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, group:"Main", on:false },
-  { name:"Hip thrusters", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
-  { name:"Cable Pull Through", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Leg raises", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.5, group:"Main", on:false },
+  { name:"Dead hang", type:"log", unit:"kg", step:2.5, body:true, timed:true, repLabel:"secs", repWord:"s", equip:"Bodyweight", group:"Main", on:false },
+  { name:"Chin ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, equip:"Bodyweight", group:"Main", on:true },
+  { name:"Pull ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Hip thrusters", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
+  { name:"Cable Pull Through", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
+  { name:"Leg raises", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.5, equip:"Bodyweight", group:"Main", on:false },
 
   /* available, off by default */
-  { name:"Cable crossovers", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Pec deck", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Dumbbell flys", type:"log", unit:"kg", step:2, group:"Main", on:false },
-  { name:"Decline bench press", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
-  { name:"Incline bench press", type:"log", unit:"kg", step:2.5, group:"Main", on:false },
-  { name:"Shoulder press", type:"log", unit:"kg", step:2.5, group:"Main", on:true },
-  { name:"Lat pulldown", type:"log", unit:"lb", step:5, group:"Main", on:true },
-  { name:"Deadlift", type:"log", unit:"kg", step:2.5, group:"Main", on:true },
+  { name:"Cable crossovers", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
+  { name:"Pec deck", type:"log", unit:"lb", step:5, equip:"Machine", group:"Main", on:false },
+  { name:"Dumbbell flys", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Decline bench press", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
+  { name:"Incline bench press", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
+  { name:"Shoulder press", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:true },
+  { name:"Lat pulldown", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:true },
+  { name:"Deadlift", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:true },
 
   /* bodyweight & floor work */
-  { name:"Press-ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.65, group:"Main", on:true },
-  { name:"Squats", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.85, group:"Main", on:true },
-  { name:"Squat jumps", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.85, group:"Main", on:false },
-  { name:"Sit ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.4, group:"Main", on:false },
-  { name:"Crunches", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.3, group:"Main", on:false },
-  { name:"Plank", type:"log", unit:"kg", step:2.5, body:true, timed:true, repLabel:"secs", repWord:"s", group:"Main", on:true },
+  { name:"Press-ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.65, equip:"Bodyweight", group:"Main", on:true },
+  { name:"Squats", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:true },
+  { name:"Squat jumps", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Sit ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.4, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Crunches", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.3, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Plank", type:"log", unit:"kg", step:2.5, body:true, timed:true, repLabel:"secs", repWord:"s", equip:"Bodyweight", group:"Main", on:true },
 
   /* filling the gaps \u2014 off until you want them */
-  { name:"Calf raises", type:"log", unit:"lb", step:5, group:"Main", on:true },
-  { name:"Face pulls", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Rear delt fly", type:"log", unit:"kg", step:2, group:"Main", on:false },
-  { name:"Tricep pushdown", type:"log", unit:"lb", step:5, group:"Main", on:true },
-  { name:"Pallof press", type:"log", unit:"lb", step:5, group:"Main", on:false },
-  { name:"Farmer carry", type:"log", unit:"kg", step:2, group:"Main", on:false },
-  { name:"Step-ups", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, group:"Main", on:false },
-  { name:"Cable step-ups", type:"log", unit:"lb", step:5, group:"Main", on:false },
+  { name:"Calf raises", type:"log", unit:"lb", step:5, equip:"Machine", group:"Main", on:true },
+  { name:"Face pulls", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
+  { name:"Rear delt fly", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Tricep pushdown", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:true },
+  { name:"Pallof press", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
+  { name:"Farmer carry", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Step-ups", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Cable step-ups", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
+
+  { name:"Kettlebell swing", type:"log", unit:"kg", step:4, equip:"Kettlebell", group:"Main", on:false },
+  { name:"Goblet squat", type:"log", unit:"kg", step:4, equip:"Kettlebell", group:"Main", on:true },
+  { name:"Kettlebell clean", type:"log", unit:"kg", step:4, equip:"Kettlebell", group:"Main", on:false },
+  { name:"Kettlebell press", type:"log", unit:"kg", step:4, equip:"Kettlebell", group:"Main", on:false },
+  { name:"Kettlebell row", type:"log", unit:"kg", step:4, equip:"Kettlebell", group:"Main", on:true },
 
   { name:"Treadmill", type:"cardio", group:"Cardio", on:false },
   { name:"Exercise bike", type:"cardio", group:"Cardio", on:false },
@@ -448,6 +468,19 @@ var GROUPS = [
   { key:"Cardio", label:"Cardio" },
   { key:"Cool", label:"Cool down" }
 ];
+
+var EQUIP_ORDER = ["Bodyweight","Dumbbell","Kettlebell","Barbell","Cable","Machine","Other"];
+var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kettlebells",Barbell:"Barbell",Cable:"Cables",Machine:"Machines",Other:"Other"};
+function equipOf(e){
+  if(e.equip) return e.equip;
+  var n=(e.name||"").toLowerCase();
+  if(/kettlebell|goblet/.test(n)) return "Kettlebell";
+  if(/dumbbell|dumbell/.test(n)) return "Dumbbell";
+  if(/barbell/.test(n)) return "Barbell";
+  if(/cable/.test(n)) return "Cable";
+  if(/machine|pec deck|leg press|smith/.test(n)) return "Machine";
+  return "Other";
+}
 
 var METRICS = [
   { key: "weight", label: "Weight", unit: "kg", good: "down", dp: 1, on:true },
@@ -557,7 +590,10 @@ var MUSCLE_MAP = {
   "Squats":{p:"Quads",s:"Glutes"}, "Squat jumps":{p:"Quads",s:"Glutes"},
   "Sit ups":{p:"Core"}, "Crunches":{p:"Core"}, "Plank":{p:"Core"},
   "Cable reverse fly":{p:"Shoulders",s:"Back"}, "Barbell Curl":{p:"Biceps"},
-  "Dumbell Curl Reversed Bench":{p:"Biceps"}, "Cable Pull Through":{p:"Glutes",s:"Hamstrings"}
+  "Dumbell Curl Reversed Bench":{p:"Biceps"}, "Cable Pull Through":{p:"Glutes",s:"Hamstrings"},
+  "Kettlebell swing":{p:"Glutes",s:"Hamstrings"}, "Goblet squat":{p:"Quads",s:"Glutes"},
+  "Kettlebell clean":{p:"Shoulders",s:"Back"}, "Kettlebell press":{p:"Shoulders",s:"Triceps"},
+  "Kettlebell row":{p:"Back",s:"Biceps"}
 };
 function muscleOf(name){
   if(MUSCLE_MAP[name]) return MUSCLE_MAP[name];
@@ -608,7 +644,7 @@ function seed(){
     height: null,
     userName: null,
     sessions: [], habits: {}, checks: {}, cardio: {}, cardioUnit: "kcal",
-    enabled: {}, metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, dayPlan: {}, plan: {mode:"letters",count:2},
+    enabled: {}, metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, exOrder: [], dayPlan: {}, plan: {mode:"letters",count:2},
     admin: { bloodwork: false },
     metrics: {
       weight: [], rhr: [], vo2max: [], waist: [], bodyfat: [], grip: [], systolic: []
@@ -649,7 +685,7 @@ function load(){
       height: (s.height!=null? s.height : base.height),
       userName: (s.userName!=null? s.userName : base.userName),
       sessions: s.sessions||[], habits: s.habits||{}, checks: s.checks||{}, cardio: s.cardio||{}, cardioUnit: s.cardioUnit||"kcal",
-      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, dayPlan: s.dayPlan||{}, plan: s.plan||{mode:"letters",count:2},
+      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, exOrder: s.exOrder||[], dayPlan: s.dayPlan||{}, plan: s.plan||{mode:"letters",count:2},
       admin: Object.assign({},base.admin,s.admin||{}),
       metrics: _mw
     };
@@ -662,7 +698,7 @@ function save(){
 
 var data = load() || seed();
 var ui = {
-  tab:"log", expanded:null, logDate: todayISO(), timer:{active:false}, dayFilter:"all", woScope:"all",
+  tab:"log", expanded:null, logDate: todayISO(), timer:{active:false}, dayFilter:"all", reorder:false, woScope:"all",
   weight:20, reps:8,
   metricInputs:{},
   restoreText:"", backupOpen:false, backupMsg:"",
@@ -792,16 +828,29 @@ function sortRank(name){
   Object.keys(data.cardio||{}).forEach(function(d){ if(data.cardio[d][name]) consider(d); });
   return best==null ? null : Math.max(0, daysBetween(best, todayISO()));
 }
-function stepsForGroup(key){
-  var list=allExercises().filter(function(e){return e.group===key && isEnabled(e.name);});
-  if(key!=="Main") return list;
+function enabledMainOrdered(){
+  var list=allExercises().filter(function(e){ return e.group==="Main" && isEnabled(e.name); });
+  var ord=data.exOrder||[];
   return list.slice().sort(function(a,b){
+    var ia=ord.indexOf(a.name), ib=ord.indexOf(b.name);
+    if(ia>=0||ib>=0){ if(ia<0) return 1; if(ib<0) return -1; return ia-ib; }
     var da=sortRank(a.name), db=sortRank(b.name);
-    var ba = (da==null||da>14) ? 99 : da;
-    var bb = (db==null||db>14) ? 99 : db;
+    var ba=(da==null||da>14)?99:da, bb=(db==null||db>14)?99:db;
     if(ba!==bb) return ba-bb;
     return a.name.localeCompare(b.name);
   });
+}
+function moveEx(name,dir){
+  var order=enabledMainOrdered().map(function(e){ return e.name; });
+  var i=order.indexOf(name), j=i+dir;
+  if(i<0||j<0||j>=order.length) return;
+  var moved=order.splice(i,1)[0];
+  order.splice(j,0,moved);
+  data.exOrder=order; commit();
+}
+function stepsForGroup(key){
+  if(key==="Main") return enabledMainOrdered();
+  return allExercises().filter(function(e){return e.group===key && isEnabled(e.name);});
 }
 function backupJSON(){ return JSON.stringify(data,null,2); }
 function setVolume(name,s){
@@ -909,7 +958,7 @@ function muscleMap(counts){
   function h2r(h){ h=(h||"").trim().replace("#",""); if(h.length!==6) return [42,46,52]; return [0,2,4].map(function(i){return parseInt(h.slice(i,i+2),16);}); }
   var BG=h2r(cs.getPropertyValue("--bg")), AC=h2r(cs.getPropertyValue("--accent")), INK=h2r(cs.getPropertyValue("--ink"));
   var maxc=0; MUSCLES.forEach(function(m){ if((counts[m]||0)>maxc) maxc=counts[m]; });
-  var HI=Math.max(12,maxc), FLOOR=0.15;
+  var HI=Math.max(12,maxc), FLOOR=0.06;
   function lerp(a,b,t){ return "rgb("+a.map(function(x,i){return Math.round(x+(b[i]-x)*t);}).join(",")+")"; }
   function heat(v){ var t=FLOOR+(1-FLOOR)*Math.max(0,Math.min(1,(v||0)/HI)); return lerp(BG,AC,t); }
   var NEUTRAL=lerp(BG,INK,0.13);
@@ -1113,23 +1162,33 @@ var timerHandle=null;
 function timerTick(){
   var el=document.getElementById("timer-display");
   if(!el){ return; }
-  var elapsed=Math.floor((Date.now()-ui.timer.startMs)/1000);
+  var st=document.getElementById("timer-status");
+  var now=Date.now();
+  if(now < ui.timer.runMs){
+    var cd=Math.max(1, Math.ceil((ui.timer.runMs-now)/1000));
+    el.textContent=cd;
+    el.className="timer-display countin";
+    if(st){ st.textContent="Get ready\u2026"; st.className="timer-status"; }
+    return;
+  }
+  var elapsed=Math.floor((now-ui.timer.runMs)/1000);
   ui.timer.held=elapsed;
   var met=elapsed>=ui.timer.target;
   el.textContent=elapsed+"s";
   el.className="timer-display"+(met?" met":" working");
-  var st=document.getElementById("timer-status");
+  if(met && !ui.timer.buzzed){ ui.timer.buzzed=true; ivBeep(880,0.35,0.5); }
   if(st){
-    st.textContent=met ? ("\u2713 Target met ("+ui.timer.target+"s)") : ("Target "+ui.timer.target+"s");
+    st.textContent=met ? ("\u2713 Target met ("+ui.timer.target+"s) \u2014 keep holding") : ("Target "+ui.timer.target+"s");
     st.className="timer-status"+(met?" met":"");
   }
 }
 function startTimer(name){
   var inp=document.getElementById("timer-target");
   var tgt=Math.max(1, Math.round(Number(inp?inp.value:ui.timer.target)||ui.timer.target||30));
-  ui.timer={active:true, name:name, target:tgt, startMs:Date.now(), held:0};
+  ui.timer={active:true, name:name, target:tgt, runMs:Date.now()+5000, held:0, buzzed:false};
+  ivAudioInit();
   if(timerHandle) clearInterval(timerHandle);
-  timerHandle=setInterval(timerTick, 250);
+  timerHandle=setInterval(timerTick, 100);
   render();
 }
 function stopTimer(){
@@ -1138,6 +1197,19 @@ function stopTimer(){
   if(held>0) ui.reps=held;
   ui.timer.active=false;
   render();
+}
+function stopTimerLog(){
+  var name=ui.timer.name;
+  if(timerHandle){ clearInterval(timerHandle); timerHandle=null; }
+  var held=ui.timer.held||0;
+  ui.timer.active=false;
+  if(held>0){ ui.reps=held; logSet(name); }
+  else render();
+}
+function tgtStep(d){
+  var inp=document.getElementById("timer-target"); if(!inp) return;
+  var v=Math.max(1, (Number(inp.value)||30)+d);
+  inp.value=v;
 }
 function saveBase(name){
   var el=document.getElementById("base-input");
@@ -1201,7 +1273,7 @@ function restoreBackup(){
     height:(parsed.height!=null?parsed.height:base.height),
     userName:(parsed.userName!=null?parsed.userName:base.userName),
     sessions: parsed.sessions||[], habits: parsed.habits||{}, checks: parsed.checks||{}, cardio: parsed.cardio||{}, cardioUnit: parsed.cardioUnit||"kcal",
-    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, dayPlan: parsed.dayPlan||{}, plan: parsed.plan||{mode:"letters",count:2},
+    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, exOrder: parsed.exOrder||[], dayPlan: parsed.dayPlan||{}, plan: parsed.plan||{mode:"letters",count:2},
     admin: Object.assign({},base.admin,parsed.admin||{}),
     metrics: Object.assign({},base.metrics,parsed.metrics||{})
   };
@@ -1273,7 +1345,7 @@ function logView(){
   var _cg=cardioGag();
   var MILE_DEFS=[
     {cat:"ton",lab:"Tonnage",val:tonTotal,steps:[[5,"Five tonnes shifted \u2014 five tonnes that used to just sit there judging you. Not anymore."],[10,"Ten tonnes moved. You\u2019re not working out, you\u2019re quietly running a removals firm."],[25,"Twenty-five tonnes \u2014 that\u2019s a lot of iron to be on first-name terms with."],[50,"Fifty tonnes shifted. Somewhere, a forklift just felt a cold shiver of professional jealousy."],[75,"Seventy-five tonnes. Your muscles have started leaving little thank-you notes."],[100,"A hundred tonnes \u2014 a whole blue whale, lifted one honest rep at a time. The whale is impressed. Whales don\u2019t impress easily."],[150,"150 tonnes. Life\u2019s a game of inches, and you\u2019ve quietly stacked up a whole mile of them."],[250,"250 tonnes. At this point the barbell hears your name and gets a little nervous."],[500,"Five hundred tonnes. Gone with the weights. Frankly, my dear, that\u2019s ridiculous \u2014 in the very best way."],[1000,"A thousand tonnes \u2014 a literal kilotonne. That blue whale from earlier? It brought the whole family to watch."]]},
-    {cat:"wo",lab:"Workouts",val:woTotal,steps:[[5,"Five sessions in. You know what showing up five times makes you? The kind of person who shows up. That\u2019s the whole secret."],[10,"Ten sessions down. Showing up is still undefeated \u2014 and so, apparently, are you."],[25,"Twenty-five workouts. Somewhere, \u2018I\u2019ll start Monday\u2019 is quietly packing its bags."],[50,"Fifty down. Somewhere in here it stopped being something you do and started being someone you are. Sneaky how that happens."],[100,"A hundred workouts. Welcome to the century club \u2014 no cake, no plaque, just you, a hundred times braver than the one who started."],[150,"150 sessions. The only place \u2018gains\u2019 comes before \u2018graft\u2019 is the dictionary. You did the graft."],[200,"Two hundred sessions. Rocky got a whole montage for less than this \u2014 and he had a soundtrack. You did it in silence. Legend."],[300,"Three hundred sessions. It\u2019s not the one who tried three hundred exercises once \u2014 it\u2019s you, doing the honest ones three hundred times, that nobody messes with."],[365,"365 workouts. A full year of you versus yesterday\u2019s you. Final score? You won. Every single time."],[500,"Five hundred sessions. Honestly, the gym should be paying YOU rent by now. Maybe name a water fountain after you."]]},
+    {cat:"wo",lab:"Workouts",val:woTotal,steps:[[5,"Five sessions in. You know what showing up five times makes you? The kind of person who shows up. That\u2019s the whole secret."],[10,"Ten workouts down \u2014 double figures. You\u2019re not \u2018giving it a go\u2019 anymore; you\u2019re just someone who trains now. Funny how quietly that snuck up on you."],[25,"Twenty-five workouts. Somewhere, \u2018I\u2019ll start Monday\u2019 is quietly packing its bags."],[50,"Fifty down. Somewhere in here it stopped being something you do and started being someone you are. Sneaky how that happens."],[100,"A hundred workouts. Welcome to the century club \u2014 no cake, no plaque, just you, a hundred times braver than the one who started."],[150,"150 sessions. The only place \u2018gains\u2019 comes before \u2018graft\u2019 is the dictionary. You did the graft."],[200,"Two hundred sessions. Rocky got a whole montage for less than this \u2014 and he had a soundtrack. You did it in silence. Legend."],[300,"Three hundred sessions. It\u2019s not the one who tried three hundred exercises once \u2014 it\u2019s you, doing the honest ones three hundred times, that nobody messes with."],[365,"365 workouts. A full year of you versus yesterday\u2019s you. Final score? You won. Every single time."],[500,"Five hundred sessions. Honestly, the gym should be paying YOU rent by now. Maybe name a water fountain after you."]]},
     {cat:"streak",lab:"Streak",val:stTotal,steps:[[2,"Two weeks back to back. It doesn\u2019t matter how fast you go, only that you don\u2019t stop \u2014 and look at you, not stopping."],[4,"Four weeks unbroken. Let\u2019s be honest with each other \u2014 you\u2019re a little bit in love with this now, aren\u2019t you?"],[8,"Eight straight weeks. Quiet consistency beats loud intensity every time. You\u2019re living proof, and you\u2019re glorious."],[12,"Twelve weeks running. A whole quarter of never-not-showing-up. That\u2019s not a habit anymore, that\u2019s a personality trait."],[26,"Twenty-six weeks. Half a year, one week at a time \u2014 the thousand-mile road, and you\u2019ve come further than you think."],[40,"Forty weeks unbroken. That\u2019s not luck, and it\u2019s not a fluke. That\u2019s just you, being magnificent on a schedule."],[52,"Fifty-two weeks. A perfect, unbroken year. The streak is strong with this one \u2014 go on, feel a little unstoppable."]]},
     {cat:"cardio",lab:"Cardio",val:cardioTotal,steps:(cardioUnit()==="min"?[[30,"Half an hour of cardio in the bank. The engine coughed, caught, and roared. We\u2019re off."],[60,"A full hour of cardio done. Your heart just sent up a little flare of pure gratitude."],[180,"Three hours in \u2014 three hours of choosing \u2018go\u2019 over \u2018sofa.\u2019 The sofa took it personally."],[300,"Five hours of cardio. Somewhere, a treadmill is telling all the other treadmills about you."],[600,"Ten whole hours! "+(_cg||"Your lungs have quietly upgraded themselves to business class.")],[1200,"Twenty hours of cardio. That\u2019s not a hobby anymore \u2014 that\u2019s a full-blown engine with a personality."],[3000,"Fifty hours of go. Fifty! Absolute machine \u2014 Coach would be beaming and reaching for the tissues."]]:[[500,"500 calories torched. The engine\u2019s lit and purring. Listen to it go."],[1000,"A thousand calories burned \u2014 a whole day\u2019s fuel, spent the gloriously hard way."],[5000,"5,000 calories \u2014 roughly two marathons of effort, minus the questionable shorts."],[10000,"10,000 calories torched. Your heart wants you to know it\u2019s having the time of its life."],[25000,"25,000 calories. "+(_cg||"Relentless. Your lungs have started bragging to other lungs.")],[50000,"50,000 calories \u2014 a truly heroic amount of huffing, puffing, and getting on with it."],[100000,"100,000 calories. Six whole figures. You beautiful, unstoppable engine \u2014 take a bow, then take a breath."]])}
   ];
@@ -1294,7 +1366,7 @@ function logView(){
 
 
 
-  if(anyDayAssigned()){
+  if(anyDayAssigned() && !ui.reorder){
   html+='<div class="day-filter">'
     +'<button class="df-btn'+(ui.dayFilter==="all"?" on":"")+'" data-action="dayfilter" data-arg="all">All</button>';
   planLabels().forEach(function(lb){
@@ -1302,7 +1374,7 @@ function logView(){
   });
   html+=helpQ('plan')+'</div>';
   html+=helpA('plan');
-  } else { ui.dayFilter="all"; }
+  } else if(!anyDayAssigned()){ ui.dayFilter="all"; }
 
   GROUPS.forEach(function(g){
     var steps=stepsForGroup(g.key);
@@ -1312,7 +1384,23 @@ function logView(){
     if(!steps.length) return;
     var head=esc(g.label);
     if(g.key==="Main" && ui.dayFilter!=="all") head+=' \u00b7 session '+esc(ui.dayFilter);
-    html+='<div class="section-head">'+head+'</div><div class="step-list">';
+    if(g.key==="Main"){
+      var _mAll=enabledMainOrdered();
+      html+='<div class="section-head sh-row">'+(ui.reorder?esc(g.label):head)+(_mAll.length>1?'<button class="reorder-btn'+(ui.reorder?" on":"")+'" data-action="reorder">'+(ui.reorder?"Done":"\u21c5 Order")+'</button>':'')+'</div>';
+      if(ui.reorder){
+        html+='<div class="ro-list">';
+        _mAll.forEach(function(e,i){
+          html+='<div class="ro-row"><span class="ro-name">'+esc(e.name)+'</span>'
+            +'<button class="ro-btn" data-action="exup" data-arg="'+esc(e.name)+'"'+(i===0?" disabled":"")+' aria-label="Move up">\u25b4</button>'
+            +'<button class="ro-btn" data-action="exdown" data-arg="'+esc(e.name)+'"'+(i===_mAll.length-1?" disabled":"")+' aria-label="Move down">\u25be</button></div>';
+        });
+        html+='<div class="ro-hint">Order once \u2014 every session follows it. The colour bar still shows freshness.</div></div>';
+        return;
+      }
+      html+='<div class="step-list">';
+    } else {
+      html+='<div class="section-head">'+head+'</div><div class="step-list">';
+    }
     steps.forEach(function(step){
       var nm=esc(step.name);
       var noteHtml = step.note ? ' <em>\u00b7 '+esc(step.note)+'</em>' : '';
@@ -1364,14 +1452,18 @@ function logView(){
         if(step.timed){
           var lastSecs = (recentEntry(step.name)||{}).r || 30;
           if(ui.timer && ui.timer.active && ui.timer.name===step.name){
-            html+='<div class="timer-box"><div id="timer-display" class="timer-display working">0s</div>'
-              +'<div id="timer-status" class="timer-status">Target '+ui.timer.target+'s</div>'
-              +'<button class="btn-log timer-stop" data-action="stoptimer">Stop &amp; use time</button>'
-              +'<div class="timer-hint">Counts up \u2014 the target lights up when you reach it. Keep holding, then Stop &amp; use time.</div></div>';
+            html+='<div class="timer-box"><div id="timer-display" class="timer-display countin">5</div>'
+              +'<div id="timer-status" class="timer-status">Get ready\u2026</div>'
+              +'<div class="timer-btns"><button class="btn-solid" data-action="stoptimer">Stop</button>'
+              +'<button class="btn-log" data-action="stoptimerlog">Stop &amp; log</button></div>'
+              +'<div class="timer-hint">5\u2026 4\u2026 3\u2026 2\u2026 1, then it counts up. The number fills in the moment you hit your target.</div></div>';
           } else {
-            html+='<div class="timer-box"><div class="timer-set"><span class="entry-label">Target</span>'
-              +'<input id="timer-target" inputmode="numeric" class="base-input" value="'+esc(lastSecs)+'"><span class="base-unit">secs</span></div>'
-              +'<button class="btn-log" data-action="starttimer" data-arg="'+nm+'">Start timer</button></div>';
+            html+='<div class="timer-box"><div class="entry-label" style="margin-bottom:6px">Hold target</div>'
+              +'<div class="tgt-stepper"><button data-action="tgt" data-arg="-10">\u221210</button><button data-action="tgt" data-arg="-1">\u22121</button>'
+              +'<input id="timer-target" inputmode="numeric" class="base-input" value="'+esc(lastSecs)+'">'
+              +'<button data-action="tgt" data-arg="1">+1</button><button data-action="tgt" data-arg="10">+10</button></div>'
+              +'<div class="base-unit" style="text-align:center;margin-top:4px">secs</div>'
+              +'<button class="btn-log" data-action="starttimer" data-arg="'+nm+'" style="margin-top:10px">Start timer</button></div>';
           }
         }
         html+='<div class="entry">'
@@ -1440,42 +1532,53 @@ function setupView(){
   html+='</select></div><div class="setup-note">Applies straight away. \u201cAuto\u201d follows your phone\u2019s light/dark setting.</div>';
   html+='<div class="section-head">Feedback</div><a class="fb-btn" href="mailto:?subject=Niten%20feedback&body='+encodeURIComponent("What happened, or what\u2019s the idea?\n\n\n\u2014\nApp v"+APP_VERSION)+'">Report a bug or an idea</a><div class="setup-note">Opens your email with the app version already filled in.</div>';
   html+='<div class="setup-note" style="margin-top:16px">Switch things on to show them, off to hide them. The pills under each exercise set which session it belongs to \u2014 tap to include or exclude. None lit means it shows in every session. Turning something off never deletes what you\u2019ve logged.</div>';
+  function libRow(e, isMain){
+    var on=isEnabled(e.name);
+    var metaHtml;
+    if(e.type==="check"){ metaHtml="tick to complete"; }
+    else if(e.type==="cardio"){ metaHtml=cardioUnit()+" \u00b7 steps of 10"; }
+    else {
+      metaHtml=esc(e.unit)+" \u00b7 steps of ";
+      if(e.type==="log" && !e.timed){
+        var _io=(e.unit==="lb")?[2.5,5,10]:[1,2,2.5,5], _cs=stepOf(e.name);
+        metaHtml+='<select class="inc-sel" data-action="setstep" data-arg="'+esc(e.name)+'">';
+        _io.forEach(function(o){ metaHtml+='<option value="'+o+'"'+(_cs===o?" selected":"")+'>'+o+'</option>'; });
+        metaHtml+='</select>';
+      } else { metaHtml+=e.step; }
+      if(e.body) metaHtml+=" \u00b7 bodyweight";
+    }
+    var dayBtn='';
+    if(isMain && on){
+      var mem=dayMembership(e.name).filter(function(m){return planLabels().indexOf(m)>=0;});
+      dayBtn='<div class="day-pills">';
+      planLabels().forEach(function(lb){
+        dayBtn+='<button class="day-pill'+(mem.indexOf(lb)>=0?" on":(mem.length===0?" all":""))+'" data-action="toggleday" data-arg="'+esc(e.name)+'" data-day="'+lb+'">'+esc(lb)+'</button>';
+      });
+      dayBtn+='</div>';
+    }
+    return '<div class="lib-row"><div class="lib-main"><div class="lib-name">'+esc(e.name)+'</div>'
+      +'<div class="lib-meta">'+metaHtml+(e.custom?" \u00b7 yours":"")+'</div>'
+      +dayBtn
+      +'</div>'
+      +(e.custom?'<button class="lib-del" data-action="delcustom" data-arg="'+esc(e.name)+'">\u00d7</button>':'')
+      +'<button class="toggle'+(on?" on":"")+'" data-action="toggleex" data-arg="'+esc(e.name)+'" aria-pressed="'+on+'"><span class="toggle-knob"></span></button></div>';
+  }
   GROUPS.forEach(function(g){
+    if(g.key==="Main"){
+      EQUIP_ORDER.forEach(function(eq){
+        var list=allExercises().filter(function(e){return e.group==="Main" && equipOf(e)===eq;})
+          .sort(function(a,b){return a.name.localeCompare(b.name);});
+        if(!list.length) return;
+        html+='<div class="section-head">'+esc(EQUIP_LABEL[eq]||eq)+'</div>';
+        list.forEach(function(e){ html+=libRow(e, true); });
+      });
+      return;
+    }
     var list=allExercises().filter(function(e){return e.group===g.key;})
       .sort(function(a,b){return a.name.localeCompare(b.name);});
     if(!list.length) return;
     html+='<div class="section-head">'+esc(g.label)+'</div>';
-    list.forEach(function(e){
-      var on=isEnabled(e.name);
-      var metaHtml;
-      if(e.type==="check"){ metaHtml="tick to complete"; }
-      else if(e.type==="cardio"){ metaHtml=cardioUnit()+" \u00b7 steps of 10"; }
-      else {
-        metaHtml=esc(e.unit)+" \u00b7 steps of ";
-        if(e.type==="log" && !e.timed){
-          var _io=(e.unit==="lb")?[2.5,5,10]:[1,2,2.5,5], _cs=stepOf(e.name);
-          metaHtml+='<select class="inc-sel" data-action="setstep" data-arg="'+esc(e.name)+'">';
-          _io.forEach(function(o){ metaHtml+='<option value="'+o+'"'+(_cs===o?" selected":"")+'>'+o+'</option>'; });
-          metaHtml+='</select>';
-        } else { metaHtml+=e.step; }
-        if(e.body) metaHtml+=" \u00b7 bodyweight";
-      }
-      var dayBtn='';
-      if(g.key==="Main" && on){
-        var mem=dayMembership(e.name).filter(function(m){return planLabels().indexOf(m)>=0;});
-        dayBtn='<div class="day-pills">';
-        planLabels().forEach(function(lb){
-          dayBtn+='<button class="day-pill'+(mem.indexOf(lb)>=0?" on":(mem.length===0?" all":""))+'" data-action="toggleday" data-arg="'+esc(e.name)+'" data-day="'+lb+'">'+esc(lb)+'</button>';
-        });
-        dayBtn+='</div>';
-      }
-      html+='<div class="lib-row"><div class="lib-main"><div class="lib-name">'+esc(e.name)+'</div>'
-        +'<div class="lib-meta">'+metaHtml+(e.custom?" \u00b7 yours":"")+'</div>'
-        +dayBtn
-        +'</div>'
-        +(e.custom?'<button class="lib-del" data-action="delcustom" data-arg="'+esc(e.name)+'">\u00d7</button>':'')
-        +'<button class="toggle'+(on?" on":"")+'" data-action="toggleex" data-arg="'+esc(e.name)+'" aria-pressed="'+on+'"><span class="toggle-knob"></span></button></div>';
-    });
+    list.forEach(function(e){ html+=libRow(e, false); });
   });
 
   var pc=planCfg();
@@ -1776,6 +1879,8 @@ appEl.addEventListener("click",function(e){
     case "savebase": saveBase(el.dataset.arg); break;
     case "starttimer": startTimer(arg); break;
     case "stoptimer": stopTimer(); break;
+    case "stoptimerlog": stopTimerLog(); break;
+    case "tgt": tgtStep(Number(arg)); break;
     case "ivstart": ivStart(); break;
     case "ivpause": ivPause(); break;
     case "ivstop": ivStop(false); break;
@@ -1786,6 +1891,9 @@ appEl.addEventListener("click",function(e){
     case "admin": toggleAdmin(); break;
     case "toggleex": toggleEnabled(arg); break;
     case "dayfilter": ui.dayFilter=arg; ui.expanded=null; render(); break;
+    case "reorder": ui.reorder=!ui.reorder; if(ui.reorder) ui.dayFilter="all"; ui.expanded=null; render(); break;
+    case "exup": moveEx(arg,-1); break;
+    case "exdown": moveEx(arg,1); break;
     case "woscope": { var wo=["all","year","month","week"]; ui.woScope=wo[(wo.indexOf(ui.woScope||"all")+1)%wo.length]; render(); break; }
     case "toggleday": toggleDayMember(arg, el.dataset.day); break;
     case "planmode": setPlan(el.dataset.arg, planCfg().count); break;
