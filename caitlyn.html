@@ -348,6 +348,12 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .iv-run.iv-work .iv-phase{color:var(--accent-deep);font-size:1.2rem;letter-spacing:.05em;text-align:center;padding:0 8px;line-height:1.2}
 .iv-run.iv-work .iv-count{color:var(--accent)}
 .iv-run.iv-rest{background:var(--surface)}
+.cond-banner{background:var(--accent-soft);border:1px solid var(--accent);border-radius:12px;padding:14px;margin-bottom:14px;font-size:.9rem;color:var(--ink);line-height:1.5}
+.cond-actions{display:flex;gap:8px;margin-top:12px}
+.cond-actions .btn-log{flex:1}
+.cond-actions .btn-solid{flex:0 0 40%}
+.cond-card{position:relative}
+.cond-del{position:absolute;top:8px;right:12px;background:none;border:none;color:var(--ink-faint);font-size:1.3rem;line-height:1;cursor:pointer;padding:4px}
 .iv-mode{display:flex;gap:6px;margin:6px 0 14px;background:var(--surface-2);border-radius:10px;padding:4px}
 .iv-mode-btn{flex:1;padding:9px 0;background:transparent;border:none;color:var(--ink-dim);font-family:'Barlow',sans-serif;font-weight:700;font-size:.9rem;border-radius:7px;cursor:pointer}
 .iv-mode-btn.on{background:var(--accent);color:var(--on-accent)}
@@ -364,6 +370,19 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .iv-newinp{flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);font-family:'Barlow',sans-serif;font-size:.9rem;font-weight:600;padding:9px 10px;border-radius:9px}
 .iv-addbtn{padding:9px 14px;white-space:nowrap}
 .iv-unit2{font-size:.8rem;color:var(--ink-faint)}
+.app-foot{text-align:center;padding:18px 0 28px}
+.foot-ver{background:none;border:none;color:var(--ink-faint);font-family:'Barlow',sans-serif;font-size:.72rem;letter-spacing:.04em;cursor:pointer;padding:6px 10px}
+.wn-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
+.wn-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;max-width:420px;width:100%;max-height:80vh;overflow-y:auto;padding:20px;box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.wn-title{font-family:'Barlow Condensed','Barlow',sans-serif;font-weight:700;font-size:1.5rem;color:var(--ink);margin-bottom:14px;text-transform:uppercase;letter-spacing:.02em}
+.wn-cheer{font-size:.92rem;font-style:italic;color:var(--accent-deep);margin:-6px 0 16px;line-height:1.5}
+.day-cheer{font-size:.9rem;font-style:italic;color:var(--ink-dim);text-align:center;margin:2px 0 14px;line-height:1.5;padding:0 10px}
+.wn-entry{margin-bottom:14px}
+.wn-ver{font-family:'Barlow',sans-serif;font-weight:700;font-size:.72rem;color:var(--accent-deep);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.wn-list{margin:0;padding-left:18px}
+.wn-list li{font-size:.9rem;color:var(--ink);line-height:1.5;margin-bottom:5px}
+.wn-p{font-size:.9rem;color:var(--ink);margin:0}
+.wn-ok{width:100%;margin-top:8px}
 .gs{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;margin:8px 0 4px}
 .gs-head{font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.75rem;color:var(--accent-deep);margin-bottom:13px;font-weight:700}
 .gs-item{display:flex;align-items:flex-start;gap:11px;margin-bottom:13px}
@@ -400,7 +419,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.41";
+var APP_VERSION = "3.45";
 var STORE_KEY = "gym-tracker-shared";
 var FILE_NAME = "Caitlyn";
 
@@ -493,6 +512,39 @@ var GROUPS = [
 var EQUIP_ORDER = ["Bodyweight","Dumbbell","Kettlebell","Barbell","Cable","Machine","Other"];
 var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kettlebells",Barbell:"Barbell",Cable:"Cables",Machine:"Machines",Other:"Other"};
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
+var CHANGELOG = [
+  {v:"3.42", items:["The app version now shows at the bottom of every screen.","This \u2018What\u2019s new\u2019 note \u2014 tap the version at any time to reopen it."]},
+  {v:"3.41", items:["Muscle balance now weighs each set by effort, not just how many sets you did."]},
+  {v:"3.40", items:["Rate a set\u2019s effort: swipe right for a hard set (to failure), left for an easy one. No swipe keeps it moderate."]},
+  {v:"3.38", items:["Tabata mode in the interval timer \u2014 alternate two exercises, with editable pairings."]},
+  {v:"3.37", items:["Assisted pull-ups and chin-ups: set a negative weight for the assist machine."]},
+  {v:"3.36", items:["Setup is grouped by equipment, you can drag exercises into your own order, and kettlebell moves were added."]},
+  {v:"3.35", items:["Hold timer upgraded: a 5-second count-in, it fills and beeps when you hit your target, and a Stop & log button."]}
+];
+function cmpVer(a,b){ var x=String(a).split("."), y=String(b).split("."); for(var i=0;i<Math.max(x.length,y.length);i++){ var d=(parseInt(x[i]||0,10))-(parseInt(y[i]||0,10)); if(d) return d; } return 0; }
+var wnSince=null;
+var CHEERS=[
+  "Look at you, showing up. That\u2019s most of the battle, right there.",
+  "Progress is quiet \u2014 it\u2019s just you, doing the thing again.",
+  "You don\u2019t have to be great to start. But you started, so you\u2019re already ahead.",
+  "Small steps are still steps. Keep going.",
+  "The second-best time to train is right now.",
+  "Nobody ever regretted the workout they did \u2014 only the one they skipped.",
+  "Stay curious about what your body can do next.",
+  "You\u2019re building something here, one honest set at a time.",
+  "They were laying bricks every hour. That\u2019s how anything gets built.",
+  "A little better than yesterday is the whole game.",
+  "You\u2019re not behind. You\u2019re exactly where the work is.",
+  "Strong is a habit, and a habit is just a choice you keep making.",
+  "Every rep is a small vote for who you\u2019re becoming.",
+  "The scale measures gravity, not worth. Carry on.",
+  "Showing up tired still counts. Might even count double.",
+  "On the hard days, the habit carries you. That\u2019s what it\u2019s for.",
+  "Rest is part of the plan, not a break from it.",
+  "Onwards. It\u2019s the only direction that matters."
+];
+function cheerHash(s){ s=String(s); var h=0; for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))|0; } return Math.abs(h); }
+function cheerLine(seed){ return CHEERS[cheerHash(seed)%CHEERS.length]; }
 function equipOf(e){
   if(e.equip) return e.equip;
   var n=(e.name||"").toLowerCase();
@@ -665,8 +717,8 @@ function seed(){
     miles: {wo:0,ton:0,streak:0,cardio:0},
     height: null,
     userName: null,
-    sessions: [], habits: {}, checks: {}, cardio: {}, cardioUnit: "kcal",
-    enabled: {}, metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, exOrder: [], dayPlan: {}, plan: {mode:"letters",count:2}, pairs: DEFAULT_PAIRS.slice(),
+    sessions: [], habits: {}, checks: {}, cardio: {}, conditioning: {}, cardioUnit: "kcal",
+    enabled: {"Goblet squat":false,"Kettlebell row":false}, metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, exOrder: [], dayPlan: {}, plan: {mode:"letters",count:2}, pairs: DEFAULT_PAIRS.slice(), lastSeenVersion: null,
     admin: { bloodwork: false },
     metrics: {
       weight: [], rhr: [], vo2max: [], waist: [], bodyfat: [], grip: [], systolic: []
@@ -706,8 +758,8 @@ function load(){
       miles: Object.assign({wo:0,ton:0,streak:0,cardio:0}, s.miles||{}),
       height: (s.height!=null? s.height : base.height),
       userName: (s.userName!=null? s.userName : base.userName),
-      sessions: s.sessions||[], habits: s.habits||{}, checks: s.checks||{}, cardio: s.cardio||{}, cardioUnit: s.cardioUnit||"kcal",
-      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, exOrder: s.exOrder||[], dayPlan: s.dayPlan||{}, plan: s.plan||{mode:"letters",count:2}, pairs: (s.pairs&&s.pairs.length?s.pairs:DEFAULT_PAIRS.slice()),
+      sessions: s.sessions||[], habits: s.habits||{}, checks: s.checks||{}, cardio: s.cardio||{}, conditioning: s.conditioning||{}, cardioUnit: s.cardioUnit||"kcal",
+      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, exOrder: s.exOrder||[], dayPlan: s.dayPlan||{}, plan: s.plan||{mode:"letters",count:2}, pairs: (s.pairs&&s.pairs.length?s.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: s.lastSeenVersion||null,
       admin: Object.assign({},base.admin,s.admin||{}),
       metrics: _mw
     };
@@ -725,7 +777,7 @@ var ui = {
   metricInputs:{},
   restoreText:"", backupOpen:false, backupMsg:"",
   saveState:"idle", progEx:null, cal:0, guideOpen:false, help:{}, flash:null, resetArmed:false, newMuscle:-1, newMuscle2:-1,
-  newName:"", newKind:0
+  newName:"", newKind:0, newCardioName:"", pendingCond:null, showWhatsNew:false
 };
 METRICS.forEach(function(m){ ui.metricInputs[m.key]=""; });
 /* ---- contextual help ---- */
@@ -747,6 +799,7 @@ function helpA(key){ return (HELP[key] && ui.help[key]) ? '<div class="help-tip"
 /* ---- exercise access ---- */
 function allExercises(){
   var custom=(data.custom||[]).map(function(c){
+    if(c.type==="cardio") return { name:c.name, type:"cardio", group:"Cardio", on:true, custom:true };
     return { name:c.name, type:"log", unit:c.unit, step:c.step, body:!!c.body,
              bwFactor:c.body?1:undefined, group:"Main", on:true, custom:true };
   });
@@ -1296,8 +1349,8 @@ function restoreBackup(){
     miles: Object.assign({wo:0,ton:0,streak:0,cardio:0}, parsed.miles||{}),
     height:(parsed.height!=null?parsed.height:base.height),
     userName:(parsed.userName!=null?parsed.userName:base.userName),
-    sessions: parsed.sessions||[], habits: parsed.habits||{}, checks: parsed.checks||{}, cardio: parsed.cardio||{}, cardioUnit: parsed.cardioUnit||"kcal",
-    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, exOrder: parsed.exOrder||[], dayPlan: parsed.dayPlan||{}, plan: parsed.plan||{mode:"letters",count:2}, pairs: (parsed.pairs&&parsed.pairs.length?parsed.pairs:DEFAULT_PAIRS.slice()),
+    sessions: parsed.sessions||[], habits: parsed.habits||{}, checks: parsed.checks||{}, cardio: parsed.cardio||{}, conditioning: parsed.conditioning||{}, cardioUnit: parsed.cardioUnit||"kcal",
+    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, exOrder: parsed.exOrder||[], dayPlan: parsed.dayPlan||{}, plan: parsed.plan||{mode:"letters",count:2}, pairs: (parsed.pairs&&parsed.pairs.length?parsed.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: parsed.lastSeenVersion||APP_VERSION,
     admin: Object.assign({},base.admin,parsed.admin||{}),
     metrics: Object.assign({},base.metrics,parsed.metrics||{})
   };
@@ -1359,9 +1412,14 @@ function logView(){
   if(!isToday) html+='<div class="past-note">Logging a past workout \u00b7 '+fmtDate(t)+'</div>';
   html+='<div class="volume-card"><div class="vc-label">'+(isToday?'Today\u2019s volume':fmtDate(t)+' volume')+'</div>'
     +'<div class="vc-value">'+Math.round(dayVolume(t)).toLocaleString("en-GB")+'<span class="vc-unit">kg</span></div></div>';
+  if(isToday && dayVolume(t)===0) html+='<div class="day-cheer">'+esc(cheerLine(t))+'</div>';
   var dc=dayCalories(t);
   if(dc) html+='<div class="volume-card"><div class="vc-label">Cardio</div>'
     +'<div class="vc-value">'+dc.toLocaleString("en-GB")+'<span class="vc-unit">'+cardioUnit()+'</span></div></div>';
+  var cond=(data.conditioning&&data.conditioning[t])||0;
+  if(cond) html+='<div class="volume-card cond-card"><div class="vc-label">Conditioning</div>'
+    +'<div class="vc-value">'+cond+'<span class="vc-unit">min</span></div>'
+    +'<button class="cond-del" data-action="delcond" aria-label="Remove conditioning">×</button></div>';
   var woTotal=(function(){ var _d={}; data.sessions.forEach(function(x){ if(x.sets.length) _d[x.date]=1; }); return Object.keys(_d).length; })();
   var tonTotal=(function(){ var _t=0; data.sessions.forEach(function(s){ s.sets.forEach(function(x){ _t+=setVolume(s.exercise,x); }); }); return _t/1000; })();
   var stTotal=weekStreak();
@@ -1478,9 +1536,8 @@ function logView(){
           if(ui.timer && ui.timer.active && ui.timer.name===step.name){
             html+='<div class="timer-box"><div id="timer-display" class="timer-display countin">5</div>'
               +'<div id="timer-status" class="timer-status">Get ready\u2026</div>'
-              +'<div class="timer-btns"><button class="btn-solid" data-action="stoptimer">Stop</button>'
-              +'<button class="btn-log" data-action="stoptimerlog">Stop &amp; log</button></div>'
-              +'<div class="timer-hint">5\u2026 4\u2026 3\u2026 2\u2026 1, then it counts up. The number fills in the moment you hit your target.</div></div>';
+              +'<div class="timer-btns"><button class="btn-log" data-action="stoptimer">Stop</button></div>'
+              +'<div class="timer-hint">5\u2026 4\u2026 3\u2026 2\u2026 1, then it counts up and fills at your target. Stop, then Log set below.</div></div>';
           } else {
             html+='<div class="timer-box"><div class="entry-label" style="margin-bottom:6px">Hold target</div>'
               +'<div class="tgt-stepper"><button data-action="tgt" data-arg="-10">\u221210</button><button data-action="tgt" data-arg="-1">\u22121</button>'
@@ -1534,6 +1591,39 @@ function logView(){
   return html+'</main>';
 }
 
+function addWeightForm(){
+  var h='<div class="section-head" style="margin-top:6px">Add a weight exercise</div><div class="add-form">'
+    +'<input class="text-input" id="new-name" placeholder="Exercise name" value="'+esc(ui.newName)+'">'
+    +'<div class="add-row"><select class="ex-select" data-action="newkind">';
+  UNIT_CHOICES.forEach(function(k,i){ h+='<option value="'+i+'"'+(i===ui.newKind?" selected":"")+'>'+esc(k.label)+'</option>'; });
+  h+='</select></div>';
+  h+='<select class="ex-select" data-action="newmuscle" style="width:100%;margin-top:9px"><option value="-1"'+(ui.newMuscle<0?" selected":"")+'>Main muscle (optional)\u2026</option>';
+  MUSCLES.forEach(function(m,i){ h+='<option value="'+i+'"'+(i===ui.newMuscle?" selected":"")+'>'+esc(m)+'</option>'; });
+  h+='</select>';
+  h+='<select class="ex-select" data-action="newmuscle2" style="width:100%;margin-top:9px"><option value="-1"'+((ui.newMuscle2==null||ui.newMuscle2<0)?" selected":"")+'>Secondary muscle (optional)\u2026</option>';
+  MUSCLES.forEach(function(m,i){ h+='<option value="'+i+'"'+(i===ui.newMuscle2?" selected":"")+'>'+esc(m)+'</option>'; });
+  h+='</select>';
+  h+='<button class="btn-solid full" data-action="addcustom">Add exercise</button></div>';
+  return h;
+}
+function addCardioForm(){
+  return '<div class="section-head" style="margin-top:6px">Add a cardio exercise</div><div class="add-form">'
+    +'<input class="text-input" id="new-cardio" placeholder="e.g. Skipping" value="'+esc(ui.newCardioName||"")+'">'
+    +'<div class="metric-caption">Logs in '+cardioUnit()+' like the machines \u2014 no weight or muscles to set.</div>'
+    +'<button class="btn-solid full" data-action="addcardio">Add cardio</button></div>';
+}
+function addCardio(){
+  var nm=(ui.newCardioName||"").trim();
+  if(!nm) return;
+  if(EX_CACHE[nm]){ ui.newCardioName=""; render(); return; }
+  data.custom=data.custom||[];
+  data.custom.push({ name:nm, type:"cardio" });
+  if(!data.enabled) data.enabled={};
+  data.enabled[nm]=true;
+  ui.newCardioName="";
+  refreshCache();
+  commit();
+}
 function setupView(){
   var html='<main>';
   html+='<div class="section-head">Your name</div><div class="add-form">'
@@ -1596,6 +1686,7 @@ function setupView(){
         html+='<div class="section-head">'+esc(EQUIP_LABEL[eq]||eq)+'</div>';
         list.forEach(function(e){ html+=libRow(e, true); });
       });
+      html+=addWeightForm();
       return;
     }
     var list=allExercises().filter(function(e){return e.group===g.key;})
@@ -1603,6 +1694,7 @@ function setupView(){
     if(!list.length) return;
     html+='<div class="section-head">'+esc(g.label)+'</div>';
     list.forEach(function(e){ html+=libRow(e, false); });
+    if(g.key==="Cardio") html+=addCardioForm();
   });
 
   var pc=planCfg();
@@ -1628,19 +1720,8 @@ function setupView(){
       +'<button class="toggle'+(on?" on":"")+'" data-action="togglemetric" data-arg="'+m.key+'" aria-pressed="'+on+'"><span class="toggle-knob"></span></button></div>';
   });
 
-  html+='<div class="section-head">Add your own exercise</div><div class="add-form">'
-    +'<input class="text-input" id="new-name" placeholder="Exercise name" value="'+esc(ui.newName)+'">'
-    +'<div class="add-row"><select class="ex-select" data-action="newkind">';
-  UNIT_CHOICES.forEach(function(k,i){ html+='<option value="'+i+'"'+(i===ui.newKind?" selected":"")+'>'+esc(k.label)+'</option>'; });
-  html+='</select></div>';
-  html+='<select class="ex-select" data-action="newmuscle" style="width:100%;margin-top:9px"><option value="-1"'+(ui.newMuscle<0?" selected":"")+'>Main muscle (optional)\u2026</option>';
-  MUSCLES.forEach(function(m,i){ html+='<option value="'+i+'"'+(i===ui.newMuscle?" selected":"")+'>'+esc(m)+'</option>'; });
-  html+='</select>';
-  html+='<select class="ex-select" data-action="newmuscle2" style="width:100%;margin-top:9px"><option value="-1"'+((ui.newMuscle2==null||ui.newMuscle2<0)?" selected":"")+'>Secondary muscle (optional)\u2026</option>';
-  MUSCLES.forEach(function(m,i){ html+='<option value="'+i+'"'+(i===ui.newMuscle2?" selected":"")+'>'+esc(m)+'</option>'; });
-  html+='</select>';
-  html+='<button class="btn-solid full" data-action="addcustom">Add exercise</button></div>';
-  if(data.custom && data.custom.length){ var _eb="My custom exercises for Niten:\n\n"; data.custom.forEach(function(c){ _eb+="\u2022 "+c.name+" \u2014 "+c.unit+", steps of "+c.step+(c.body?", bodyweight":"")+(c.muscle?", primary: "+c.muscle:"")+(c.muscle2?", secondary: "+c.muscle2:"")+"\n"; }); _eb+="\n(sent from Niten v"+APP_VERSION+")"; html+='<a class="fb-btn" style="margin-top:10px" href="mailto:?subject=Niten%20custom%20exercises&body='+encodeURIComponent(_eb)+'">Email my custom exercises</a>'; }
+
+  if(data.custom && data.custom.length){ var _eb="My custom exercises for Niten:\n\n"; data.custom.forEach(function(c){ _eb+="\u2022 "+c.name+(c.type==="cardio"?" \u2014 cardio":" \u2014 "+c.unit+", steps of "+c.step+(c.body?", bodyweight":"")+(c.muscle?", primary: "+c.muscle:"")+(c.muscle2?", secondary: "+c.muscle2:""))+"\n"; }); _eb+="\n(sent from Niten v"+APP_VERSION+")"; html+='<a class="fb-btn" style="margin-top:10px" href="mailto:?subject=Niten%20custom%20exercises&body='+encodeURIComponent(_eb)+'">Email my custom exercises</a>'; }
 
   html+='<div class="section-head" style="margin-top:28px">Danger zone</div>';
   if(!ui.resetArmed){
@@ -1829,11 +1910,11 @@ function ivStart(){
     var work=Math.max(1,Math.round(Number(d.workSec)||20)), rest=Math.max(1,Math.round(Number(d.restSec)||10));
     var rounds=Math.max(1,Math.round(Number(d.rounds)||1));
     var pr=(data.pairs&&data.pairs[d.pairIdx])||{a:"Exercise A",b:"Exercise B"};
-    ui.iv={on:true,paused:false,cfg:{mode:"pairs",work:work,rest:rest,reps:rounds,inf:false,prep:5,nameA:pr.a,nameB:pr.b},idx:0,cd:99};
+    ui.iv={on:true,paused:false,startedAt:Date.now(),cfg:{mode:"pairs",work:work,rest:rest,reps:rounds,inf:false,prep:5,nameA:pr.a,nameB:pr.b},idx:0,cd:99};
   } else {
     var a=Math.max(1,(Math.max(0,Math.round(Number(d.aMin)||0))*60)+Math.max(0,Math.round(Number(d.aSec)||0))), b=Math.max(1,(Math.max(0,Math.round(Number(d.bMin)||0))*60)+Math.max(0,Math.round(Number(d.bSec)||0)));
     var reps=Math.max(1,Math.round(Number(d.reps)||1)), inf=!!d.inf;
-    ui.iv={on:true,paused:false,cfg:{mode:"simple",a:a,b:b,reps:reps,inf:inf,prep:5},idx:0,cd:99};
+    ui.iv={on:true,paused:false,startedAt:Date.now(),cfg:{mode:"simple",a:a,b:b,reps:reps,inf:inf,prep:5},idx:0,cd:99};
   }
   var f=ivPhase(0); ui.iv.remain=f.d; ui.iv.endAt=Date.now()+f.d*1000;
   ivAudioInit(); ivWakeOn(); ivCue("tick");
@@ -1863,8 +1944,20 @@ function ivStop(done){
   if(ivHandle){ clearInterval(ivHandle); ivHandle=null; }
   if(done) ivCue("done");
   ivWakeOff();
-  if(ui.iv) ui.iv.on=false;
+  if(ui.iv){
+    ui.iv.on=false;
+    var _m=ui.iv.startedAt ? Math.max(1, Math.round((Date.now()-ui.iv.startedAt)/60000)) : 0;
+    if(_m>0) ui.pendingCond={min:_m};
+  }
   render();
+}
+function logCond(){
+  if(!ui.pendingCond) return;
+  var t=todayISO();
+  data.conditioning=data.conditioning||{};
+  data.conditioning[t]=(data.conditioning[t]||0)+ui.pendingCond.min;
+  ui.pendingCond=null;
+  commit();
 }
 function ivUpdateDisplay(){ var el=document.getElementById("iv-count"); if(el) el.textContent=ivFmt(ui.iv.remain); }
 function ivUpdatePhase(){
@@ -1892,6 +1985,7 @@ function timerView(){
   var d=ui.ivDraft;
   var mode=d.mode||"simple";
   var h='<div class="card"><div class="section-head">Interval timer</div>';
+  if(ui.pendingCond){ h+='<div class="cond-banner">Session done — <b>'+ui.pendingCond.min+' min</b>. Log it as conditioning?<div class="cond-actions"><button class="btn-log" data-action="logcond">Log it</button><button class="btn-solid" data-action="dismisscond">Not now</button></div></div>'; }
   h+='<div class="iv-mode"><button class="iv-mode-btn'+(mode==="simple"?" on":"")+'" data-action="ivmode" data-arg="simple">Simple</button><button class="iv-mode-btn'+(mode==="pairs"?" on":"")+'" data-action="ivmode" data-arg="pairs">Pairs</button></div>';
   if(mode==="pairs"){
     var pairs=data.pairs||[];
@@ -1927,7 +2021,13 @@ function render(){
     +'<button class="tab'+(ui.tab==="timer"?" on":"")+'" data-action="tab" data-arg="timer">Timer</button>'
     +'<button class="tab'+(ui.tab==="setup"?" on":"")+'" data-action="tab" data-arg="setup">Setup</button></nav>';
   html+= ui.tab==="log" ? logView() : ui.tab==="trends" ? trendsView() : ui.tab==="timer" ? timerView() : setupView();
+  html+='<footer class="app-foot"><button class="foot-ver" data-action="whatsnew">v'+APP_VERSION+' \u00b7 What\u2019s new</button></footer>';
   html+='</div>';
+  if(ui.showWhatsNew){
+    var _wn=CHANGELOG.filter(function(e){ return wnSince==null || cmpVer(e.v,wnSince)>0; });
+    var _body=_wn.length ? _wn.map(function(e){ return '<div class="wn-entry"><div class="wn-ver">v'+esc(e.v)+'</div><ul class="wn-list">'+e.items.map(function(it){ return '<li>'+esc(it)+'</li>'; }).join("")+'</ul></div>'; }).join("") : '<div class="wn-entry"><p class="wn-p">You\u2019re up to date.</p></div>';
+    html+='<div class="wn-overlay" data-action="dismisswhatsnew"><div class="wn-card" data-action="noop"><div class="wn-title">What\u2019s new</div><div class="wn-cheer">'+esc(cheerLine(APP_VERSION))+'</div>'+_body+'<button class="btn-log wn-ok" data-action="dismisswhatsnew">Got it</button></div></div>';
+  }
   document.getElementById("app").innerHTML=html;
 }
 
@@ -1958,6 +2058,9 @@ appEl.addEventListener("click",function(e){
     case "ivstart": ivStart(); break;
     case "ivpause": ivPause(); break;
     case "ivstop": ivStop(false); break;
+    case "logcond": logCond(); break;
+    case "dismisscond": ui.pendingCond=null; render(); break;
+    case "delcond": if(data.conditioning) delete data.conditioning[ui.logDate]; commit(); break;
     case "ivinf": if(!ui.ivDraft)ui.ivDraft={aMin:0,aSec:30,bMin:0,bSec:15,reps:8,inf:false}; ui.ivDraft.inf=!ui.ivDraft.inf; render(); break;
     case "ivmode": if(ui.ivDraft) ui.ivDraft.mode=arg; render(); break;
     case "ivpair": if(ui.ivDraft) ui.ivDraft.pairIdx=Number(arg); render(); break;
@@ -1979,10 +2082,14 @@ appEl.addEventListener("click",function(e){
     case "planminus": setPlan(planCfg().mode, planCfg().count-1); break;
     case "togglemetric": toggleMetric(arg); break;
     case "addcustom": addCustom(); break;
+    case "addcardio": addCardio(); break;
     case "delcustom": removeCustom(arg); break;
     case "backuptoggle": ui.backupOpen=!ui.backupOpen; render(); break;
     case "guidetoggle": ui.guideOpen=!ui.guideOpen; render(); break;
     case "help": ui.help[arg]=!ui.help[arg]; render(); break;
+    case "whatsnew": wnSince=null; ui.showWhatsNew=true; render(); break;
+    case "dismisswhatsnew": data.lastSeenVersion=APP_VERSION; ui.showWhatsNew=false; commit(); break;
+    case "noop": break;
     case "miledismiss": if(!data.miles)data.miles={}; data.miles[arg]=Number(el.dataset.ms); commit(); break;
     case "cardiounit": data.cardioUnit=arg; commit(); break;
     case "download": downloadBackup(); break;
@@ -2003,6 +2110,7 @@ appEl.addEventListener("input",function(e){
   else if(el.id==="w-input") ui.weight=el.value;
   else if(el.id==="r-input") ui.reps=el.value;
   else if(el.id==="new-name") ui.newName=el.value;
+  else if(el.id==="new-cardio") ui.newCardioName=el.value;
   else if(el.id && el.id.indexOf("metric-")===0) ui.metricInputs[el.id.slice(7)]=el.value;
   else if(el.id==="paste-area") ui.restoreText=el.value;
   else if(el.id==="iv-amin"){ if(!ui.ivDraft)ui.ivDraft={aMin:0,aSec:30,bMin:0,bSec:15,reps:8,inf:false}; ui.ivDraft.aMin=el.value; }
@@ -2035,6 +2143,13 @@ appEl.addEventListener("touchend",function(e){ if(!_swEl) return; var t=e.change
 appEl.addEventListener("focusin",function(e){ var el=e.target; if(el.tagName==="INPUT" && (el.inputMode==="decimal"||el.inputMode==="numeric")){ setTimeout(function(){ var n=el.value.length; try{ el.setSelectionRange(n,n); }catch(_){} },0); } });
 document.title = appTitle().replace(/\u2019/g,"'");
 if(!currentWeight() && !(data.userName||"").trim() && !data.sessions.length){ ui.tab="setup"; }
+(function(){
+  var _seen=data.lastSeenVersion;
+  if(!_seen){
+    if((data.sessions&&data.sessions.length)||(data.custom&&data.custom.length)){ wnSince=null; ui.showWhatsNew=true; }
+    else { data.lastSeenVersion=APP_VERSION; }
+  } else if(cmpVer(APP_VERSION,_seen)>0){ wnSince=_seen; ui.showWhatsNew=true; }
+})();
 render();
 </script>
 </body>
