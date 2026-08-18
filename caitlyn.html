@@ -344,6 +344,26 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .iv-controls{display:flex;gap:10px;margin-top:20px;width:100%;max-width:320px}
 .iv-btn{flex:1;padding:14px 0;font-size:1rem}
 .iv-stop{background:var(--warn);color:var(--on-warn)}
+.iv-run.iv-work{background:var(--accent-soft)}
+.iv-run.iv-work .iv-phase{color:var(--accent-deep);font-size:1.2rem;letter-spacing:.05em;text-align:center;padding:0 8px;line-height:1.2}
+.iv-run.iv-work .iv-count{color:var(--accent)}
+.iv-run.iv-rest{background:var(--surface)}
+.iv-mode{display:flex;gap:6px;margin:6px 0 14px;background:var(--surface-2);border-radius:10px;padding:4px}
+.iv-mode-btn{flex:1;padding:9px 0;background:transparent;border:none;color:var(--ink-dim);font-family:'Barlow',sans-serif;font-weight:700;font-size:.9rem;border-radius:7px;cursor:pointer}
+.iv-mode-btn.on{background:var(--accent);color:var(--on-accent)}
+.iv-plabel{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);font-weight:700;margin-bottom:7px}
+.iv-pairs{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.iv-pnote{font-size:.85rem;color:var(--ink-faint);padding:4px 2px}
+.iv-pair{display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 12px;cursor:pointer}
+.iv-pair.on{border-color:var(--accent);background:var(--accent-soft)}
+.iv-pair-txt{font-weight:600;font-size:.95rem;color:var(--ink)}
+.iv-pair.on .iv-pair-txt{color:var(--accent-deep)}
+.iv-pair-amp{color:var(--ink-faint);font-weight:700;padding:0 2px}
+.iv-pair-del{background:transparent;border:none;color:var(--ink-faint);font-size:1.25rem;line-height:1;cursor:pointer;padding:0 4px}
+.iv-pair-add{display:flex;align-items:center;gap:6px;margin-bottom:14px}
+.iv-newinp{flex:1;min-width:0;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);font-family:'Barlow',sans-serif;font-size:.9rem;font-weight:600;padding:9px 10px;border-radius:9px}
+.iv-addbtn{padding:9px 14px;white-space:nowrap}
+.iv-unit2{font-size:.8rem;color:var(--ink-faint)}
 .gs{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 14px 12px;margin:8px 0 4px}
 .gs-head{font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.75rem;color:var(--accent-deep);margin-bottom:13px;font-weight:700}
 .gs-item{display:flex;align-items:flex-start;gap:11px;margin-bottom:13px}
@@ -380,7 +400,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.37";
+var APP_VERSION = "3.41";
 var STORE_KEY = "gym-tracker-shared";
 var FILE_NAME = "Caitlyn";
 
@@ -472,6 +492,7 @@ var GROUPS = [
 
 var EQUIP_ORDER = ["Bodyweight","Dumbbell","Kettlebell","Barbell","Cable","Machine","Other"];
 var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kettlebells",Barbell:"Barbell",Cable:"Cables",Machine:"Machines",Other:"Other"};
+var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 function equipOf(e){
   if(e.equip) return e.equip;
   var n=(e.name||"").toLowerCase();
@@ -645,7 +666,7 @@ function seed(){
     height: null,
     userName: null,
     sessions: [], habits: {}, checks: {}, cardio: {}, cardioUnit: "kcal",
-    enabled: {}, metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, exOrder: [], dayPlan: {}, plan: {mode:"letters",count:2},
+    enabled: {}, metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, exOrder: [], dayPlan: {}, plan: {mode:"letters",count:2}, pairs: DEFAULT_PAIRS.slice(),
     admin: { bloodwork: false },
     metrics: {
       weight: [], rhr: [], vo2max: [], waist: [], bodyfat: [], grip: [], systolic: []
@@ -686,7 +707,7 @@ function load(){
       height: (s.height!=null? s.height : base.height),
       userName: (s.userName!=null? s.userName : base.userName),
       sessions: s.sessions||[], habits: s.habits||{}, checks: s.checks||{}, cardio: s.cardio||{}, cardioUnit: s.cardioUnit||"kcal",
-      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, exOrder: s.exOrder||[], dayPlan: s.dayPlan||{}, plan: s.plan||{mode:"letters",count:2},
+      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, exOrder: s.exOrder||[], dayPlan: s.dayPlan||{}, plan: s.plan||{mode:"letters",count:2}, pairs: (s.pairs&&s.pairs.length?s.pairs:DEFAULT_PAIRS.slice()),
       admin: Object.assign({},base.admin,s.admin||{}),
       metrics: _mw
     };
@@ -699,7 +720,7 @@ function save(){
 
 var data = load() || seed();
 var ui = {
-  tab:"log", expanded:null, logDate: todayISO(), timer:{active:false}, dayFilter:"all", reorder:false, woScope:"all",
+  tab:"log", expanded:null, logDate: todayISO(), timer:{active:false}, dayFilter:"all", reorder:false, ivNewA:"", ivNewB:"", woScope:"all",
   weight:20, reps:8,
   metricInputs:{},
   restoreText:"", backupOpen:false, backupMsg:"",
@@ -712,7 +733,7 @@ var HELP={
   colours:"Each exercise shows how long since you last did it \u2014 violet today, fading through blue, green and yellow to red at a week or more, then grey. Freshest sit at the top of the list.",
   plan:"Filter to one session\u2019s exercises, or show All. You choose which exercises belong to which session in Setup; anything in no session shows every time.",
   volume:"Every set\u2019s weight \u00d7 reps, added up. Machine sets logged in lb convert to kg so the total stays consistent. It\u2019s a workload measure \u2014 rising over time means you\u2019re doing more.",
-  muscle:"Sets per muscle over the last 7 days \u2014 a primary muscle counts 1, a supporting one \u00bd. A zero (in the warn colour) is a gap worth filling.",
+  muscle:"Effort-weighted sets over the last 7 days. Each set counts by how hard it was \u2014 green (easy) \u00d7\u00bd, amber (moderate, the default) \u00d71, red (to failure) \u00d71.2. A supporting muscle counts half. Swipe a set left or right to rate it.",
   measurements:"Track any of these every week or two and follow the trend, not one reading. Waist beats the scale for the fat that matters. VO\u2082max is cardio fitness: short hard intervals (say 4\u20135 \u00d7 3 min hard, easy between) raise it \u2014 steady easy work won\u2019t. Grip is a quiet marker of overall strength.",
   e1rm:"The heaviest single you\u2019d likely manage, estimated from your best set \u2014 so 60\u00d78 and 65\u00d75 compare as one number. Trust the trend; it reads a little high above ~12\u201315 reps.",
   backup:"Download or copy a snapshot you keep yourself. It\u2019s the only copy that doesn\u2019t live inside this app \u2014 worth doing now and then."
@@ -970,6 +991,7 @@ function muscleMap(counts){
     +'<div class="mm-scale"><div class="mm-bar"></div><div class="mm-scale-lbl"><span>Neglected</span><span>Well worked</span></div></div>'
     +'<div class="mm-key"><div class="mm-col"><div class="mm-kh">Front</div>'+rows(FL)+'</div><div class="mm-col"><div class="mm-kh">Back</div>'+rows(BL)+'</div></div>';
 }
+function effortW(rag){ return rag==="g"?0.5:rag==="r"?1.2:1.0; }
 function muscleSets(win){
   var end=todayISO(), start=daysAgoISO(win-1);
   var c={}; MUSCLES.forEach(function(m){c[m]=0;});
@@ -978,9 +1000,9 @@ function muscleSets(win){
     if(sess.date<start||sess.date>end||!sess.sets.length) return;
     var mm=muscleOf(sess.exercise);
     if(!mm){ untagged+=sess.sets.length; return; }
-    var n=sess.sets.length;
-    if(mm.p && c[mm.p]!=null) c[mm.p]+=n;
-    if(mm.s && c[mm.s]!=null) c[mm.s]+=n*0.5;
+    var w=0; sess.sets.forEach(function(s){ w+=effortW(s.rag); });
+    if(mm.p && c[mm.p]!=null) c[mm.p]+=w;
+    if(mm.s && c[mm.s]!=null) c[mm.s]+=w*0.5;
   });
   return { counts:c, untagged:untagged };
 }
@@ -1114,10 +1136,10 @@ function logSet(name){
   var t=ui.logDate;
   var sess=data.sessions.filter(function(s){return s.date===t&&s.exercise===name;})[0];
   if(!sess){ sess={id:t+"-"+name+"-"+Date.now(),date:t,exercise:name,sets:[]}; data.sessions.push(sess); }
-  sess.sets.push({w:w,r:r});
+  sess.sets.push({w:w,r:r,rag:"a"});
   commit();
 }
-function ragStep(cur,dir){ var order=["g","a","r"]; var i = cur==null ? (dir<0?0:2) : order.indexOf(cur)+(dir<0?-1:1); i=Math.max(0,Math.min(2,i)); return order[i]; }
+function ragStep(cur,dir){ var order=["g","a","r"]; var i=order.indexOf(cur||"a"); if(i<0) i=1; i=Math.max(0,Math.min(2,i+(dir<0?-1:1))); return order[i]; }
 function ragSet(name,idx,dir){ var sess=data.sessions.filter(function(s){return s.date===ui.logDate&&s.exercise===name;})[0]; if(!sess||!sess.sets[idx]) return; sess.sets[idx].rag=ragStep(sess.sets[idx].rag,dir); commit(); }
 function removeSet(name,idx){
   var sess=data.sessions.filter(function(s){return s.date===ui.logDate&&s.exercise===name;})[0];
@@ -1275,7 +1297,7 @@ function restoreBackup(){
     height:(parsed.height!=null?parsed.height:base.height),
     userName:(parsed.userName!=null?parsed.userName:base.userName),
     sessions: parsed.sessions||[], habits: parsed.habits||{}, checks: parsed.checks||{}, cardio: parsed.cardio||{}, cardioUnit: parsed.cardioUnit||"kcal",
-    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, exOrder: parsed.exOrder||[], dayPlan: parsed.dayPlan||{}, plan: parsed.plan||{mode:"letters",count:2},
+    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, exOrder: parsed.exOrder||[], dayPlan: parsed.dayPlan||{}, plan: parsed.plan||{mode:"letters",count:2}, pairs: (parsed.pairs&&parsed.pairs.length?parsed.pairs:DEFAULT_PAIRS.slice()),
     admin: Object.assign({},base.admin,parsed.admin||{}),
     metrics: Object.assign({},base.metrics,parsed.metrics||{})
   };
@@ -1488,7 +1510,7 @@ function logView(){
           sess.sets.forEach(function(s,si){
             var body = (step.body && !s.w) ? s.r+'<span class="set-unit">'+(step.repWord||"reps")+'</span>'
                                            : s.w+'<span class="set-unit">'+u+'</span><span class="set-x">\u00d7</span>'+s.r;
-            html+='<li class="set-row'+(s.rag?" rag-"+s.rag:"")+'" data-ex="'+esc(nm)+'" data-setidx="'+si+'"><span class="set-idx">'+(si+1)+'</span><span class="set-num">'+body+'</span>'
+            html+='<li class="set-row'+" rag-"+(s.rag||"a")+'" data-ex="'+esc(nm)+'" data-setidx="'+si+'"><span class="set-idx">'+(si+1)+'</span><span class="set-num">'+body+'</span>'
               +'<button class="set-del" data-action="delset" data-arg="'+nm+'" data-idx="'+si+'">\u00d7</button></li>';
           });
           html+='</ul>';
@@ -1676,7 +1698,7 @@ function trendsView(){
   html+='<div class="section-head">Muscle balance'+helpQ('muscle')+'</div>'+helpA('muscle')+'<div class="card">';
   html+=muscleMap(msW.counts);
   if(msW.untagged) html+='<div class="metric-caption">'+msW.untagged+' set(s) from untagged custom exercises aren\u2019t counted \u2014 set a muscle for them when adding.</div>';
-  html+='<div class="metric-caption">Sets per muscle over the last 7 days (a secondary muscle counts as half). Brighter means more volume, faded is a gap \u2014 a sanity-check, not a target to chase.</div></div>';
+  html+='<div class="metric-caption">Effort-weighted sets, last 7 days \u2014 swipe each set: green easy (\u00d7\u00bd), amber moderate (\u00d71), red to failure (\u00d71.2). A supporting muscle counts half. Brighter = more, faded = a gap \u2014 a sanity-check, not a target.</div></div>';
 
   var shownMetrics=METRICS.filter(function(m){return isMetricOn(m.key);});
   if(shownMetrics.length) html+='<div class="section-head">Metrics'+helpQ('measurements')+'</div>'+helpA('measurements');
@@ -1765,24 +1787,54 @@ function ivAudioInit(){
   if("audioSession" in navigator){ try{ navigator.audioSession.type="transient"; }catch(e){} }
 }
 function ivBeep(freq,dur,vol){ if(!ivAC) return; try{ var t=ivAC.currentTime, o=ivAC.createOscillator(), g=ivAC.createGain(); o.type="sine"; o.frequency.value=freq; o.connect(g); g.connect(ivAC.destination); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vol||0.4,t+0.015); g.gain.exponentialRampToValueAtTime(0.0001,t+(dur||0.15)); o.start(t); o.stop(t+(dur||0.15)+0.03); }catch(e){} }
-function ivCue(k){ if(k==="a") ivBeep(880,0.4,0.5); else if(k==="b") ivBeep(494,0.45,0.45); else if(k==="tick") ivBeep(660,0.09,0.32); else if(k==="done"){ ivBeep(659,0.14,0.5); setTimeout(function(){ivBeep(880,0.14,0.5);},150); setTimeout(function(){ivBeep(1175,0.42,0.55);},300); } }
+function ivCue(k){ if(k==="a"||k==="work") ivBeep(880,0.4,0.5); else if(k==="b"||k==="rest") ivBeep(494,0.45,0.45); else if(k==="tick") ivBeep(660,0.09,0.32); else if(k==="done"){ ivBeep(659,0.14,0.5); setTimeout(function(){ivBeep(880,0.14,0.5);},150); setTimeout(function(){ivBeep(1175,0.42,0.55);},300); } }
 function ivWakeOn(){ try{ if("wakeLock" in navigator) navigator.wakeLock.request("screen").then(function(w){ivWake=w;}).catch(function(){}); }catch(e){} }
 function ivWakeOff(){ try{ if(ivWake){ ivWake.release(); ivWake=null; } }catch(e){} }
 function ivPhase(i){ var c=ui.iv.cfg, off=0;
   if(c.prep>0){ if(i===0) return {k:"prep",d:c.prep,cyc:0}; off=1; }
+  if(c.mode==="pairs"){
+    var jp=i-off, round=Math.floor(jp/4), pos=jp%4;
+    if(pos===0) return {k:"work",d:c.work,ex:c.nameA,cyc:round+1};
+    if(pos===1) return {k:"rest",d:c.rest,ex:null,cyc:round+1};
+    if(pos===2) return {k:"work",d:c.work,ex:c.nameB,cyc:round+1};
+    return {k:"rest",d:c.rest,ex:null,cyc:round+1};
+  }
   var j=i-off, cyc=Math.floor(j/2), isA=(j%2===0);
   return {k:isA?"a":"b", d:isA?c.a:c.b, cyc:cyc+1};
 }
-function ivTotal(){ var c=ui.iv.cfg; return c.inf?Infinity:(c.prep>0?1:0)+c.reps*2; }
+function ivTotal(){ var c=ui.iv.cfg; if(c.inf) return Infinity; var per=(c.mode==="pairs")?4:2; return (c.prep>0?1:0)+c.reps*per; }
 function ivFmt(s){ if(s>=60) return Math.floor(s/60)+":"+("0"+(s%60)).slice(-2); return ""+s; }
-function ivPhaseLabel(ph){ return ph.k==="prep"?"GET READY":ph.k==="a"?"A":"B"; }
-function ivCycLabel(ph){ if(ph.k==="prep") return "starting\u2026"; var tot=ui.iv.cfg.inf?"\u221e":ui.iv.cfg.reps; return "Cycle "+ph.cyc+" / "+tot; }
+function ivPhaseLabel(ph){ if(ph.k==="prep") return "GET READY"; if(ph.k==="work") return ph.ex||"WORK"; if(ph.k==="rest") return "REST"; return ph.k==="a"?"A":"B"; }
+function ivCycLabel(ph){ if(ph.k==="prep") return "starting\u2026"; var tot=ui.iv.cfg.inf?"\u221e":ui.iv.cfg.reps; return (ui.iv.cfg.mode==="pairs"?"Round ":"Cycle ")+ph.cyc+" / "+tot; }
+function ivPairAdd(){
+  var a=(ui.ivNewA||"").trim(), b=(ui.ivNewB||"").trim();
+  if(!a||!b) return;
+  if(!data.pairs) data.pairs=[];
+  data.pairs.push({a:a,b:b});
+  if(ui.ivDraft) ui.ivDraft.pairIdx=data.pairs.length-1;
+  ui.ivNewA=""; ui.ivNewB="";
+  commit();
+}
+function ivPairDel(i){
+  if(!data.pairs||i<0||i>=data.pairs.length) return;
+  data.pairs.splice(i,1);
+  if(ui.ivDraft && ui.ivDraft.pairIdx>=data.pairs.length) ui.ivDraft.pairIdx=Math.max(0,data.pairs.length-1);
+  commit();
+}
 function ivStart(){
   if(!ui.ivDraft) ui.ivDraft={aMin:0,aSec:30,bMin:0,bSec:15,reps:8,inf:false};
+  if(ui.ivDraft.mode==null){ ui.ivDraft.mode="simple"; ui.ivDraft.workSec=20; ui.ivDraft.restSec=10; ui.ivDraft.rounds=4; ui.ivDraft.pairIdx=0; }
   var d=ui.ivDraft;
-  var a=Math.max(1,(Math.max(0,Math.round(Number(d.aMin)||0))*60)+Math.max(0,Math.round(Number(d.aSec)||0))), b=Math.max(1,(Math.max(0,Math.round(Number(d.bMin)||0))*60)+Math.max(0,Math.round(Number(d.bSec)||0)));
-  var reps=Math.max(1,Math.round(Number(d.reps)||1)), inf=!!d.inf;
-  ui.iv={on:true,paused:false,cfg:{a:a,b:b,reps:reps,inf:inf,prep:5},idx:0,cd:99};
+  if(d.mode==="pairs"){
+    var work=Math.max(1,Math.round(Number(d.workSec)||20)), rest=Math.max(1,Math.round(Number(d.restSec)||10));
+    var rounds=Math.max(1,Math.round(Number(d.rounds)||1));
+    var pr=(data.pairs&&data.pairs[d.pairIdx])||{a:"Exercise A",b:"Exercise B"};
+    ui.iv={on:true,paused:false,cfg:{mode:"pairs",work:work,rest:rest,reps:rounds,inf:false,prep:5,nameA:pr.a,nameB:pr.b},idx:0,cd:99};
+  } else {
+    var a=Math.max(1,(Math.max(0,Math.round(Number(d.aMin)||0))*60)+Math.max(0,Math.round(Number(d.aSec)||0))), b=Math.max(1,(Math.max(0,Math.round(Number(d.bMin)||0))*60)+Math.max(0,Math.round(Number(d.bSec)||0)));
+    var reps=Math.max(1,Math.round(Number(d.reps)||1)), inf=!!d.inf;
+    ui.iv={on:true,paused:false,cfg:{mode:"simple",a:a,b:b,reps:reps,inf:inf,prep:5},idx:0,cd:99};
+  }
   var f=ivPhase(0); ui.iv.remain=f.d; ui.iv.endAt=Date.now()+f.d*1000;
   ivAudioInit(); ivWakeOn(); ivCue("tick");
   if(ivHandle) clearInterval(ivHandle); ivHandle=setInterval(ivTick,200);
@@ -1826,6 +1878,7 @@ function ivUpdatePhase(){
 function ivMsField(label,idm,ids,vm,vs){ return '<div class="iv-row"><label class="iv-lbl">'+label+'</label><div class="iv-inrow"><input class="iv-inp iv-ms" id="'+idm+'" inputmode="numeric" value="'+esc(vm)+'"><span class="iv-colon">:</span><input class="iv-inp iv-ms" id="'+ids+'" inputmode="numeric" value="'+esc(vs)+'"></div></div>'; }
 function timerView(){
   if(!ui.ivDraft) ui.ivDraft={aMin:0,aSec:30,bMin:0,bSec:15,reps:8,inf:false};
+  if(ui.ivDraft.mode==null){ ui.ivDraft.mode="simple"; ui.ivDraft.workSec=20; ui.ivDraft.restSec=10; ui.ivDraft.rounds=4; ui.ivDraft.pairIdx=0; }
   if(ui.iv&&ui.iv.on){
     var ph=ivPhase(ui.iv.idx);
     var h='<div class="iv-run iv-'+ph.k+'" id="iv-run">';
@@ -1837,7 +1890,26 @@ function timerView(){
     return h;
   }
   var d=ui.ivDraft;
+  var mode=d.mode||"simple";
   var h='<div class="card"><div class="section-head">Interval timer</div>';
+  h+='<div class="iv-mode"><button class="iv-mode-btn'+(mode==="simple"?" on":"")+'" data-action="ivmode" data-arg="simple">Simple</button><button class="iv-mode-btn'+(mode==="pairs"?" on":"")+'" data-action="ivmode" data-arg="pairs">Pairs</button></div>';
+  if(mode==="pairs"){
+    var pairs=data.pairs||[];
+    var pi=Math.min(d.pairIdx||0,Math.max(0,pairs.length-1));
+    h+='<div class="iv-plabel">Pairing</div><div class="iv-pairs">';
+    if(!pairs.length) h+='<div class="iv-pnote">No pairings yet \u2014 add one below.</div>';
+    pairs.forEach(function(p,i){
+      h+='<div class="iv-pair'+(i===pi?" on":"")+'" data-action="ivpair" data-arg="'+i+'"><span class="iv-pair-txt">'+esc(p.a)+' <span class="iv-pair-amp">+</span> '+esc(p.b)+'</span><button class="iv-pair-del" data-action="ivpairdel" data-arg="'+i+'" aria-label="Delete">\u00d7</button></div>';
+    });
+    h+='</div>';
+    h+='<div class="iv-pair-add"><input class="iv-newinp" id="iv-newa" placeholder="Exercise A" value="'+esc(ui.ivNewA||"")+'"><span class="iv-pair-amp">+</span><input class="iv-newinp" id="iv-newb" placeholder="Exercise B" value="'+esc(ui.ivNewB||"")+'"><button class="btn-solid iv-addbtn" data-action="ivpairadd">Add</button></div>';
+    h+='<div class="iv-cfg"><div class="iv-row"><label class="iv-lbl">Work</label><div class="iv-inrow"><input class="iv-inp" id="iv-work" inputmode="numeric" value="'+esc(d.workSec)+'"><span class="iv-unit2">sec</span></div></div>';
+    h+='<div class="iv-row"><label class="iv-lbl">Rest</label><div class="iv-inrow"><input class="iv-inp" id="iv-rest" inputmode="numeric" value="'+esc(d.restSec)+'"><span class="iv-unit2">sec</span></div></div>';
+    h+='<div class="iv-row"><label class="iv-lbl">Rounds</label><div class="iv-inrow"><input class="iv-inp" id="iv-rounds" inputmode="numeric" value="'+esc(d.rounds)+'"></div></div></div>';
+    h+='<button class="btn-solid full iv-start" data-action="ivstart">Start</button>';
+    h+='<div class="metric-caption">One round = A, rest, B, rest \u2014 repeated for the rounds you set, after a 5-second lead-in. Beeps play over your music, so start that in Apple Music first.</div></div>';
+    return h;
+  }
   h+='<div class="iv-cfg">'+ivMsField("A","iv-amin","iv-asec",d.aMin,d.aSec)+ivMsField("B","iv-bmin","iv-bsec",d.bMin,d.bSec);
   h+='<div class="iv-row"><label class="iv-lbl">Repeats</label><div class="iv-inrow"><input class="iv-inp" id="iv-reps" inputmode="numeric" value="'+esc(d.inf?"":d.reps)+'"'+(d.inf?" disabled":"")+'><button class="iv-inf'+(d.inf?" on":"")+'" data-action="ivinf">\u221e</button></div></div></div>';
   h+='<button class="btn-solid full iv-start" data-action="ivstart">Start</button>';
@@ -1887,6 +1959,10 @@ appEl.addEventListener("click",function(e){
     case "ivpause": ivPause(); break;
     case "ivstop": ivStop(false); break;
     case "ivinf": if(!ui.ivDraft)ui.ivDraft={aMin:0,aSec:30,bMin:0,bSec:15,reps:8,inf:false}; ui.ivDraft.inf=!ui.ivDraft.inf; render(); break;
+    case "ivmode": if(ui.ivDraft) ui.ivDraft.mode=arg; render(); break;
+    case "ivpair": if(ui.ivDraft) ui.ivDraft.pairIdx=Number(arg); render(); break;
+    case "ivpairadd": ivPairAdd(); break;
+    case "ivpairdel": ivPairDel(Number(arg)); break;
     case "saveheight": saveHeight(); break;
     case "savename": saveName(); break;
     case "savecardio": saveCardio(arg); break;
@@ -1934,6 +2010,11 @@ appEl.addEventListener("input",function(e){
   else if(el.id==="iv-bmin"){ if(!ui.ivDraft)ui.ivDraft={aMin:0,aSec:30,bMin:0,bSec:15,reps:8,inf:false}; ui.ivDraft.bMin=el.value; }
   else if(el.id==="iv-bsec"){ if(!ui.ivDraft)ui.ivDraft={aMin:0,aSec:30,bMin:0,bSec:15,reps:8,inf:false}; ui.ivDraft.bSec=el.value; }
   else if(el.id==="iv-reps"){ if(!ui.ivDraft)ui.ivDraft={aMin:0,aSec:30,bMin:0,bSec:15,reps:8,inf:false}; ui.ivDraft.reps=el.value; }
+  else if(el.id==="iv-work"){ if(ui.ivDraft) ui.ivDraft.workSec=el.value; }
+  else if(el.id==="iv-rest"){ if(ui.ivDraft) ui.ivDraft.restSec=el.value; }
+  else if(el.id==="iv-rounds"){ if(ui.ivDraft) ui.ivDraft.rounds=el.value; }
+  else if(el.id==="iv-newa"){ ui.ivNewA=el.value; }
+  else if(el.id==="iv-newb"){ ui.ivNewB=el.value; }
 });
 appEl.addEventListener("change",function(e){
   var _lt=e.target; if(_lt&&_lt.dataset&&_lt.dataset.action==="setlabel"){ setLabel(Number(_lt.dataset.idx),_lt.value); return; }
