@@ -377,6 +377,11 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .wn-title{font-family:'Barlow Condensed','Barlow',sans-serif;font-weight:700;font-size:1.5rem;color:var(--ink);margin-bottom:14px;text-transform:uppercase;letter-spacing:.02em}
 .wn-cheer{font-size:.92rem;font-style:italic;color:var(--accent-deep);margin:-6px 0 16px;line-height:1.5}
 .day-cheer{font-size:.9rem;font-style:italic;color:var(--ink-dim);text-align:center;margin:2px 0 14px;line-height:1.5;padding:0 10px}
+.lib-edit{background:none;border:none;color:var(--ink-faint);font-size:1.05rem;cursor:pointer;padding:4px 6px;align-self:center}
+.edit-panel{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;margin:-2px 0 10px}
+.edit-lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint);font-weight:700;margin-bottom:8px}
+.edit-panel .ex-select{width:100%;margin-top:0}
+.edit-panel .ex-select+.ex-select{margin-top:8px}
 .wn-entry{margin-bottom:14px}
 .wn-ver{font-family:'Barlow',sans-serif;font-weight:700;font-size:.72rem;color:var(--accent-deep);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
 .wn-list{margin:0;padding-left:18px}
@@ -419,7 +424,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.45";
+var APP_VERSION = "3.47";
 var STORE_KEY = "gym-tracker-shared";
 var FILE_NAME = "Caitlyn";
 
@@ -777,7 +782,7 @@ var ui = {
   metricInputs:{},
   restoreText:"", backupOpen:false, backupMsg:"",
   saveState:"idle", progEx:null, cal:0, guideOpen:false, help:{}, flash:null, resetArmed:false, newMuscle:-1, newMuscle2:-1,
-  newName:"", newKind:0, newCardioName:"", pendingCond:null, showWhatsNew:false
+  newName:"", newKind:0, newCardioName:"", pendingCond:null, editCustom:null, showWhatsNew:false
 };
 METRICS.forEach(function(m){ ui.metricInputs[m.key]=""; });
 /* ---- contextual help ---- */
@@ -1424,12 +1429,14 @@ function logView(){
   var tonTotal=(function(){ var _t=0; data.sessions.forEach(function(s){ s.sets.forEach(function(x){ _t+=setVolume(s.exercise,x); }); }); return _t/1000; })();
   var stTotal=weekStreak();
   var cardioTotal=(function(){ var _c=0, _cd=data.cardio||{}; for(var _dd in _cd){ for(var _ex in _cd[_dd]){ _c+=Number(_cd[_dd][_ex])||0; } } return _c; })();
+  var condTotal=(function(){ var _c=0, _cc=data.conditioning||{}; for(var _dd in _cc){ _c+=Number(_cc[_dd])||0; } return _c; })();
   var _cg=cardioGag();
   var MILE_DEFS=[
     {cat:"ton",lab:"Tonnage",val:tonTotal,steps:[[5,"Five tonnes shifted \u2014 five tonnes that used to just sit there judging you. Not anymore."],[10,"Ten tonnes moved. You\u2019re not working out, you\u2019re quietly running a removals firm."],[25,"Twenty-five tonnes \u2014 that\u2019s a lot of iron to be on first-name terms with."],[50,"Fifty tonnes shifted. Somewhere, a forklift just felt a cold shiver of professional jealousy."],[75,"Seventy-five tonnes. Your muscles have started leaving little thank-you notes."],[100,"A hundred tonnes \u2014 a whole blue whale, lifted one honest rep at a time. The whale is impressed. Whales don\u2019t impress easily."],[150,"150 tonnes. Life\u2019s a game of inches, and you\u2019ve quietly stacked up a whole mile of them."],[250,"250 tonnes. At this point the barbell hears your name and gets a little nervous."],[500,"Five hundred tonnes. Gone with the weights. Frankly, my dear, that\u2019s ridiculous \u2014 in the very best way."],[1000,"A thousand tonnes \u2014 a literal kilotonne. That blue whale from earlier? It brought the whole family to watch."]]},
     {cat:"wo",lab:"Workouts",val:woTotal,steps:[[5,"Five sessions in. You know what showing up five times makes you? The kind of person who shows up. That\u2019s the whole secret."],[10,"Ten workouts down \u2014 double figures. You\u2019re not \u2018giving it a go\u2019 anymore; you\u2019re just someone who trains now. Funny how quietly that snuck up on you."],[25,"Twenty-five workouts. Somewhere, \u2018I\u2019ll start Monday\u2019 is quietly packing its bags."],[50,"Fifty down. Somewhere in here it stopped being something you do and started being someone you are. Sneaky how that happens."],[100,"A hundred workouts. Welcome to the century club \u2014 no cake, no plaque, just you, a hundred times braver than the one who started."],[150,"150 sessions. The only place \u2018gains\u2019 comes before \u2018graft\u2019 is the dictionary. You did the graft."],[200,"Two hundred sessions. Rocky got a whole montage for less than this \u2014 and he had a soundtrack. You did it in silence. Legend."],[300,"Three hundred sessions. It\u2019s not the one who tried three hundred exercises once \u2014 it\u2019s you, doing the honest ones three hundred times, that nobody messes with."],[365,"365 workouts. A full year of you versus yesterday\u2019s you. Final score? You won. Every single time."],[500,"Five hundred sessions. Honestly, the gym should be paying YOU rent by now. Maybe name a water fountain after you."]]},
     {cat:"streak",lab:"Streak",val:stTotal,steps:[[2,"Two weeks back to back. It doesn\u2019t matter how fast you go, only that you don\u2019t stop \u2014 and look at you, not stopping."],[4,"Four weeks unbroken. Let\u2019s be honest with each other \u2014 you\u2019re a little bit in love with this now, aren\u2019t you?"],[8,"Eight straight weeks. Quiet consistency beats loud intensity every time. You\u2019re living proof, and you\u2019re glorious."],[12,"Twelve weeks running. A whole quarter of never-not-showing-up. That\u2019s not a habit anymore, that\u2019s a personality trait."],[26,"Twenty-six weeks. Half a year, one week at a time \u2014 the thousand-mile road, and you\u2019ve come further than you think."],[40,"Forty weeks unbroken. That\u2019s not luck, and it\u2019s not a fluke. That\u2019s just you, being magnificent on a schedule."],[52,"Fifty-two weeks. A perfect, unbroken year. The streak is strong with this one \u2014 go on, feel a little unstoppable."]]},
-    {cat:"cardio",lab:"Cardio",val:cardioTotal,steps:(cardioUnit()==="min"?[[30,"Half an hour of cardio in the bank. The engine coughed, caught, and roared. We\u2019re off."],[60,"A full hour of cardio done. Your heart just sent up a little flare of pure gratitude."],[180,"Three hours in \u2014 three hours of choosing \u2018go\u2019 over \u2018sofa.\u2019 The sofa took it personally."],[300,"Five hours of cardio. Somewhere, a treadmill is telling all the other treadmills about you."],[600,"Ten whole hours! "+(_cg||"Your lungs have quietly upgraded themselves to business class.")],[1200,"Twenty hours of cardio. That\u2019s not a hobby anymore \u2014 that\u2019s a full-blown engine with a personality."],[3000,"Fifty hours of go. Fifty! Absolute machine \u2014 Coach would be beaming and reaching for the tissues."]]:[[500,"500 calories torched. The engine\u2019s lit and purring. Listen to it go."],[1000,"A thousand calories burned \u2014 a whole day\u2019s fuel, spent the gloriously hard way."],[5000,"5,000 calories \u2014 roughly two marathons of effort, minus the questionable shorts."],[10000,"10,000 calories torched. Your heart wants you to know it\u2019s having the time of its life."],[25000,"25,000 calories. "+(_cg||"Relentless. Your lungs have started bragging to other lungs.")],[50000,"50,000 calories \u2014 a truly heroic amount of huffing, puffing, and getting on with it."],[100000,"100,000 calories. Six whole figures. You beautiful, unstoppable engine \u2014 take a bow, then take a breath."]])}
+    {cat:"cardio",lab:"Cardio",val:cardioTotal,steps:(cardioUnit()==="min"?[[30,"Half an hour of cardio in the bank. The engine coughed, caught, and roared. We\u2019re off."],[60,"A full hour of cardio done. Your heart just sent up a little flare of pure gratitude."],[180,"Three hours in \u2014 three hours of choosing \u2018go\u2019 over \u2018sofa.\u2019 The sofa took it personally."],[300,"Five hours of cardio. Somewhere, a treadmill is telling all the other treadmills about you."],[600,"Ten whole hours! "+(_cg||"Your lungs have quietly upgraded themselves to business class.")],[1200,"Twenty hours of cardio. That\u2019s not a hobby anymore \u2014 that\u2019s a full-blown engine with a personality."],[3000,"Fifty hours of go. Fifty! Absolute machine \u2014 Coach would be beaming and reaching for the tissues."]]:[[500,"500 calories torched. The engine\u2019s lit and purring. Listen to it go."],[1000,"A thousand calories burned \u2014 a whole day\u2019s fuel, spent the gloriously hard way."],[5000,"5,000 calories \u2014 roughly two marathons of effort, minus the questionable shorts."],[10000,"10,000 calories torched. Your heart wants you to know it\u2019s having the time of its life."],[25000,"25,000 calories. "+(_cg||"Relentless. Your lungs have started bragging to other lungs.")],[50000,"50,000 calories \u2014 a truly heroic amount of huffing, puffing, and getting on with it."],[100000,"100,000 calories. Six whole figures. You beautiful, unstoppable engine \u2014 take a bow, then take a breath."]])},
+    {cat:"cond",lab:"Conditioning",val:condTotal,steps:[[30,"Half an hour of conditioning banked \u2014 short, sharp, and entirely on purpose."],[60,"A full hour of intervals done. Your heart rate and your willpower had a proper argument, and you won."],[180,"Three hours of conditioning \u2014 that\u2019s a lot of \u2018go\u2019 packed into little bursts."],[300,"Five hours of intervals. The kind of work that doesn\u2019t look like much until you feel like everything."],[600,"Ten hours of conditioning. Your engine\u2019s been quietly retuned, one hard round at a time."],[1200,"Twenty hours of intervals \u2014 that\u2019s a whole second gear you built yourself."]]}
   ];
   var mPend=null;
   for(var mdi=0; mdi<MILE_DEFS.length && !mPend; mdi++){
@@ -1558,7 +1565,7 @@ function logView(){
         if(!step.body && !step.timed){
           var bw0=baseOf(step.name);
           html+='<div class="base-row">'
-            +'<span class="base-lbl">Machine base'+(bw0?' \u00b7 adds to every set':'')+'</span>'
+            +'<span class="base-lbl">Base / bar weight'+(bw0?' \u00b7 adds to every set':'')+'</span>'
             +'<span class="base-entry"><input id="base-input" inputmode="decimal" class="base-input" value="'+(bw0||"")+'" placeholder="0"><span class="base-unit">'+u+'</span>'
             +'<button class="btn-solid" data-action="savebase" data-arg="'+nm+'">Set</button></span></div>';
         }
@@ -1670,12 +1677,27 @@ function setupView(){
       });
       dayBtn+='</div>';
     }
+    var editBtn=(e.custom&&isMain)?'<button class="lib-edit" data-action="editcustom" data-arg="'+esc(e.name)+'" aria-label="Edit muscles">\u270e</button>':'';
+    var editPanel='';
+    if(e.custom&&isMain&&ui.editCustom===e.name){
+      var _co=(data.custom||[]).filter(function(c){return c.name===e.name;})[0]||{};
+      var _pi=MUSCLES.indexOf(_co.muscle), _si=MUSCLES.indexOf(_co.muscle2);
+      editPanel='<div class="edit-panel"><div class="edit-lbl">Muscles worked</div>'
+        +'<select class="ex-select" data-action="editmuscle" data-arg="'+esc(e.name)+'"><option value="-1"'+(_pi<0?" selected":"")+'>Main muscle\u2026</option>'
+        +MUSCLES.map(function(m,i){ return '<option value="'+i+'"'+(i===_pi?" selected":"")+'>'+esc(m)+'</option>'; }).join("")
+        +'</select>'
+        +'<select class="ex-select" data-action="editmuscle2" data-arg="'+esc(e.name)+'"><option value="-1"'+(_si<0?" selected":"")+'>Secondary muscle (optional)\u2026</option>'
+        +MUSCLES.map(function(m,i){ return '<option value="'+i+'"'+(i===_si?" selected":"")+'>'+esc(m)+'</option>'; }).join("")
+        +'</select></div>';
+    }
     return '<div class="lib-row"><div class="lib-main"><div class="lib-name">'+esc(e.name)+'</div>'
       +'<div class="lib-meta">'+metaHtml+(e.custom?" \u00b7 yours":"")+'</div>'
       +dayBtn
       +'</div>'
+      +editBtn
       +(e.custom?'<button class="lib-del" data-action="delcustom" data-arg="'+esc(e.name)+'">\u00d7</button>':'')
-      +'<button class="toggle'+(on?" on":"")+'" data-action="toggleex" data-arg="'+esc(e.name)+'" aria-pressed="'+on+'"><span class="toggle-knob"></span></button></div>';
+      +'<button class="toggle'+(on?" on":"")+'" data-action="toggleex" data-arg="'+esc(e.name)+'" aria-pressed="'+on+'"><span class="toggle-knob"></span></button></div>'
+      +editPanel;
   }
   GROUPS.forEach(function(g){
     if(g.key==="Main"){
@@ -1740,12 +1762,14 @@ function trendsView(){
   var t=todayISO();
 
   var W=weekSummary();
+  var condWeek=(function(){ var s=0; for(var i=0;i<7;i++){ s+=Number((data.conditioning||{})[daysAgoISO(i)])||0; } return s; })();
   var html='<main><div class="section-head">This week</div><div class="card">';
   html+='<div class="stats-row" style="margin-bottom:4px">'
     +'<div class="stat"><div class="stat-num">'+W.workouts+'</div><div class="stat-label">Workouts</div></div>'
     +'<div class="stat-div"></div>'
     +'<div class="stat"><div class="stat-num">'+liftedHTML(W.volume)+'</div><div class="stat-label">Volume</div></div>'
     +(W.kcal?'<div class="stat-div"></div><div class="stat"><div class="stat-num">'+W.kcal.toLocaleString("en-GB")+'</div><div class="stat-label">Cardio kcal</div></div>':'')
+    +(condWeek?'<div class="stat-div"></div><div class="stat"><div class="stat-num">'+condWeek+'</div><div class="stat-label">Cond. min</div></div>':'')
     +'</div>';
   if(W.bests.length){
     html+='<div class="wk-block"><div class="wk-h">New bests</div>';
@@ -2084,6 +2108,7 @@ appEl.addEventListener("click",function(e){
     case "addcustom": addCustom(); break;
     case "addcardio": addCardio(); break;
     case "delcustom": removeCustom(arg); break;
+    case "editcustom": ui.editCustom=(ui.editCustom===arg?null:arg); render(); break;
     case "backuptoggle": ui.backupOpen=!ui.backupOpen; render(); break;
     case "guidetoggle": ui.guideOpen=!ui.guideOpen; render(); break;
     case "help": ui.help[arg]=!ui.help[arg]; render(); break;
@@ -2135,6 +2160,8 @@ appEl.addEventListener("change",function(e){
   else if(el.dataset.action==="newmuscle"){ ui.newMuscle=Number(el.value); }
   else if(el.dataset.action==="newmuscle2"){ ui.newMuscle2=Number(el.value); }
   else if(el.dataset.action==="setstep"){ if(!data.stepOverride)data.stepOverride={}; var _sv=Number(el.value); if(_sv===(exOf(el.dataset.arg).step||2)) delete data.stepOverride[el.dataset.arg]; else data.stepOverride[el.dataset.arg]=_sv; commit(); }
+  else if(el.dataset.action==="editmuscle"){ var _ce=(data.custom||[]).filter(function(c){return c.name===el.dataset.arg;})[0]; if(_ce){ _ce.muscle=MUSCLES[Number(el.value)]||null; commit(); } }
+  else if(el.dataset.action==="editmuscle2"){ var _ce=(data.custom||[]).filter(function(c){return c.name===el.dataset.arg;})[0]; if(_ce){ _ce.muscle2=MUSCLES[Number(el.value)]||null; commit(); } }
 });
 
 var _swEl=null,_swX=0,_swY=0;
