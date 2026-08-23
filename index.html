@@ -431,7 +431,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.53";
+var APP_VERSION = "3.54";
 var STORE_KEY = "block-tracker";
 
 /* ---------------------------------------------------------------
@@ -448,12 +448,12 @@ var LIBRARY = [
   { name:"Cable internal rotation", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
   { name:"Cable front raise", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
   { name:"Seated row", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:true },
-  { name:"Seated Row Plates", type:"log", unit:"kg", step:2.5, equip:"Machine", group:"Main", on:false },
+  { name:"Seated row (plates)", type:"log", unit:"kg", step:2.5, equip:"Machine", group:"Main", on:false },
   { name:"Cable reverse fly", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
   { name:"Bench press", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:true },
   { name:"Preacher curl", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:true },
-  { name:"Barbell Curl", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
-  { name:"Dumbell Curl Reversed Bench", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Barbell curl", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
+  { name:"Dumbbell curl reversed bench", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
   { name:"Skullcrushers", type:"log", unit:"kg", step:2, equip:"Barbell", group:"Main", on:false },
   { name:"Dumbbell press", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:true },
   { name:"Seated dumbbell curl", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
@@ -464,10 +464,10 @@ var LIBRARY = [
   { name:"Lunge walk", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:true },
 
   { name:"Dead hang", type:"log", unit:"kg", step:2.5, body:true, timed:true, repLabel:"secs", repWord:"s", equip:"Bodyweight", group:"Main", on:false },
-  { name:"Chin ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, assist:true, equip:"Bodyweight", group:"Main", on:true },
-  { name:"Pull ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, assist:true, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Chin-ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, assist:true, equip:"Bodyweight", group:"Main", on:true },
+  { name:"Pull-ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, assist:true, equip:"Bodyweight", group:"Main", on:false },
   { name:"Hip thrusters", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
-  { name:"Cable Pull Through", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
+  { name:"Cable pull-through", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
   { name:"Leg raises", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.5, equip:"Bodyweight", group:"Main", on:false },
 
   /* available, off by default */
@@ -484,7 +484,7 @@ var LIBRARY = [
   { name:"Press-ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.65, equip:"Bodyweight", group:"Main", on:true },
   { name:"Squats", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:true },
   { name:"Squat jumps", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:false },
-  { name:"Sit ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.4, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Sit-ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.4, equip:"Bodyweight", group:"Main", on:false },
   { name:"Crunches", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.3, equip:"Bodyweight", group:"Main", on:false },
   { name:"Plank", type:"log", unit:"kg", step:2.5, body:true, timed:true, repLabel:"secs", repWord:"s", equip:"Bodyweight", group:"Main", on:true },
 
@@ -508,7 +508,7 @@ var LIBRARY = [
   { name:"Exercise bike", type:"cardio", group:"Cardio", on:false },
   { name:"Rower", type:"cardio", group:"Cardio", on:false },
   { name:"Elliptical", type:"cardio", group:"Cardio", on:false },
-  { name:"Stair Stepper", type:"cardio", group:"Cardio", on:false },
+  { name:"Stair stepper", type:"cardio", group:"Cardio", on:false },
   { name:"Cool-down cardio", type:"cardio", note:"walk / jog / bike / row", group:"Cool", on:true },
   { name:"Stretch & mobility", type:"check", group:"Cool", on:true }
 ];
@@ -523,8 +523,9 @@ var GROUPS = [
 var EQUIP_ORDER = ["Bodyweight","Dumbbell","Kettlebell","Barbell","Cable","Machine","Other"];
 var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kettlebells",Barbell:"Barbell",Cable:"Cables",Machine:"Machines",Other:"Other"};
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
-var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell Curl","Plank"];
+var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.54", items:["A tidy-up of exercise names for consistency (spelling and capitalisation). Your logged history moves across with them \u2014 nothing lost."]},
   {v:"3.53", items:["Open an exercise and last time\u2019s sets are tinted by how hard they were (green/amber/red). The interval target\u2019s \u00b110 now snaps to round numbers. And Simple mode keeps the muscle balance."]},
   {v:"3.52", items:["New Simple mode keeps things to the essentials \u2014 good for anyone starting out. Advanced (in Setup) unlocks the charts, sessions, custom exercises and interval pairs. Switch any time."]},
   {v:"3.51", items:["It starts you off with a handful of common exercises now (add the rest any time in Setup), and opens on the Log \u2014 a gentler on-ramp for anyone just getting going."]},
@@ -696,12 +697,12 @@ function setPlan(mode,count){
 var MUSCLES = ["Chest","Back","Shoulders","Biceps","Triceps","Forearms","Quads","Hamstrings","Glutes","Calves","Core"];
 var MUSCLE_MAP = {
   "Cable external rotation":{p:"Shoulders"}, "Cable internal rotation":{p:"Shoulders"}, "Cable front raise":{p:"Shoulders"},
-  "Seated row":{p:"Back",s:"Biceps"}, "Seated Row Plates":{p:"Back",s:"Biceps"},
+  "Seated row":{p:"Back",s:"Biceps"}, "Seated row (plates)":{p:"Back",s:"Biceps"},
   "Bench press":{p:"Chest",s:"Triceps"}, "Preacher curl":{p:"Biceps"}, "Skullcrushers":{p:"Triceps"},
   "Dumbbell press":{p:"Chest",s:"Triceps"}, "Seated dumbbell curl":{p:"Biceps"},
   "Upright row (dumbbells)":{p:"Shoulders",s:"Biceps"}, "Leg press":{p:"Quads",s:"Glutes"}, "Lying leg press":{p:"Quads",s:"Glutes"},
   "Hamstring curl":{p:"Hamstrings"}, "Lunge walk":{p:"Quads",s:"Glutes"},
-  "Dead hang":{p:"Forearms",s:"Back"}, "Chin ups":{p:"Back",s:"Biceps"}, "Pull ups":{p:"Back",s:"Biceps"},
+  "Dead hang":{p:"Forearms",s:"Back"}, "Chin-ups":{p:"Back",s:"Biceps"}, "Pull-ups":{p:"Back",s:"Biceps"},
   "Hip thrusters":{p:"Glutes",s:"Hamstrings"}, "Leg raises":{p:"Core"},
   "Cable crossovers":{p:"Chest"}, "Pec deck":{p:"Chest"}, "Dumbbell flys":{p:"Chest"},
   "Decline bench press":{p:"Chest",s:"Triceps"}, "Incline bench press":{p:"Chest",s:"Triceps"},
@@ -710,9 +711,9 @@ var MUSCLE_MAP = {
   "Tricep pushdown":{p:"Triceps"}, "Pallof press":{p:"Core"}, "Farmer carry":{p:"Forearms",s:"Core"},
   "Step-ups":{p:"Quads",s:"Glutes"}, "Cable step-ups":{p:"Quads",s:"Glutes"}, "Press-ups":{p:"Chest",s:"Triceps"},
   "Squats":{p:"Quads",s:"Glutes"}, "Squat jumps":{p:"Quads",s:"Glutes"},
-  "Sit ups":{p:"Core"}, "Crunches":{p:"Core"}, "Plank":{p:"Core"},
-  "Cable reverse fly":{p:"Shoulders",s:"Back"}, "Barbell Curl":{p:"Biceps"},
-  "Dumbell Curl Reversed Bench":{p:"Biceps"}, "Cable Pull Through":{p:"Glutes",s:"Hamstrings"},
+  "Sit-ups":{p:"Core"}, "Crunches":{p:"Core"}, "Plank":{p:"Core"},
+  "Cable reverse fly":{p:"Shoulders",s:"Back"}, "Barbell curl":{p:"Biceps"},
+  "Dumbbell curl reversed bench":{p:"Biceps"}, "Cable pull-through":{p:"Glutes",s:"Hamstrings"},
   "Kettlebell swing":{p:"Glutes",s:"Hamstrings"}, "Goblet squat":{p:"Quads",s:"Glutes"},
   "Kettlebell clean":{p:"Shoulders",s:"Back"}, "Kettlebell press":{p:"Shoulders",s:"Triceps"},
   "Kettlebell row":{p:"Back",s:"Biceps"}
@@ -774,22 +775,29 @@ function seed(){
   };
 }
 
+var RENAMES={ "Seated row (light)":"Seated row", "Warm-up · elliptical":"Warm-up cardio", "Barbell Curl":"Barbell curl", "Cable Pull Through":"Cable pull-through", "Dumbell Curl Reversed Bench":"Dumbbell curl reversed bench", "Seated Row Plates":"Seated row (plates)", "Stair Stepper":"Stair stepper", "Sit ups":"Sit-ups", "Chin ups":"Chin-ups", "Pull ups":"Pull-ups" };
+function migrateRenames(s){
+  if(!s) return s;
+  function rn(n){ return RENAMES[n]||n; }
+  (s.sessions||[]).forEach(function(x){ if(RENAMES[x.exercise]) x.exercise=RENAMES[x.exercise]; });
+  Object.keys(s.checks||{}).forEach(function(d){
+    Object.keys(RENAMES).forEach(function(old){
+      if(s.checks[d][old]!==undefined){ s.checks[d][RENAMES[old]]=s.checks[d][old]; delete s.checks[d][old]; }
+    });
+  });
+  ["enabled","baseWeight","stepOverride","dayPlan"].forEach(function(k){
+    var o=s[k]; if(o && typeof o==="object"){ Object.keys(o).forEach(function(n){ if(RENAMES[n] && RENAMES[n]!==n){ o[RENAMES[n]]=o[n]; delete o[n]; } }); }
+  });
+  if(Array.isArray(s.exOrder)) s.exOrder=s.exOrder.map(rn);
+  return s;
+}
 function load(){
   try{
     var raw=localStorage.getItem(STORE_KEY);
     if(!raw) return null;
     var s=JSON.parse(raw), base=seed();
     /* carry old names forward so history isn't orphaned by a rename */
-    var RENAMES={ "Seated row (light)":"Seated row", "Warm-up · elliptical":"Warm-up cardio" };
-    (s.sessions||[]).forEach(function(x){ if(RENAMES[x.exercise]) x.exercise=RENAMES[x.exercise]; });
-    Object.keys(s.checks||{}).forEach(function(d){
-      Object.keys(RENAMES).forEach(function(old){
-        if(s.checks[d][old]!==undefined){ s.checks[d][RENAMES[old]]=s.checks[d][old]; delete s.checks[d][old]; }
-      });
-    });
-    Object.keys(s.enabled||{}).forEach(function(k){
-      if(RENAMES[k]){ s.enabled[RENAMES[k]]=s.enabled[k]; delete s.enabled[k]; }
-    });
+    migrateRenames(s);
     /* one-time repair: custom plate exercises created before the 2.5kg fix */
     (s.custom||[]).forEach(function(c){ if(c.unit==="kg" && c.step===1.25){ c.step=2.5; } });
     /* de-dupe: drop any custom exercise that has since become a built-in (same name).
@@ -1403,6 +1411,7 @@ function restoreBackup(){
   if(!parsed || typeof parsed!=="object" || !Array.isArray(parsed.sessions)){ ui.backupMsg="That backup is missing its training data."; render(); return; }
   if(!confirm("Replace everything currently in the app with this backup?")) return;
   var base=seed();
+  migrateRenames(parsed);
   data={
     blockStart: parsed.blockStart||base.blockStart,
     miles: Object.assign({wo:0,ton:0,streak:0,cardio:0}, parsed.miles||{}),
