@@ -431,7 +431,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.54";
+var APP_VERSION = "3.55";
 var STORE_KEY = "gym-tracker-shared";
 
 /* ---------------------------------------------------------------
@@ -525,6 +525,7 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.55", items:["The Push/Pull filters now carry a colour for how long since you last did each \u2014 the warmer one is due. Tap Total lifted to cycle it through week / month / year / all, like the workout count."]},
   {v:"3.54", items:["A tidy-up of exercise names for consistency (spelling and capitalisation). Your logged history moves across with them \u2014 nothing lost."]},
   {v:"3.53", items:["Open an exercise and last time\u2019s sets are tinted by how hard they were (green/amber/red). The interval target\u2019s \u00b110 now snaps to round numbers. And Simple mode keeps the muscle balance."]},
   {v:"3.52", items:["New Simple mode keeps things to the essentials \u2014 good for anyone starting out. Advanced (in Setup) unlocks the charts, sessions, custom exercises and interval pairs. Switch any time."]},
@@ -630,6 +631,16 @@ function dayMembership(name){
   }
   var d=DAY_DEFAULT[name];
   return (d && d!=="both") ? [d] : [];
+}
+function sessionDaysSince(label){
+  var last=null;
+  (data.sessions||[]).forEach(function(s){
+    if(!s.sets || !s.sets.length) return;
+    var mem=dayMembership(s.exercise);
+    if(mem && mem.length && mem.indexOf(label)>=0){ if(last===null || s.date>last) last=s.date; }
+  });
+  if(last===null) return null;
+  return Math.round((Date.parse(todayISO())-Date.parse(last))/86400000);
 }
 function showsOnDay(name,label){
   var mem=dayMembership(name), labels=planLabels();
@@ -1439,7 +1450,7 @@ function statsView(){
   }
   var wN=dates.filter(inScope).length;
   var scopeLabel = scope==="year"?"This year" : scope==="month"?"This month" : scope==="week"?"This week" : "Total workouts";
-  var total=0; data.sessions.forEach(function(s){ s.sets.forEach(function(x){ total+=setVolume(s.exercise,x); }); });
+  var total=0; data.sessions.forEach(function(s){ if(inScope(s.date)) s.sets.forEach(function(x){ total+=setVolume(s.exercise,x); }); });
   var totalStr = liftedHTML(total);
   var dsw=daysSinceWorkout(), col=streakColor(dsw);
   var dswNum = dsw==null ? '\u2014' : dsw;
@@ -1448,7 +1459,7 @@ function statsView(){
   return '<section class="stats-card"><div class="stats-strip" style="background:'+col+'"></div><div class="stats-row">'
     +'<button class="stat stat-tap" data-action="woscope"><div class="stat-num">'+wN+'</div><div class="stat-label">'+scopeLabel+'<span class="tap-cyc">\u27f3</span></div></button>'
     +'<div class="stat-div"></div>'
-    +'<div class="stat stat-hero"><div class="stat-num">'+totalStr+'</div><div class="stat-label">Total lifted</div></div>'
+    +'<button class="stat stat-hero stat-tap" data-action="woscope"><div class="stat-num">'+totalStr+'</div><div class="stat-label">'+(scope==="all"?"Total lifted":"Lifted")+'<span class="tap-cyc">\u27f3</span></div></button>'
     +'<div class="stat-div"></div>'
     +'<div class="stat"><div class="stat-num" style="color:'+col+'">'+dswNum+'</div><div class="stat-label">'+dswLabel+'</div></div>'
     +'</div><div class="stats-since">'+lastTxt+'</div></section>';
@@ -1525,7 +1536,7 @@ function logView(){
   html+='<div class="day-filter">'
     +'<button class="df-btn'+(ui.dayFilter==="all"?" on":"")+'" data-action="dayfilter" data-arg="all">All</button>';
   planLabels().forEach(function(lb){
-    html+='<button class="df-btn'+(ui.dayFilter===lb?" on":"")+'" data-action="dayfilter" data-arg="'+lb+'">'+esc(lb)+'</button>';
+    html+='<button class="df-btn'+(ui.dayFilter===lb?" on":"")+'" data-action="dayfilter" data-arg="'+lb+'" style="border-color:'+streakColor(sessionDaysSince(lb))+';border-width:2px">'+esc(lb)+'</button>';
   });
   html+=helpQ('plan')+'</div>';
   html+=helpA('plan');
@@ -1720,7 +1731,8 @@ function setupView(){
   html+='<select class="text-input theme-select" data-action="settheme">';
   THEMES.forEach(function(t){ html+='<option value="'+t.k+'"'+(currentTheme===t.k?' selected':'')+'>'+esc(t.name)+'</option>'; });
   html+='</select></div><div class="setup-note">Applies straight away. \u201cAuto\u201d follows your phone\u2019s light/dark setting.</div>';
-  html+='<div class="section-head">Feedback</div><a class="fb-btn" href="mailto:?subject=Niten%20feedback&body='+encodeURIComponent("What happened, or what\u2019s the idea?\n\n\n\u2014\nApp v"+APP_VERSION)+'">Report a bug or an idea</a><div class="setup-note">Opens your email with the app version already filled in.</div>';
+  html+='<div class="section-head">Feedback</div><a class="fb-btn" href="mailto:Niten.fitness@gmail.com?subject=Niten%20feedback&body='+encodeURIComponent("What happened, or what\u2019s the idea?\n\n\n\u2014\nApp v"+APP_VERSION)+'">Report a bug or an idea</a><div class="setup-note">Opens your email with the app version already filled in.</div>';
+  html+='<a class="fb-btn" style="margin-top:10px" href="https://ko-fi.com/nisto999" target="_blank" rel="noopener">Support Niten on Ko-fi \u2615</a>';
   html+='<div class="setup-note" style="margin-top:16px">Switch things on to show them, off to hide them. The pills under each exercise set which session it belongs to \u2014 tap to include or exclude. None lit means it shows in every session. Turning something off never deletes what you\u2019ve logged.</div>';
   function libRow(e, isMain){
     var on=isEnabled(e.name);
@@ -1812,7 +1824,7 @@ function setupView(){
   });
 
 
-  if(data.custom && data.custom.length){ var _eb="My custom exercises for Niten:\n\n"; data.custom.forEach(function(c){ _eb+="\u2022 "+c.name+(c.type==="cardio"?" \u2014 cardio":" \u2014 "+c.unit+", steps of "+c.step+(c.body?", bodyweight":"")+(c.muscle?", primary: "+c.muscle:"")+(c.muscle2?", secondary: "+c.muscle2:""))+"\n"; }); _eb+="\n(sent from Niten v"+APP_VERSION+")"; html+='<a class="fb-btn" style="margin-top:10px" href="mailto:?subject=Niten%20custom%20exercises&body='+encodeURIComponent(_eb)+'">Email my custom exercises</a>'; }
+  if(data.custom && data.custom.length){ var _eb="My custom exercises for Niten:\n\n"; data.custom.forEach(function(c){ _eb+="\u2022 "+c.name+(c.type==="cardio"?" \u2014 cardio":" \u2014 "+c.unit+", steps of "+c.step+(c.body?", bodyweight":"")+(c.muscle?", primary: "+c.muscle:"")+(c.muscle2?", secondary: "+c.muscle2:""))+"\n"; }); _eb+="\n(sent from Niten v"+APP_VERSION+")"; html+='<a class="fb-btn" style="margin-top:10px" href="mailto:Niten.fitness@gmail.com?subject=Niten%20custom%20exercises&body='+encodeURIComponent(_eb)+'">Email my custom exercises</a>'; }
 
   html+='<div class="section-head" style="margin-top:28px">Danger zone</div>';
   if(!ui.resetArmed){
