@@ -431,7 +431,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.55";
+var APP_VERSION = "3.56";
 var STORE_KEY = "block-tracker";
 
 /* ---------------------------------------------------------------
@@ -525,6 +525,7 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.56", items:["Restore straight from a saved file now \u2014 pick your backup and Niten checks it\u2019s complete before it replaces anything. Pasting still works too."]},
   {v:"3.55", items:["The Push/Pull filters now carry a colour for how long since you last did each \u2014 the warmer one is due. Tap Total lifted to cycle it through week / month / year / all, like the workout count."]},
   {v:"3.54", items:["A tidy-up of exercise names for consistency (spelling and capitalisation). Your logged history moves across with them \u2014 nothing lost."]},
   {v:"3.53", items:["Open an exercise and last time\u2019s sets are tinted by how hard they were (green/amber/red). The interval target\u2019s \u00b110 now snaps to round numbers. And Simple mode keeps the muscle balance."]},
@@ -1415,12 +1416,25 @@ function copyBackup(){
   if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(done).catch(fail); }
   else fail();
 }
-function restoreBackup(){
+function parseBackup(text){
   var parsed;
-  try{ parsed=JSON.parse(ui.restoreText); }
-  catch(e){ ui.backupMsg="That doesn't look like a valid backup \u2014 paste the whole thing."; render(); return; }
-  if(!parsed || typeof parsed!=="object" || !Array.isArray(parsed.sessions)){ ui.backupMsg="That backup is missing its training data."; render(); return; }
-  if(!confirm("Replace everything currently in the app with this backup?")) return;
+  try{ parsed=JSON.parse(text); }
+  catch(e){ return {ok:false,msg:"That doesn\u2019t look like a backup \u2014 the file isn\u2019t readable data."}; }
+  if(!parsed || typeof parsed!=="object" || Array.isArray(parsed)) return {ok:false,msg:"That file isn\u2019t a Niten backup."};
+  if(!Array.isArray(parsed.sessions)) return {ok:false,msg:"That backup is missing its training data."};
+  var _objs=["habits","checks","cardio","conditioning","enabled","baseWeight","stepOverride","dayPlan"];
+  for(var _i=0;_i<_objs.length;_i++){ var _k=_objs[_i]; if(parsed[_k]!=null && (typeof parsed[_k]!=="object"||Array.isArray(parsed[_k]))) return {ok:false,msg:"That backup looks corrupted \u2014 leaving your current data untouched."}; }
+  var _dt=parsed.sessions.map(function(s){return s&&s.date;}).filter(Boolean).sort();
+  var _n=parsed.sessions.length;
+  var _rg=_dt.length?(_dt[0]+" to "+_dt[_dt.length-1]):"no dated workouts";
+  return {ok:true, data:parsed, summary:_n+" workout"+(_n===1?"":"s")+", "+_rg};
+}
+function restoreBackup(){ applyRestore(ui.restoreText); }
+function applyRestore(text){
+  var r=parseBackup(text);
+  if(!r.ok){ ui.backupMsg=r.msg; render(); return; }
+  if(!confirm("This backup holds "+r.summary+".\n\nReplace everything currently in the app with it?")) return;
+  var parsed=r.data;
   var base=seed();
   migrateRenames(parsed);
   data={
@@ -1963,8 +1977,10 @@ function trendsView(){
     html+='<div class="backup-row"><button class="btn-solid" data-action="download">Download file</button><button class="btn-solid" data-action="copy">Copy backup</button></div>';
     html+='<textarea class="backup-area" readonly>'+esc(backupJSON())+'</textarea>';
     html+='<div class="backup-restore"><div class="entry-label">Restore from a backup</div>';
-    html+='<textarea class="backup-area paste" id="paste-area" placeholder="Paste a saved backup here\u2026">'+esc(ui.restoreText)+'</textarea>';
-    html+='<button class="btn-solid full" data-action="restore">Restore</button></div>';
+    html+='<div class="backup-row"><button class="btn-solid full" data-action="restorefile">Restore from a file\u2026</button></div>';
+    html+='<input type="file" id="restore-file" accept="application/json,.json" style="display:none">';
+    html+='<textarea class="backup-area paste" id="paste-area" placeholder="\u2026or paste a saved backup here">'+esc(ui.restoreText)+'</textarea>';
+    html+='<button class="btn-solid full" data-action="restore">Restore pasted text</button></div>';
     if(ui.backupMsg) html+='<div class="backup-msg">'+esc(ui.backupMsg)+'</div>';
     html+='</div>';
   }
@@ -2213,6 +2229,7 @@ appEl.addEventListener("click",function(e){
     case "emailsummary": emailSummary(); break;
     case "copysummary": copySummary(); break;
     case "restore": restoreBackup(); break;
+    case "restorefile": var _fi=document.getElementById("restore-file"); if(_fi){ _fi.value=""; _fi.click(); } break;
     case "armreset": armReset(); break;
     case "cancelreset": cancelReset(); break;
     case "reset": resetAll(); break;
@@ -2241,6 +2258,7 @@ appEl.addEventListener("input",function(e){
   else if(el.id==="iv-newb"){ ui.ivNewB=el.value; }
 });
 appEl.addEventListener("change",function(e){
+  if(e.target && e.target.id==="restore-file"){ var _f=e.target.files&&e.target.files[0]; if(_f){ var _fr=new FileReader(); _fr.onload=function(){ applyRestore(String(_fr.result)); }; _fr.onerror=function(){ ui.backupMsg="Couldn\u2019t read that file."; render(); }; _fr.readAsText(_f); } return; }
   var _lt=e.target; if(_lt&&_lt.dataset&&_lt.dataset.action==="setlabel"){ setLabel(Number(_lt.dataset.idx),_lt.value); return; }
   if(e.target.id==="log-date"){ ui.logDate=e.target.value||todayISO(); ui.expanded=null; render(); return; }
   var el=e.target.closest("[data-action]");
