@@ -79,6 +79,12 @@ html,body{background:var(--bg)}
 .date-label{font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;color:var(--ink-dim)}
 .date-input{background:var(--surface-2);border:1px solid var(--line);color:var(--ink);font-family:'Barlow',sans-serif;font-size:.95rem;padding:8px 10px;border-radius:8px}
 .past-note{font-size:.78rem;color:var(--accent);margin:0 2px 8px;font-weight:600}
+.note-card{margin:0 0 8px}
+.note-area{width:100%;min-height:44px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);color:var(--ink);font-family:'Barlow',sans-serif;font-size:.92rem;line-height:1.45;padding:11px 13px;resize:vertical}
+.note-area::placeholder{color:var(--ink-faint)}
+.gymcode{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;cursor:pointer}
+.gc-label{font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.7rem;color:var(--ink-dim);font-weight:600}
+.gc-val{font-weight:700;font-size:1.05rem;color:var(--ink);letter-spacing:.12em}
 .bw-row .btn-solid{padding:8px 14px;font-size:.85rem}
 
 .volume-card{display:flex;align-items:baseline;justify-content:space-between;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:13px 15px;margin-bottom:8px}
@@ -431,7 +437,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.57";
+var APP_VERSION = "3.60";
 var STORE_KEY = "gym-tracker-shared";
 var FILE_NAME = "Caitlyn";
 
@@ -526,6 +532,9 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.60", items:["Stash your gym entry code \u2014 save it in Setup and a tap-to-reveal chip sits at the top for the door. Stays on your phone."]},
+  {v:"3.59", items:["Add a note to any workout \u2014 a quick line on how it went, saved with that day and kept in your backups."]},
+  {v:"3.58", items:["A built-in guide — tap How it works in Setup for a full walkthrough of every feature."]},
   {v:"3.57", items:["A little visual tidy-up \u2014 more even, consistent spacing between blocks for a calmer, cleaner layout."]},
   {v:"3.56", items:["Restore straight from a saved file now \u2014 pick your backup and Niten checks it\u2019s complete before it replaces anything. Pasting still works too."]},
   {v:"3.55", items:["The Push/Pull filters now carry a colour for how long since you last did each \u2014 the warmer one is due. Tap Total lifted to cycle it through week / month / year / all, like the workout count."]},
@@ -774,7 +783,7 @@ function seed(){
     height: null,
     userName: null,
     sessions: [], habits: {}, checks: {}, cardio: {}, conditioning: {}, lastBackupWO: null, backupSnoozeWO: null, advanced: null, cardioUnit: "kcal",
-    enabled: (function(){ var e={}; LIBRARY.forEach(function(x){ if(x.group==="Main"&&x.type==="log") e[x.name]=STARTERS.indexOf(x.name)>=0; }); return e; })(), metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, exOrder: [], dayPlan: {}, plan: {mode:"letters",count:2}, pairs: DEFAULT_PAIRS.slice(), lastSeenVersion: null,
+    enabled: (function(){ var e={}; LIBRARY.forEach(function(x){ if(x.group==="Main"&&x.type==="log") e[x.name]=STARTERS.indexOf(x.name)>=0; }); return e; })(), metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, exOrder: [], dayPlan: {}, notes: {}, notesOn: true, gymCode: "", plan: {mode:"letters",count:2}, pairs: DEFAULT_PAIRS.slice(), lastSeenVersion: null,
     admin: { bloodwork: false },
     metrics: {
       weight: [], rhr: [], vo2max: [], waist: [], bodyfat: [], grip: [], systolic: []
@@ -822,7 +831,7 @@ function load(){
       height: (s.height!=null? s.height : base.height),
       userName: (s.userName!=null? s.userName : base.userName),
       sessions: s.sessions||[], habits: s.habits||{}, checks: s.checks||{}, cardio: s.cardio||{}, conditioning: s.conditioning||{}, lastBackupWO: (s.lastBackupWO!=null?s.lastBackupWO:null), backupSnoozeWO: (s.backupSnoozeWO!=null?s.backupSnoozeWO:null), advanced: (s.advanced!=null?s.advanced:null), cardioUnit: s.cardioUnit||"kcal",
-      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, exOrder: s.exOrder||[], dayPlan: s.dayPlan||{}, plan: s.plan||{mode:"letters",count:2}, pairs: (s.pairs&&s.pairs.length?s.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: s.lastSeenVersion||null,
+      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, exOrder: s.exOrder||[], dayPlan: s.dayPlan||{}, notes: s.notes||{}, notesOn: (s.notesOn!==false), gymCode: s.gymCode||"", plan: s.plan||{mode:"letters",count:2}, pairs: (s.pairs&&s.pairs.length?s.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: s.lastSeenVersion||null,
       admin: Object.assign({},base.admin,s.admin||{}),
       metrics: _mw
     };
@@ -1295,6 +1304,14 @@ function saveName(){
   commit();
   setTimeout(function(){ if(ui.flash==="name"){ ui.flash=null; render(); } }, 1600);
 }
+function saveGymCode(){
+  var el=document.getElementById("gymcode-input");
+  var v=(el?el.value:"").trim();
+  data.gymCode = v;
+  ui.flash="gymcode";
+  commit();
+  setTimeout(function(){ if(ui.flash==="gymcode"){ ui.flash=null; render(); } }, 1600);
+}
 function saveHeight(){
   var el=document.getElementById("height-input");
   var v=Number(el? el.value : (ui.heightDraft!=null?ui.heightDraft:NaN));
@@ -1438,7 +1455,7 @@ function applyRestore(text){
     height:(parsed.height!=null?parsed.height:base.height),
     userName:(parsed.userName!=null?parsed.userName:base.userName),
     sessions: parsed.sessions||[], habits: parsed.habits||{}, checks: parsed.checks||{}, cardio: parsed.cardio||{}, conditioning: parsed.conditioning||{}, lastBackupWO: (parsed.lastBackupWO!=null?parsed.lastBackupWO:null), backupSnoozeWO: (parsed.backupSnoozeWO!=null?parsed.backupSnoozeWO:null), advanced: (parsed.advanced!=null?parsed.advanced:null), cardioUnit: parsed.cardioUnit||"kcal",
-    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, exOrder: parsed.exOrder||[], dayPlan: parsed.dayPlan||{}, plan: parsed.plan||{mode:"letters",count:2}, pairs: (parsed.pairs&&parsed.pairs.length?parsed.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: parsed.lastSeenVersion||APP_VERSION,
+    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, exOrder: parsed.exOrder||[], dayPlan: parsed.dayPlan||{}, notes: parsed.notes||{}, notesOn: (parsed.notesOn!==false), gymCode: parsed.gymCode||"", plan: parsed.plan||{mode:"letters",count:2}, pairs: (parsed.pairs&&parsed.pairs.length?parsed.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: parsed.lastSeenVersion||APP_VERSION,
     admin: Object.assign({},base.admin,parsed.admin||{}),
     metrics: Object.assign({},base.metrics,parsed.metrics||{})
   };
@@ -1518,6 +1535,7 @@ function logView(){
   if(cond) html+='<div class="volume-card cond-card"><div class="vc-label">Conditioning</div>'
     +'<div class="vc-value">'+cond+'<span class="vc-unit">min</span></div>'
     +'<button class="cond-del" data-action="delcond" aria-label="Remove conditioning">×</button></div>';
+  if(data.notesOn!==false) html+='<div class="note-card"><textarea id="wo-note" class="note-area" rows="2" maxlength="1000" placeholder="Add a note for this workout\u2026">'+esc((data.notes&&data.notes[t])||"")+'</textarea></div>';
   var woTotal=(function(){ var _d={}; data.sessions.forEach(function(x){ if(x.sets.length) _d[x.date]=1; }); return Object.keys(_d).length; })();
   var tonTotal=(function(){ var _t=0; data.sessions.forEach(function(s){ s.sets.forEach(function(x){ _t+=setVolume(s.exercise,x); }); }); return _t/1000; })();
   var stTotal=weekStreak();
@@ -1734,6 +1752,10 @@ function setupView(){
     +'<input class="text-input" id="name-input" placeholder="e.g. Nick" value="'+esc(data.userName||"")+'">'
     +'<button class="btn-solid full'+(ui.flash==="name"?" flashed":"")+'" data-action="savename">'+(ui.flash==="name"?"Saved \u2713":"Save Name")+'</button>'
     +'<div class="metric-caption">Puts your name on the app: \u201c'+esc(appTitle())+'\u201d. Stays on this device.</div></div>';
+  html+='<div class="section-head">Gym code</div><div class="add-form">'
+    +'<input class="text-input" id="gymcode-input" inputmode="text" placeholder="e.g. 4821" value="'+esc(data.gymCode||"")+'">'
+    +'<button class="btn-solid full'+(ui.flash==="gymcode"?" flashed":"")+'" data-action="savegymcode">'+(ui.flash==="gymcode"?"Saved \u2713":"Save code")+'</button>'
+    +'<div class="setup-note">Your gym\u2019s entry code \u2014 kept on your phone, shown as a tap-to-reveal chip at the top.</div></div>';
   html+='<div class="section-head">Your height (cm)</div><div class="add-form">'
     +'<input class="text-input" id="height-input" inputmode="decimal" placeholder="e.g. 178" value="'+esc(data.height||"")+'">'
     +'<button class="btn-solid full'+(ui.flash==="height"?" flashed":"")+'" data-action="saveheight">'+(ui.flash==="height"?"Saved \u2713":"Set height")+'</button>'
@@ -1747,6 +1769,8 @@ function setupView(){
   html+='<select class="text-input theme-select" data-action="settheme">';
   THEMES.forEach(function(t){ html+='<option value="'+t.k+'"'+(currentTheme===t.k?' selected':'')+'>'+esc(t.name)+'</option>'; });
   html+='</select></div><div class="setup-note">Applies straight away. \u201cAuto\u201d follows your phone\u2019s light/dark setting.</div>';
+  html+='<div class="section-head">Workout notes</div>';
+  html+='<div class="lib-row"><div class="lib-main"><div class="lib-name">Note on each workout</div><div class="lib-meta">A quick line on the Log for how it went</div></div><button class="toggle'+((data.notesOn!==false)?" on":"")+'" data-action="togglenotes" aria-pressed="'+(data.notesOn!==false)+'"><span class="toggle-knob"></span></button></div>';
   html+='<div class="section-head">Feedback</div><a class="fb-btn" href="mailto:Niten.fitness@gmail.com?subject=Niten%20feedback&body='+encodeURIComponent("What happened, or what\u2019s the idea?\n\n\n\u2014\nApp v"+APP_VERSION)+'">Report a bug or an idea</a><div class="setup-note">Opens your email with the app version already filled in.</div>';
   html+='<a class="fb-btn" style="margin-top:10px" href="https://ko-fi.com/nisto999" target="_blank" rel="noopener">Support Niten on Ko-fi \u2615</a>';
   html+='<div class="setup-note" style="margin-top:16px">Switch things on to show them, off to hide them. The pills under each exercise set which session it belongs to \u2014 tap to include or exclude. None lit means it shows in every session. Turning something off never deletes what you\u2019ve logged.</div>';
@@ -1965,6 +1989,7 @@ function trendsView(){
       +'<div class="card"><p class="e1rm-intro">Once you\u2019ve logged an exercise across two sessions, this charts your <strong>estimated 1-rep max</strong> \u2014 the heaviest single you\u2019d likely manage, worked out from your best set, so 60\u00d78 and 65\u00d75 compare as one number. Bodyweight moves show your best set instead. Log any exercise twice and its trend appears here.</p></div>';
   }
 
+  html+='<div class="section-head">Guide</div><div class="card"><a class="backup-toggle" style="text-decoration:none" href="https://nitenfitness.app/guide.html" target="_blank" rel="noopener"><span>How it works — full guide</span><span class="sl-chev">↗</span></a></div>';
   html+='<div class="section-head">Backup &amp; restore'+helpQ('backup')+'</div>'+helpA('backup')+'<div class="card">';
   html+='<button class="backup-toggle" data-action="backuptoggle"><span>Save or restore your data</span><span class="sl-chev">'+(ui.backupOpen?"\u25be":"\u25b8")+'</span></button>';
   if(ui.backupOpen){
@@ -2137,6 +2162,7 @@ function render(){
   var saveLabel = ui.saveState==="saved"?"Saved \u2713":ui.saveState==="error"?"Not saved":"Save";
   var html='<div class="root'+(data.advanced?'':' simple')+'"><header class="topbar"><div class="brand"><span class="brand-mark">\u259a</span><span class="brand-name'+((data.userName||"").trim()?" brand-long":"")+'">'+esc(appTitle())+'</span></div>'
     +'<div class="top-actions"><button class="save-btn '+ui.saveState+'" data-action="save">'+saveLabel+'</button></div></header>';
+  if((data.gymCode||"").trim()){ html+='<button class="gymcode'+(ui.codeShown?" shown":"")+'" data-action="revealcode"><span class="gc-label">Gym code</span><span class="gc-val">'+(ui.codeShown?esc(data.gymCode):"\u2022\u2022\u2022\u2022")+'</span></button>'; }
   html+=statsView();
   html+='<nav class="tabs">'
     +'<button class="tab'+(ui.tab==="log"?" on":"")+'" data-action="tab" data-arg="log">Log</button>'
@@ -2192,8 +2218,11 @@ appEl.addEventListener("click",function(e){
     case "ivpairdel": ivPairDel(Number(arg)); break;
     case "saveheight": saveHeight(); break;
     case "savename": saveName(); break;
+    case "savegymcode": saveGymCode(); break;
+    case "revealcode": ui.codeShown=!ui.codeShown; render(); break;
     case "savecardio": saveCardio(arg); break;
     case "admin": toggleAdmin(); break;
+    case "togglenotes": data.notesOn=!(data.notesOn!==false); commit(); break;
     case "toggleex": toggleEnabled(arg); break;
     case "dayfilter": ui.dayFilter=arg; ui.expanded=null; render(); break;
     case "reorder": ui.reorder=!ui.reorder; if(ui.reorder) ui.dayFilter="all"; ui.expanded=null; render(); break;
@@ -2253,6 +2282,7 @@ appEl.addEventListener("input",function(e){
   else if(el.id==="iv-newb"){ ui.ivNewB=el.value; }
 });
 appEl.addEventListener("change",function(e){
+  if(e.target && e.target.id==="wo-note"){ if(!data.notes) data.notes={}; var _v=e.target.value; _v=(_v==null?"":String(_v)).trim(); if(_v){ data.notes[ui.logDate]=_v; } else { delete data.notes[ui.logDate]; } save(); return; }
   if(e.target && e.target.id==="restore-file"){ var _f=e.target.files&&e.target.files[0]; if(_f){ var _fr=new FileReader(); _fr.onload=function(){ applyRestore(String(_fr.result)); }; _fr.onerror=function(){ ui.backupMsg="Couldn\u2019t read that file."; render(); }; _fr.readAsText(_f); } return; }
   var _lt=e.target; if(_lt&&_lt.dataset&&_lt.dataset.action==="setlabel"){ setLabel(Number(_lt.dataset.idx),_lt.value); return; }
   if(e.target.id==="log-date"){ ui.logDate=e.target.value||todayISO(); ui.expanded=null; render(); return; }
