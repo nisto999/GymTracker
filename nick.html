@@ -224,8 +224,8 @@ html,body{background:var(--bg)}
 .timer-box{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:13px;margin-bottom:12px;text-align:center}
 .timer-set{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px}
 .timer-display{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:2.6rem;line-height:1;color:var(--accent);margin-bottom:10px;border-radius:12px;transition:background .15s,color .15s,transform .15s}
-.timer-display.countin{color:var(--accent-deep);font-size:3.6rem}
-.timer-display.working{color:var(--ink)}
+.timer-display.countin{color:#20242a;font-size:3.6rem;background:#e7b53e;padding:6px 0}
+.timer-display.working{color:#20242a;background:#e7b53e;padding:6px 0}
 .timer-display.met{color:var(--on-accent);background:var(--accent);padding:6px 0;transform:scale(1.04)}
 .timer-status{font-size:.8rem;color:var(--ink-dim);font-weight:600;margin:-2px 0 10px}
 .timer-status.met{color:var(--accent-deep);font-weight:700}
@@ -438,7 +438,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.61";
+var APP_VERSION = "3.62";
 var STORE_KEY = "block-tracker";
 
 /* ---------------------------------------------------------------
@@ -532,7 +532,8 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
-  {v:"3.61", items:["Cleaner top \u2014 the workout date now sits up in the stats on the Log, and the days-off counter is gone; the exercise colours already show what\u2019s due."]},
+  {v:"3.62", items:["The hold timer now turns gold while it\u2019s running \u2014 clear at a glance it\u2019s going."]},
+  {v:"3.61", items:["Tidied the header \u2014 dropped the days-off counter; it now shows your workouts, total lifted and your last workout date."]},
   {v:"3.60", items:["Stash your gym entry code \u2014 save it in Setup and a tap-to-reveal chip sits at the top for the door. Stays on your phone."]},
   {v:"3.59", items:["Add a note to any workout \u2014 a quick line on how it went, saved with that day and kept in your backups."]},
   {v:"3.58", items:["A built-in guide — tap How it works in Setup for a full walkthrough of every feature."]},
@@ -1501,7 +1502,6 @@ function statsView(){
     +'<button class="stat stat-tap" data-action="woscope"><div class="stat-num">'+wN+'</div><div class="stat-label">'+scopeLabel+'<span class="tap-cyc">\u27f3</span></div></button>'
     +'<div class="stat-div"></div>'
     +'<button class="stat stat-hero stat-tap" data-action="woscope"><div class="stat-num">'+totalStr+'</div><div class="stat-label">'+(scope==="all"?"Total lifted":"Lifted")+'<span class="tap-cyc">\u27f3</span></div></button>'
-    +((ui.tab==="log")?'<div class="stat-div"></div><div class="stat"><input type="date" id="log-date" class="date-input stat-date" value="'+ui.logDate+'" max="'+todayISO()+'"><div class="stat-label">Workout date</div></div>':'')
     +'</div><div class="stats-since">'+lastTxt+'</div></section>';
 }
 
@@ -1520,7 +1520,8 @@ function woCount(){ var _d={}; (data.sessions||[]).forEach(function(x){ if(x.set
 function logView(){
   var t=ui.logDate, isToday=t===todayISO();
   var checks=data.checks[t]||{};
-  var html='<main>';
+  var html='<main><div class="date-row"><span class="date-label">Workout date</span>'
+    +'<input type="date" id="log-date" class="date-input" value="'+t+'" max="'+todayISO()+'"></div>';
   if(!isToday) html+='<div class="past-note">Logging a past workout \u00b7 '+fmtDate(t)+'</div>';
   var _wo=woCount(), _snz=(data.backupSnoozeWO==null?_wo:data.backupSnoozeWO), _lbk=(data.lastBackupWO==null?_wo:data.lastBackupWO);
   if(isToday && _wo>=_snz+10){
