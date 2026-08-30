@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -438,7 +438,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.62";
+var APP_VERSION = "3.65";
 var STORE_KEY = "gym-tracker-shared";
 var FILE_NAME = "Cheralyn";
 
@@ -533,6 +533,9 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.65", items:["Tidied the in-app help tips \u2014 kept them where they earn their keep (1-rep-max and muscle balance); the guide now covers the rest."]},
+  {v:"3.64", items:["Bigger text if you need it \u2014 pick Normal, Large or Larger in Setup, and pinch-to-zoom works now too."]},
+  {v:"3.63", items:["Clearer wording \u2014 the Log now says \u201cLifted today\u201d to match \u201cTotal lifted\u201d up top."]},
   {v:"3.62", items:["The hold timer now turns gold while it\u2019s running \u2014 clear at a glance it\u2019s going."]},
   {v:"3.61", items:["Tidied the header \u2014 dropped the days-off counter; it now shows your workouts, total lifted and your last workout date."]},
   {v:"3.60", items:["Stash your gym entry code \u2014 save it in Setup and a tap-to-reveal chip sits at the top for the door. Stays on your phone."]},
@@ -753,6 +756,11 @@ var FRESH=FRESH_SCALES.charcoal;
 function resolveTheme(){if(currentTheme==="auto"){var d=window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches;return d?"charcoal":"ink";}return FRESH_SCALES[currentTheme]?currentTheme:"charcoal";}
 function applyTheme(t){if(t){currentTheme=t;try{localStorage.setItem(THEME_KEY,t);}catch(e){}}var eff=resolveTheme();document.documentElement.setAttribute("data-theme",eff);FRESH=FRESH_SCALES[eff]||FRESH_SCALES.charcoal;var mc=document.querySelector('meta[name="theme-color"]');if(mc){mc.setAttribute("content",THEME_BG[eff]||"#14171A");}}
 applyTheme(currentTheme);
+var TSIZE_KEY=STORE_KEY+"-textsize";
+var currentTextSize=(function(){try{return localStorage.getItem(TSIZE_KEY)||"normal";}catch(e){return "normal";}})();
+var TEXT_SIZES={normal:"100%",large:"115%",larger:"130%"};
+function applyTextSize(v){if(v){currentTextSize=v;try{localStorage.setItem(TSIZE_KEY,v);}catch(e){}}document.documentElement.style.fontSize=TEXT_SIZES[currentTextSize]||"100%";}
+applyTextSize(currentTextSize);
 if(window.matchMedia){try{window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change",function(){if(currentTheme==="auto"){applyTheme();if(typeof render==="function")render();}});}catch(e){}}
 function freshColor(d){
   if(d==null || d>14) return "#3A444C";          // never done, or faded after 2 weeks
@@ -1523,7 +1531,7 @@ function logView(){
       +'<div class="backup-cheer">'+esc(BACKUP_CHEERS[cheerHash(String(_wo))%BACKUP_CHEERS.length])+'</div>'
       +'<div class="backup-actions"><button class="btn-log" data-action="download">Back up now</button><button class="btn-solid" data-action="backuplater">Later</button></div></div>';
   }
-  html+='<div class="volume-card"><div class="vc-label">'+(isToday?'Today\u2019s volume':fmtDate(t)+' volume')+'</div>'
+  html+='<div class="volume-card"><div class="vc-label">'+(isToday?'Lifted today':'Lifted '+fmtDate(t))+'</div>'
     +'<div class="vc-value">'+Math.round(dayVolume(t)).toLocaleString("en-GB")+'<span class="vc-unit">kg</span></div></div>';
   if(isToday && dayVolume(t)===0){
     if(!(data.sessions&&data.sessions.length)) html+='<div class="day-cheer">Welcome! A handful of common exercises are ready below \u2014 tap one to log your first set. Add more, or set up sessions, any time in Setup.</div>';
@@ -1573,8 +1581,7 @@ function logView(){
   planLabels().forEach(function(lb){
     html+='<button class="df-btn'+(ui.dayFilter===lb?" on":"")+'" data-action="dayfilter" data-arg="'+lb+'" style="border-color:'+streakColor(sessionDaysSince(lb))+';border-width:2px">'+esc(lb)+'</button>';
   });
-  html+=helpQ('plan')+'</div>';
-  html+=helpA('plan');
+  html+='</div>';
   } else if(!anyDayAssigned()){ ui.dayFilter="all"; }
 
   GROUPS.forEach(function(g){
@@ -1770,6 +1777,11 @@ function setupView(){
   html+='<select class="text-input theme-select" data-action="settheme">';
   THEMES.forEach(function(t){ html+='<option value="'+t.k+'"'+(currentTheme===t.k?' selected':'')+'>'+esc(t.name)+'</option>'; });
   html+='</select></div><div class="setup-note">Applies straight away. \u201cAuto\u201d follows your phone\u2019s light/dark setting.</div>';
+  html+='<div class="section-head">Text size</div><select class="text-input theme-select" data-action="settextsize">'
+    +'<option value="normal"'+(currentTextSize==="normal"?" selected":"")+'>Normal</option>'
+    +'<option value="large"'+(currentTextSize==="large"?" selected":"")+'>Large</option>'
+    +'<option value="larger"'+(currentTextSize==="larger"?" selected":"")+'>Larger</option>'
+    +'</select><div class="setup-note">Makes everything in the app a little bigger.</div>';
   html+='<div class="section-head">Workout notes</div>';
   html+='<div class="lib-row"><div class="lib-main"><div class="lib-name">Note on each workout</div><div class="lib-meta">A quick line on the Log for how it went</div></div><button class="toggle'+((data.notesOn!==false)?" on":"")+'" data-action="togglenotes" aria-pressed="'+(data.notesOn!==false)+'"><span class="toggle-knob"></span></button></div>';
   html+='<div class="section-head">Feedback</div><a class="fb-btn" href="mailto:Niten.fitness@gmail.com?subject=Niten%20feedback&body='+encodeURIComponent("What happened, or what\u2019s the idea?\n\n\n\u2014\nApp v"+APP_VERSION)+'">Report a bug or an idea</a><div class="setup-note">Opens your email with the app version already filled in.</div>';
@@ -1915,7 +1927,7 @@ function trendsView(){
   var vdates={}; data.sessions.forEach(function(s){ vdates[s.date]=1; });
   var volSeries=Object.keys(vdates).map(function(d){return {date:d,v:dayVolume(d)};}).filter(function(p){return p.v>0;}).sort(function(a,b){return a.date.localeCompare(b.date);});
   var latestVol=volSeries.length?volSeries[volSeries.length-1].v:0;
-  html+='<div class="section-head adv-only">Training volume'+helpQ('volume')+'</div>'+helpA('volume')+'<div class="card metric adv-only">';
+  html+='<div class="section-head adv-only">Training volume</div><div class="card metric adv-only">';
   html+='<div class="metric-head"><span class="metric-label">Daily volume</span><span class="metric-unit">kg</span></div>';
   html+='<div class="metric-value-row"><span class="metric-value">'+Math.round(latestVol).toLocaleString("en-GB")+'</span></div>';
   html+= volSeries.length>=2 ? sparkline(volSeries,"up","_vol") : '<div class="spark-empty">Log another day to see the trend</div>';
@@ -1928,7 +1940,7 @@ function trendsView(){
   html+='<div class="metric-caption">Effort-weighted sets, last 7 days \u2014 swipe each set: green easy (\u00d7\u00bd), amber moderate (\u00d71), red to failure (\u00d71.2). A supporting muscle counts half. Brighter = more, faded = a gap \u2014 a sanity-check, not a target.</div></div>';
 
   var shownMetrics=METRICS.filter(function(m){return isMetricOn(m.key);});
-  if(shownMetrics.length) html+='<div class="section-head adv-only">Metrics'+helpQ('measurements')+'</div>'+helpA('measurements');
+  if(shownMetrics.length) html+='<div class="section-head adv-only">Metrics</div>';
   shownMetrics.forEach(function(m){
     var series=data.metrics[m.key]||(data.metrics[m.key]=[]);
     var sorted=series.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
@@ -1991,7 +2003,7 @@ function trendsView(){
   }
 
   html+='<div class="section-head">Guide</div><div class="card"><a class="backup-toggle" style="text-decoration:none" href="https://nitenfitness.app/guide.html" target="_blank" rel="noopener"><span>How it works — full guide</span><span class="sl-chev">↗</span></a></div>';
-  html+='<div class="section-head">Backup &amp; restore'+helpQ('backup')+'</div>'+helpA('backup')+'<div class="card">';
+  html+='<div class="section-head">Backup &amp; restore</div><div class="card">';
   html+='<button class="backup-toggle" data-action="backuptoggle"><span>Save or restore your data</span><span class="sl-chev">'+(ui.backupOpen?"\u25be":"\u25b8")+'</span></button>';
   if(ui.backupOpen){
     html+='<div class="backup-body"><p class="backup-note">Export saves a copy of everything you\u2019ve logged. Keep it in Notes, email, or a file \u2014 then you can restore it here anytime, or on a new phone.</p>';
@@ -2290,6 +2302,7 @@ appEl.addEventListener("change",function(e){
   var el=e.target.closest("[data-action]");
   if(!el) return;
   if(el.dataset.action==="settheme"){ applyTheme(el.value); render(); return; }
+  if(el.dataset.action==="settextsize"){ applyTextSize(el.value); render(); return; }
   if(el.dataset.action==="progex"){ ui.progEx=el.value; render(); }
   else if(el.dataset.action==="newkind"){ ui.newKind=Number(el.value)||0; }
   else if(el.dataset.action==="newmuscle"){ ui.newMuscle=Number(el.value); }
