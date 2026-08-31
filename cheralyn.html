@@ -370,6 +370,11 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .iv-mode{display:flex;gap:6px;margin:6px 0 14px;background:var(--surface-2);border-radius:10px;padding:4px}
 .iv-mode-btn{flex:1;padding:9px 0;background:transparent;border:none;color:var(--ink-dim);font-family:'Barlow',sans-serif;font-weight:700;font-size:.9rem;border-radius:7px;cursor:pointer}
 .iv-mode-btn.on{background:var(--accent);color:var(--on-accent)}
+.rt-row{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:8px}
+.rt-row.on{border-color:var(--accent)}
+.rt-name{width:auto;flex:1;text-align:left;min-width:0}
+.rt-tag{font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);white-space:nowrap}
+.rt-head{font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:8px}
 .root.simple .adv-only{display:none}
 .iv-plabel{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);font-weight:700;margin-bottom:7px}
 .iv-pairs{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
@@ -438,7 +443,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.65";
+var APP_VERSION = "3.70";
 var STORE_KEY = "gym-tracker-shared";
 var FILE_NAME = "Cheralyn";
 
@@ -533,6 +538,7 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.70", items:["Routines \u2014 in Advanced mode you can now pick a ready-made split (Push/Pull, Push/Pull/Legs, Upper/Lower, Bodyweight or Full body) and the app sets itself up in one tap.","Save up to three of your own routines and switch between them \u2014 handy for holidays, a home week, or a deload.","However you switch things around, nothing you\u2019ve logged is ever touched. Turn an exercise back on and its history is exactly where you left it."]},
   {v:"3.65", items:["Tidied the in-app help tips \u2014 kept them where they earn their keep (1-rep-max and muscle balance); the guide now covers the rest."]},
   {v:"3.64", items:["Bigger text if you need it \u2014 pick Normal, Large or Larger in Setup, and pinch-to-zoom works now too."]},
   {v:"3.63", items:["Clearer wording \u2014 the Log now says \u201cLifted today\u201d to match \u201cTotal lifted\u201d up top."]},
@@ -674,6 +680,178 @@ function toggleDayMember(name,label){
   data.dayPlan[name]=mem;
   commit();
 }
+var SETUP_SCHEMA = 1, MAX_SETUPS = 3;
+var PRESETS = [
+  { key:"pushpull", name:"Push / Pull", meta:"2 sessions", labels:["Push","Pull"],
+    sessions:[
+      ["Bench press","Incline bench press","Shoulder press","Dumbbell press","Pec deck","Cable crossovers","Tricep pushdown","Squats","Leg press","Calf raises"],
+      ["Lat pulldown","Seated row","Chin-ups","Face pulls","Rear delt fly","Barbell curl","Seated dumbbell curl","Hamstring curl","Deadlift"]
+    ], all:["Plank"] },
+  { key:"ppl", name:"Push / Pull / Legs", meta:"3 sessions", labels:["Push","Pull","Legs"],
+    sessions:[
+      ["Bench press","Incline bench press","Shoulder press","Dumbbell press","Pec deck","Cable crossovers","Tricep pushdown","Skullcrushers"],
+      ["Lat pulldown","Seated row","Chin-ups","Pull-ups","Face pulls","Rear delt fly","Barbell curl","Seated dumbbell curl"],
+      ["Squats","Leg press","Hamstring curl","Deadlift","Hip thrusters","Calf raises","Lunge walk","Leg raises"]
+    ], all:["Plank"] },
+  { key:"upperlower", name:"Upper / Lower", meta:"2 sessions", labels:["Upper","Lower"],
+    sessions:[
+      ["Bench press","Shoulder press","Lat pulldown","Seated row","Dumbbell press","Face pulls","Barbell curl","Tricep pushdown","Rear delt fly"],
+      ["Squats","Leg press","Hamstring curl","Deadlift","Hip thrusters","Calf raises","Lunge walk"]
+    ], all:["Plank"] },
+  { key:"bodyweight", name:"Bodyweight", meta:"2 sessions \u00b7 no kit needed", labels:["Upper","Lower"],
+    sessions:[
+      ["Press-ups","Chin-ups","Pull-ups","Dead hang","Sit-ups"],
+      ["Squats","Squat jumps","Lunge walk","Step-ups","Crunches","Leg raises"]
+    ], all:["Plank"] },
+  { key:"fullbody", name:"Full body", meta:"one list, no sessions", labels:["A","B"],
+    sessions:[[],[]],
+    all:["Squats","Deadlift","Bench press","Seated row","Shoulder press","Lat pulldown","Leg press","Hamstring curl","Barbell curl","Tricep pushdown","Plank"] }
+];
+function presetOf(key){ for(var i=0;i<PRESETS.length;i++){ if(PRESETS[i].key===key) return PRESETS[i]; } return null; }
+
+/* A snapshot records the arrangement only: which exercises are on, which session
+   each sits in, the session labels and the display order. It never touches
+   sessions[] (logged sets) or custom[] (custom exercises). */
+function snapshotConfig(){
+  var labels=planLabels(), en={}, dp={};
+  allExercises().forEach(function(e){
+    en[e.name]=isEnabled(e.name);
+    dp[e.name]=dayMembership(e.name).filter(function(m){ return labels.indexOf(m)>=0; });
+  });
+  var pc=planCfg();
+  return { enabled:en, dayPlan:dp, plan:{mode:pc.mode,count:pc.count,labels:labels.slice()}, exOrder:(data.exOrder||[]).slice() };
+}
+function cfgKey(c){
+  var en=c.enabled||{}, dp=c.dayPlan||{}, p=c.plan||{};
+  var names=Object.keys(en).sort();
+  var s=names.map(function(n){ return n+":"+(en[n]?1:0)+":"+((dp[n]||[]).slice().sort().join("/")); }).join("|");
+  return s+"||"+((p.mode||"letters")+","+(p.count||2)+","+((p.labels||[]).join(",")))+"||"+((c.exOrder||[]).join(","));
+}
+function markSnap(){ data.activeSnap=cfgKey(snapshotConfig()); }
+function configDirty(){ return !!data.activeSnap && cfgKey(snapshotConfig())!==data.activeSnap; }
+function applyConfig(cfg){
+  data.enabled=Object.assign({},cfg.enabled||{});
+  data.dayPlan=Object.assign({},cfg.dayPlan||{});
+  var p=cfg.plan||{};
+  data.plan={ mode:p.mode||"letters", count:Math.min(7,Math.max(2,p.count||2)), labels:(p.labels||[]).slice() };
+  data.exOrder=(cfg.exOrder||[]).slice();
+  if(ui.dayFilter!=="all" && planLabels().indexOf(ui.dayFilter)<0) ui.dayFilter="all";
+}
+/* A preset only ever rearranges the main lifting list. Warm-up, cardio and
+   cool-down stay exactly as the user left them. */
+function applyPreset(p){
+  var labels=p.labels.slice();
+  data.plan={ mode:"letters", count:labels.length, labels:labels };
+  if(!data.enabled) data.enabled={};
+  if(!data.dayPlan) data.dayPlan={};
+  var assign={}, order=[];
+  labels.forEach(function(lb,i){
+    (p.sessions[i]||[]).forEach(function(n){
+      if(!EX_CACHE[n]) return;
+      if(!assign[n]) assign[n]=[];
+      if(assign[n].indexOf(lb)<0) assign[n].push(lb);
+      if(order.indexOf(n)<0) order.push(n);
+    });
+  });
+  (p.all||[]).forEach(function(n){
+    if(!EX_CACHE[n]) return;
+    if(!assign[n]) assign[n]=[];
+    if(order.indexOf(n)<0) order.push(n);
+  });
+  allExercises().forEach(function(e){
+    if(e.group!=="Main" || e.type!=="log") return;
+    var on=assign.hasOwnProperty(e.name);
+    data.enabled[e.name]=on;
+    if(on) data.dayPlan[e.name]=assign[e.name].slice(); else delete data.dayPlan[e.name];
+  });
+  data.exOrder=order;
+  data.activeSetup="preset:"+p.key;
+  if(ui.dayFilter!=="all" && planLabels().indexOf(ui.dayFilter)<0) ui.dayFilter="all";
+  markSnap(); commit();
+}
+/* Runs once. Records whatever arrangement you already have as a routine called
+   "My setup" and changes nothing else, so the app opens exactly as before. */
+function ensureSetups(){
+  if(!Array.isArray(data.setups)) data.setups=[];
+  if(typeof data.schema!=="number") data.schema=0;
+  if(data.schema>=SETUP_SCHEMA) return;
+  if(!data.setups.length){
+    var snap=snapshotConfig();
+    snap.name="My setup";
+    data.setups=[snap];
+    data.activeSetup=0;
+    data.activeSnap=cfgKey(snap);
+  }
+  data.schema=SETUP_SCHEMA;
+  save();
+}
+function useSetup(i){
+  var st=(data.setups||[])[i]; if(!st) return;
+  if(data.activeSetup!==i && configDirty() && !confirm("You\u2019ve changed things since your current routine was saved.\n\nSwitch to \u201c"+(st.name||"that routine")+"\u201d and lose those changes?")) return;
+  applyConfig(st); data.activeSetup=i; markSnap(); commit();
+}
+function saveSetup(i){
+  var st=(data.setups||[])[i]; if(!st) return;
+  var snap=snapshotConfig(); snap.name=st.name;
+  data.setups[i]=snap; data.activeSetup=i; markSnap(); commit();
+}
+function newSetup(){
+  if(!Array.isArray(data.setups)) data.setups=[];
+  if(data.setups.length>=MAX_SETUPS) return;
+  var snap=snapshotConfig(); snap.name="Routine "+(data.setups.length+1);
+  data.setups.push(snap); data.activeSetup=data.setups.length-1; markSnap(); commit();
+}
+function delSetup(i){
+  var st=(data.setups||[])[i]; if(!st) return;
+  if(!confirm("Delete the routine \u201c"+(st.name||"")+"\u201d?\n\nYour exercises and everything you\u2019ve logged stay exactly as they are.")) return;
+  data.setups.splice(i,1);
+  if(data.activeSetup===i){ data.activeSetup=null; data.activeSnap=null; }
+  else if(typeof data.activeSetup==="number" && data.activeSetup>i) data.activeSetup--;
+  commit();
+}
+function usePreset(key){
+  var p=presetOf(key); if(!p) return;
+  if(configDirty() && !confirm("You\u2019ve changed things since your current routine was saved.\n\nApply \u201c"+p.name+"\u201d and lose those changes?")) return;
+  applyPreset(p);
+}
+function setSetupName(i,val){
+  var st=(data.setups||[])[i]; if(!st) return;
+  val=(val||"").trim().slice(0,20);
+  if(!val){ render(); return; }
+  if(val===st.name) return;
+  st.name=val; commit();
+}
+function routinesSection(){
+  var act=data.activeSetup, dirty=configDirty(), sets=data.setups||[];
+  var h='<div class="section-head adv-only">Routines</div>';
+  h+='<div class="setup-note adv-only">A routine just sets which exercises are switched on and how they\u2019re split across sessions. You log exactly as you do now, and nothing you\u2019ve already logged is ever touched \u2014 switch an exercise back on and its history is right where you left it.</div>';
+  h+='<div class="add-form adv-only"><div class="rt-head">Your routines</div>';
+  if(!sets.length) h+='<div class="setup-note" style="margin:0 0 8px">None saved yet.</div>';
+  sets.forEach(function(st,i){
+    var on=(act===i);
+    h+='<div class="rt-row'+(on?" on":"")+'">'
+      +'<input class="lbl-input rt-name" data-action="setupname" data-idx="'+i+'" value="'+esc(st.name||("Routine "+(i+1)))+'" maxlength="20" aria-label="Routine name">'
+      +(on?'<span class="rt-tag">'+(dirty?"Edited":"In use")+'</span>':'')
+      +(on?(dirty?'<button class="seg-btn" data-action="savesetup" data-idx="'+i+'">Save</button>':'')
+          :'<button class="seg-btn" data-action="usesetup" data-idx="'+i+'">Use</button>')
+      +'<button class="lib-del" data-action="delsetup" data-idx="'+i+'" aria-label="Delete routine">\u00d7</button>'
+      +'</div>';
+  });
+  if(sets.length<MAX_SETUPS) h+='<button class="btn-solid full" data-action="newsetup">\uff0b Save how it\u2019s set up now as a routine</button>';
+  h+='</div>';
+  h+='<div class="setup-note adv-only" style="margin-top:14px">Ready-made splits. Tapping one switches its exercises on, groups them into sessions, and switches the other main lifts off \u2014 warm-up, cardio and cool-down stay as you have them.</div>';
+  h+='<div class="adv-only">';
+  PRESETS.forEach(function(p){
+    var pon=(act==="preset:"+p.key), n=(p.all||[]).length;
+    p.sessions.forEach(function(l){ n+=l.length; });
+    h+='<div class="lib-row"><div class="lib-main"><div class="lib-name">'+esc(p.name)+'</div>'
+      +'<div class="lib-meta">'+esc(p.meta)+' \u00b7 '+n+' exercises</div></div>'
+      +(pon?'<span class="rt-tag">'+(dirty?"Edited":"In use")+'</span>':'')
+      +'<button class="seg-btn" data-action="usepreset" data-arg="'+p.key+'">'+(pon?"Reapply":"Use")+'</button></div>';
+  });
+  h+='</div>';
+  return h;
+}
 function migrateLabels(oldL,newL){
   if(!data.dayPlan) return;
   var ren={},drop={};
@@ -794,7 +972,7 @@ function seed(){
     height: null,
     userName: null,
     sessions: [], habits: {}, checks: {}, cardio: {}, conditioning: {}, lastBackupWO: null, backupSnoozeWO: null, advanced: null, cardioUnit: "kcal",
-    enabled: (function(){ var e={}; LIBRARY.forEach(function(x){ if(x.group==="Main"&&x.type==="log") e[x.name]=STARTERS.indexOf(x.name)>=0; }); return e; })(), metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, exOrder: [], dayPlan: {}, notes: {}, notesOn: true, gymCode: "", plan: {mode:"letters",count:2}, pairs: DEFAULT_PAIRS.slice(), lastSeenVersion: null,
+    enabled: (function(){ var e={}; LIBRARY.forEach(function(x){ if(x.group==="Main"&&x.type==="log") e[x.name]=STARTERS.indexOf(x.name)>=0; }); return e; })(), metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, exOrder: [], dayPlan: {}, notes: {}, notesOn: true, gymCode: "", setups: [], activeSetup: null, activeSnap: null, schema: 0, plan: {mode:"letters",count:2}, pairs: DEFAULT_PAIRS.slice(), lastSeenVersion: null,
     admin: { bloodwork: false },
     metrics: {
       weight: [], rhr: [], vo2max: [], waist: [], bodyfat: [], grip: [], systolic: []
@@ -842,7 +1020,7 @@ function load(){
       height: (s.height!=null? s.height : base.height),
       userName: (s.userName!=null? s.userName : base.userName),
       sessions: s.sessions||[], habits: s.habits||{}, checks: s.checks||{}, cardio: s.cardio||{}, conditioning: s.conditioning||{}, lastBackupWO: (s.lastBackupWO!=null?s.lastBackupWO:null), backupSnoozeWO: (s.backupSnoozeWO!=null?s.backupSnoozeWO:null), advanced: (s.advanced!=null?s.advanced:null), cardioUnit: s.cardioUnit||"kcal",
-      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, exOrder: s.exOrder||[], dayPlan: s.dayPlan||{}, notes: s.notes||{}, notesOn: (s.notesOn!==false), gymCode: s.gymCode||"", plan: s.plan||{mode:"letters",count:2}, pairs: (s.pairs&&s.pairs.length?s.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: s.lastSeenVersion||null,
+      enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, exOrder: s.exOrder||[], dayPlan: s.dayPlan||{}, notes: s.notes||{}, notesOn: (s.notesOn!==false), gymCode: s.gymCode||"", setups: (Array.isArray(s.setups)?s.setups:[]), activeSetup: (s.activeSetup!==undefined?s.activeSetup:null), activeSnap: (s.activeSnap||null), schema: (typeof s.schema==="number"?s.schema:0), plan: s.plan||{mode:"letters",count:2}, pairs: (s.pairs&&s.pairs.length?s.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: s.lastSeenVersion||null,
       admin: Object.assign({},base.admin,s.admin||{}),
       metrics: _mw
     };
@@ -891,6 +1069,7 @@ function allExercises(){
 var EX_CACHE = {};
 function refreshCache(){ EX_CACHE={}; allExercises().forEach(function(e){ EX_CACHE[e.name]=e; }); }
 refreshCache();
+ensureSetups();
 
 function exOf(name){ return EX_CACHE[name] || {unit:"kg",step:2.5,type:"log"}; }
 function isEnabled(name){
@@ -1466,12 +1645,12 @@ function applyRestore(text){
     height:(parsed.height!=null?parsed.height:base.height),
     userName:(parsed.userName!=null?parsed.userName:base.userName),
     sessions: parsed.sessions||[], habits: parsed.habits||{}, checks: parsed.checks||{}, cardio: parsed.cardio||{}, conditioning: parsed.conditioning||{}, lastBackupWO: (parsed.lastBackupWO!=null?parsed.lastBackupWO:null), backupSnoozeWO: (parsed.backupSnoozeWO!=null?parsed.backupSnoozeWO:null), advanced: (parsed.advanced!=null?parsed.advanced:null), cardioUnit: parsed.cardioUnit||"kcal",
-    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, exOrder: parsed.exOrder||[], dayPlan: parsed.dayPlan||{}, notes: parsed.notes||{}, notesOn: (parsed.notesOn!==false), gymCode: parsed.gymCode||"", plan: parsed.plan||{mode:"letters",count:2}, pairs: (parsed.pairs&&parsed.pairs.length?parsed.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: parsed.lastSeenVersion||APP_VERSION,
+    enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, exOrder: parsed.exOrder||[], dayPlan: parsed.dayPlan||{}, notes: parsed.notes||{}, notesOn: (parsed.notesOn!==false), gymCode: parsed.gymCode||"", setups: (Array.isArray(parsed.setups)?parsed.setups:[]), activeSetup: (parsed.activeSetup!==undefined?parsed.activeSetup:null), activeSnap: (parsed.activeSnap||null), schema: (typeof parsed.schema==="number"?parsed.schema:0), plan: parsed.plan||{mode:"letters",count:2}, pairs: (parsed.pairs&&parsed.pairs.length?parsed.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: parsed.lastSeenVersion||APP_VERSION,
     admin: Object.assign({},base.admin,parsed.admin||{}),
     metrics: Object.assign({},base.metrics,parsed.metrics||{})
   };
   if((!data.metrics.weight||!data.metrics.weight.length) && parsed.bodyweight!=null && Number(parsed.bodyweight)>0) data.metrics.weight=[{date:todayISO(),v:Number(parsed.bodyweight)}];
-  ui.restoreText=""; ui.backupMsg="Restored \u2713"; refreshCache(); save(); render();
+  ui.restoreText=""; ui.backupMsg="Restored \u2713"; refreshCache(); ensureSetups(); save(); render();
 }
 
 /* ---- views ---- */
@@ -1756,6 +1935,7 @@ function setupView(){
     +'<button class="cu-btn'+(!data.advanced?" on":"")+'" data-action="setmode" data-arg="simple">Simple</button>'
     +'<button class="cu-btn'+(data.advanced?" on":"")+'" data-action="setmode" data-arg="advanced">Advanced</button></div>'
     +'<div class="setup-note">Simple keeps it to the essentials. Advanced unlocks charts, sessions, custom exercises and interval pairs.</div>';
+  html+=routinesSection();
   html+='<div class="section-head">Your name</div><div class="add-form">'
     +'<input class="text-input" id="name-input" placeholder="e.g. Nick" value="'+esc(data.userName||"")+'">'
     +'<button class="btn-solid full'+(ui.flash==="name"?" flashed":"")+'" data-action="savename">'+(ui.flash==="name"?"Saved \u2713":"Save Name")+'</button>'
@@ -2246,6 +2426,11 @@ appEl.addEventListener("click",function(e){
     case "planmode": setPlan(el.dataset.arg, planCfg().count); break;
     case "planplus": setPlan(planCfg().mode, planCfg().count+1); break;
     case "planminus": setPlan(planCfg().mode, planCfg().count-1); break;
+    case "usesetup": useSetup(Number(el.dataset.idx)); break;
+    case "savesetup": saveSetup(Number(el.dataset.idx)); break;
+    case "newsetup": newSetup(); break;
+    case "delsetup": delSetup(Number(el.dataset.idx)); break;
+    case "usepreset": usePreset(arg); break;
     case "togglemetric": toggleMetric(arg); break;
     case "addcustom": addCustom(); break;
     case "addcardio": addCardio(); break;
@@ -2297,6 +2482,7 @@ appEl.addEventListener("input",function(e){
 appEl.addEventListener("change",function(e){
   if(e.target && e.target.id==="wo-note"){ if(!data.notes) data.notes={}; var _v=e.target.value; _v=(_v==null?"":String(_v)).trim(); if(_v){ data.notes[ui.logDate]=_v; } else { delete data.notes[ui.logDate]; } save(); return; }
   if(e.target && e.target.id==="restore-file"){ var _f=e.target.files&&e.target.files[0]; if(_f){ var _fr=new FileReader(); _fr.onload=function(){ applyRestore(String(_fr.result)); }; _fr.onerror=function(){ ui.backupMsg="Couldn\u2019t read that file."; render(); }; _fr.readAsText(_f); } return; }
+  var _st=e.target; if(_st&&_st.dataset&&_st.dataset.action==="setupname"){ setSetupName(Number(_st.dataset.idx),_st.value); return; }
   var _lt=e.target; if(_lt&&_lt.dataset&&_lt.dataset.action==="setlabel"){ setLabel(Number(_lt.dataset.idx),_lt.value); return; }
   if(e.target.id==="log-date"){ ui.logDate=e.target.value||todayISO(); ui.expanded=null; render(); return; }
   var el=e.target.closest("[data-action]");
