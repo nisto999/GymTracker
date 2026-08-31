@@ -451,7 +451,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.73";
+var APP_VERSION = "3.75";
 var STORE_KEY = "block-tracker";
 
 /* ---------------------------------------------------------------
@@ -462,7 +462,7 @@ var STORE_KEY = "block-tracker";
    timed:true -> reps are seconds; excluded from volume
 ----------------------------------------------------------------*/
 var LIBRARY = [
-  { name:"Warm-up cardio", type:"cardio", note:"walk / jog / bike / row / elliptical", group:"Warm", on:true },
+  { name:"Warm-up cardio", type:"cardio", note:"walk / jog / bike / row / elliptical / stairs", group:"Warm", on:true },
 
   { name:"Cable external rotation", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
   { name:"Cable internal rotation", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
@@ -529,7 +529,7 @@ var LIBRARY = [
   { name:"Rower", type:"cardio", group:"Cardio", on:false },
   { name:"Elliptical", type:"cardio", group:"Cardio", on:false },
   { name:"Stair stepper", type:"cardio", group:"Cardio", on:false },
-  { name:"Cool-down cardio", type:"cardio", note:"walk / jog / bike / row", group:"Cool", on:true },
+  { name:"Cool-down cardio", type:"cardio", note:"walk / jog / bike / row / elliptical / stairs", group:"Cool", on:true },
   { name:"Stretch & mobility", type:"check", group:"Cool", on:true }
 ];
 
@@ -545,6 +545,8 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.75", items:["Setup is in a more sensible order \u2014 who you are and how it looks first, then how your training is organised, then your exercises.","Sessions now sits above the exercise list, so you can name them before you assign anything to them.","Backup \u0026 restore and the full guide have moved from Trends into Setup, where you\u2019d look for them."]},
+  {v:"3.74", items:["Warm-up and cool-down now suggest the same options \u2014 and both mention the elliptical and the stair stepper, which the app has had all along."]},
   {v:"3.73", items:["A quiet Ko-fi link now sits at the foot of every tab, next to the version \u2014 rather than hiding in Setup."]},
   {v:"3.72", items:["Tidied the top of Setup \u2014 your name, gym code and height now sit together in one short \u201cAbout you\u201d box instead of three screens of cards.","They save themselves as you go, so there\u2019s nothing to tap. Clear a box to forget it."]},
   {v:"3.71", items:["Each ready-made routine now shows the sessions it sets up, so you can see what you\u2019re getting before you tap Use."]},
@@ -1957,20 +1959,15 @@ function addCardio(){
 }
 function setupView(){
   var html='<main>';
-  html+='<div class="section-head">Mode</div><div class="cu-toggle">'
-    +'<button class="cu-btn'+(!data.advanced?" on":"")+'" data-action="setmode" data-arg="simple">Simple</button>'
-    +'<button class="cu-btn'+(data.advanced?" on":"")+'" data-action="setmode" data-arg="advanced">Advanced</button></div>'
-    +'<div class="setup-note">Simple keeps it to the essentials. Advanced unlocks charts, sessions, custom exercises and interval pairs.</div>';
-  html+=routinesSection();
   html+='<div class="section-head">About you</div><div class="add-form">'
     +'<div class="au-row"><span class="au-lbl">Name</span><input class="au-inp" id="name-input" data-action="saveaufield" data-field="name" placeholder="e.g. Nick" value="'+esc(data.userName||"")+'" aria-label="Your name"></div>'
     +'<div class="au-row"><span class="au-lbl">Gym code</span><input class="au-inp" id="gymcode-input" data-action="saveaufield" data-field="gymcode" inputmode="text" placeholder="e.g. 4821" value="'+esc(data.gymCode||"")+'" aria-label="Gym entry code"></div>'
     +'<div class="au-row"><span class="au-lbl">Height</span><input class="au-inp au-num" id="height-input" data-action="saveaufield" data-field="height" inputmode="decimal" placeholder="178" value="'+esc(data.height||"")+'" aria-label="Your height in centimetres"><span class="au-unit">cm</span></div>'
     +'<div class="metric-caption" style="margin-top:2px">Saved as you type them, and only on this device. Your name goes in the title, the gym code sits masked at the top until you tap it, and your height powers the waist-to-height guide. Clear a box to forget it.</div></div>';
-  html+='<div class="section-head">Cardio units</div><div class="cu-toggle">'
-    +'<button class="cu-btn'+(cardioUnit()==="kcal"?" on":"")+'" data-action="cardiounit" data-arg="kcal">Calories</button>'
-    +'<button class="cu-btn'+(cardioUnit()==="min"?" on":"")+'" data-action="cardiounit" data-arg="min">Minutes</button></div>'
-    +'<div class="setup-note">How you log cardio \u2014 calories burned or minutes done.</div>';
+  html+='<div class="section-head">Mode</div><div class="cu-toggle">'
+    +'<button class="cu-btn'+(!data.advanced?" on":"")+'" data-action="setmode" data-arg="simple">Simple</button>'
+    +'<button class="cu-btn'+(data.advanced?" on":"")+'" data-action="setmode" data-arg="advanced">Advanced</button></div>'
+    +'<div class="setup-note">Simple keeps it to the essentials. Advanced unlocks charts, sessions, custom exercises and interval pairs.</div>';
   html+='<div class="section-head">Colour scheme</div><div class="theme-pick">';
   html+='<select class="text-input theme-select" data-action="settheme">';
   THEMES.forEach(function(t){ html+='<option value="'+t.k+'"'+(currentTheme===t.k?' selected':'')+'>'+esc(t.name)+'</option>'; });
@@ -1980,9 +1977,26 @@ function setupView(){
     +'<option value="large"'+(currentTextSize==="large"?" selected":"")+'>Large</option>'
     +'<option value="larger"'+(currentTextSize==="larger"?" selected":"")+'>Larger</option>'
     +'</select><div class="setup-note">Makes everything in the app a little bigger.</div>';
+  html+='<div class="section-head">Cardio units</div><div class="cu-toggle">'
+    +'<button class="cu-btn'+(cardioUnit()==="kcal"?" on":"")+'" data-action="cardiounit" data-arg="kcal">Calories</button>'
+    +'<button class="cu-btn'+(cardioUnit()==="min"?" on":"")+'" data-action="cardiounit" data-arg="min">Minutes</button></div>'
+    +'<div class="setup-note">How you log cardio \u2014 calories burned or minutes done.</div>';
   html+='<div class="section-head">Workout notes</div>';
   html+='<div class="lib-row"><div class="lib-main"><div class="lib-name">Note on each workout</div><div class="lib-meta">A quick line on the Log for how it went</div></div><button class="toggle'+((data.notesOn!==false)?" on":"")+'" data-action="togglenotes" aria-pressed="'+(data.notesOn!==false)+'"><span class="toggle-knob"></span></button></div>';
-  html+='<div class="section-head">Feedback</div><a class="fb-btn" href="mailto:Niten.fitness@gmail.com?subject=Niten%20feedback&body='+encodeURIComponent("What happened, or what\u2019s the idea?\n\n\n\u2014\nApp v"+APP_VERSION)+'">Report a bug or an idea</a><div class="setup-note">Opens your email with the app version already filled in.</div>';
+  html+=routinesSection();
+  var pc=planCfg();
+  html+='<div class="section-head adv-only" style="margin-top:6px">Sessions</div><div class="add-form adv-only">';
+  html+='<div class="plan-row"><span class="plan-lbl">Label sessions by</span><div class="seg">'
+    +'<button class="seg-btn'+(pc.mode==="letters"?" on":"")+'" data-action="planmode" data-arg="letters">A / B / C</button>'
+    +'<button class="seg-btn'+(pc.mode==="weekdays"?" on":"")+'" data-action="planmode" data-arg="weekdays">Days</button></div></div>';
+  html+='<div class="plan-row"><span class="plan-lbl">How many sessions</span><div class="plan-count">'
+    +'<button class="btn-solid" data-action="planminus">\u2212</button>'
+    +'<span class="plan-n">'+pc.count+'</span>'
+    +'<button class="btn-solid" data-action="planplus">+</button></div></div>';
+  html+='<div class="plan-row"><span class="plan-lbl">Session names</span><div class="lbl-edits">';
+  planLabels().forEach(function(lb,i){ html+='<input class="lbl-input" data-action="setlabel" data-idx="'+i+'" value="'+esc(lb)+'" maxlength="8" aria-label="Session name '+(i+1)+'">'; });
+  html+='</div></div>';
+  html+='<div class="metric-caption">Assign each exercise to one or more sessions below (none = every session).</div></div>';
   html+='<div class="setup-note" style="margin-top:16px">Switch things on to show them, off to hide them. The pills under each exercise set which session it belongs to \u2014 tap to include or exclude. None lit means it shows in every session. Turning something off never deletes what you\u2019ve logged.</div>';
   function libRow(e, isMain){
     var on=isEnabled(e.name);
@@ -2049,22 +2063,6 @@ function setupView(){
     list.forEach(function(e){ html+=libRow(e, false); });
     if(data.advanced && g.key==="Cardio") html+=addCardioForm();
   });
-
-  var pc=planCfg();
-  html+='<div class="section-head adv-only" style="margin-top:6px">Sessions</div><div class="add-form adv-only">';
-  html+='<div class="plan-row"><span class="plan-lbl">Label sessions by</span><div class="seg">'
-    +'<button class="seg-btn'+(pc.mode==="letters"?" on":"")+'" data-action="planmode" data-arg="letters">A / B / C</button>'
-    +'<button class="seg-btn'+(pc.mode==="weekdays"?" on":"")+'" data-action="planmode" data-arg="weekdays">Days</button></div></div>';
-  html+='<div class="plan-row"><span class="plan-lbl">How many sessions</span><div class="plan-count">'
-    +'<button class="btn-solid" data-action="planminus">\u2212</button>'
-    +'<span class="plan-n">'+pc.count+'</span>'
-    +'<button class="btn-solid" data-action="planplus">+</button></div></div>';
-  html+='<div class="plan-row"><span class="plan-lbl">Session names</span><div class="lbl-edits">';
-  planLabels().forEach(function(lb,i){ html+='<input class="lbl-input" data-action="setlabel" data-idx="'+i+'" value="'+esc(lb)+'" maxlength="8" aria-label="Session name '+(i+1)+'">'; });
-  html+='</div></div>';
-  html+='<div class="metric-caption">Assign each exercise to one or more sessions below (none = every session).</div></div>';
-
-
   html+='<div class="section-head adv-only">Metrics</div>';
   METRICS.forEach(function(m){
     var on=isMetricOn(m.key);
@@ -2072,10 +2070,24 @@ function setupView(){
       +'<div class="lib-meta">'+esc(m.unit)+(m.hint?' \u00b7 '+esc(m.hint):'')+'</div></div>'
       +'<button class="toggle'+(on?" on":"")+'" data-action="togglemetric" data-arg="'+m.key+'" aria-pressed="'+on+'"><span class="toggle-knob"></span></button></div>';
   });
-
-
   if(data.custom && data.custom.length){ var _eb="My custom exercises for Niten:\n\n"; data.custom.forEach(function(c){ _eb+="\u2022 "+c.name+(c.type==="cardio"?" \u2014 cardio":" \u2014 "+c.unit+", steps of "+c.step+(c.body?", bodyweight":"")+(c.muscle?", primary: "+c.muscle:"")+(c.muscle2?", secondary: "+c.muscle2:""))+"\n"; }); _eb+="\n(sent from Niten v"+APP_VERSION+")"; html+='<a class="fb-btn" style="margin-top:10px" href="mailto:Niten.fitness@gmail.com?subject=Niten%20custom%20exercises&body='+encodeURIComponent(_eb)+'">Email my custom exercises</a>'; }
-
+  html+='<div class="section-head">Guide</div><div class="card"><a class="backup-toggle" style="text-decoration:none" href="https://nitenfitness.app/guide.html" target="_blank" rel="noopener"><span>How it works — full guide</span><span class="sl-chev">↗</span></a></div>';
+  html+='<div class="section-head">Backup &amp; restore</div><div class="card">';
+  html+='<button class="backup-toggle" data-action="backuptoggle"><span>Save or restore your data</span><span class="sl-chev">'+(ui.backupOpen?"\u25be":"\u25b8")+'</span></button>';
+  if(ui.backupOpen){
+    html+='<div class="backup-body"><p class="backup-note">Export saves a copy of everything you\u2019ve logged. Keep it in Notes, email, or a file \u2014 then you can restore it here anytime, or on a new phone.</p>';
+    html+='<div class="backup-row"><button class="btn-solid" data-action="download">Download file</button><button class="btn-solid" data-action="copy">Copy backup</button></div>';
+    html+='<textarea class="backup-area" readonly>'+esc(backupJSON())+'</textarea>';
+    html+='<div class="backup-restore"><div class="entry-label">Restore from a backup</div>';
+    html+='<div class="backup-row"><button class="btn-solid full" data-action="restorefile">Restore from a file\u2026</button></div>';
+    html+='<input type="file" id="restore-file" accept="application/json,.json" style="display:none">';
+    html+='<textarea class="backup-area paste" id="paste-area" placeholder="\u2026or paste a saved backup here">'+esc(ui.restoreText)+'</textarea>';
+    html+='<button class="btn-solid full" data-action="restore">Restore pasted text</button></div>';
+    if(ui.backupMsg) html+='<div class="backup-msg">'+esc(ui.backupMsg)+'</div>';
+    html+='</div>';
+  }
+  html+='</div>';
+  html+='<div class="section-head">Feedback</div><a class="fb-btn" href="mailto:Niten.fitness@gmail.com?subject=Niten%20feedback&body='+encodeURIComponent("What happened, or what\u2019s the idea?\n\n\n\u2014\nApp v"+APP_VERSION)+'">Report a bug or an idea</a><div class="setup-note">Opens your email with the app version already filled in.</div>';
   html+='<div class="section-head" style="margin-top:28px">Danger zone</div>';
   if(!ui.resetArmed){
     html+='<button class="reset-link" data-action="armreset">Reset all data\u2026</button>';
@@ -2198,23 +2210,6 @@ function trendsView(){
     html+='<div class="section-head">Estimated 1-rep max'+helpQ('e1rm')+'</div>'+helpA('e1rm')
       +'<div class="card"><p class="e1rm-intro">Once you\u2019ve logged an exercise across two sessions, this charts your <strong>estimated 1-rep max</strong> \u2014 the heaviest single you\u2019d likely manage, worked out from your best set, so 60\u00d78 and 65\u00d75 compare as one number. Bodyweight moves show your best set instead. Log any exercise twice and its trend appears here.</p></div>';
   }
-
-  html+='<div class="section-head">Guide</div><div class="card"><a class="backup-toggle" style="text-decoration:none" href="https://nitenfitness.app/guide.html" target="_blank" rel="noopener"><span>How it works — full guide</span><span class="sl-chev">↗</span></a></div>';
-  html+='<div class="section-head">Backup &amp; restore</div><div class="card">';
-  html+='<button class="backup-toggle" data-action="backuptoggle"><span>Save or restore your data</span><span class="sl-chev">'+(ui.backupOpen?"\u25be":"\u25b8")+'</span></button>';
-  if(ui.backupOpen){
-    html+='<div class="backup-body"><p class="backup-note">Export saves a copy of everything you\u2019ve logged. Keep it in Notes, email, or a file \u2014 then you can restore it here anytime, or on a new phone.</p>';
-    html+='<div class="backup-row"><button class="btn-solid" data-action="download">Download file</button><button class="btn-solid" data-action="copy">Copy backup</button></div>';
-    html+='<textarea class="backup-area" readonly>'+esc(backupJSON())+'</textarea>';
-    html+='<div class="backup-restore"><div class="entry-label">Restore from a backup</div>';
-    html+='<div class="backup-row"><button class="btn-solid full" data-action="restorefile">Restore from a file\u2026</button></div>';
-    html+='<input type="file" id="restore-file" accept="application/json,.json" style="display:none">';
-    html+='<textarea class="backup-area paste" id="paste-area" placeholder="\u2026or paste a saved backup here">'+esc(ui.restoreText)+'</textarea>';
-    html+='<button class="btn-solid full" data-action="restore">Restore pasted text</button></div>';
-    if(ui.backupMsg) html+='<div class="backup-msg">'+esc(ui.backupMsg)+'</div>';
-    html+='</div>';
-  }
-  html+='</div>';
 
   html+='<div class="disclaimer">Everything you enter stays on this device \u2014 nothing is uploaded or shared. This app tracks patterns; it isn\u2019t medical advice. If you\u2019re training around an injury or health condition, follow your doctor or physio rather than anything here.</div>';
   return html+'</main>';
