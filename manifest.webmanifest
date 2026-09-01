@@ -1,0 +1,15 @@
+{
+  "id": "/",
+  "name": "Niten",
+  "short_name": "Niten",
+  "description": "A quiet gym tracker — private, and entirely on your phone.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EBE8E0",
+  "theme_color": "#EBE8E0",
+  "icons": [
+    { "src": "icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

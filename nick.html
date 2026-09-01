@@ -30,6 +30,15 @@ html[data-theme="military"]{--bg:#14170E;--surface:#1E2415;--surface-2:#2B331D;-
 html[data-theme="midnight"]{--bg:#0E1220;--surface:#161B2C;--surface-2:#1F2740;--line:#2C3654;--ink:#E6E9F2;--ink-dim:#8B93A8;--ink-faint:#565F76;--accent:#E0B24C;--accent-deep:#EFC96E;--warn:#E0785F;--accent-soft:rgba(224,178,76,.13);--on-accent:#161616;--on-warn:#161616}
 html[data-theme="graphite"]{--bg:#131313;--surface:#1C1C1D;--surface-2:#262627;--line:#363638;--ink:#ECECEC;--ink-dim:#9A9A9C;--ink-faint:#636365;--accent:#B0B0B6;--accent-deep:#D2D2D8;--warn:#CC6B5A;--accent-soft:rgba(176,176,182,.14);--on-accent:#161616;--on-warn:#161616}
 html[data-theme="violet"]{--bg:#FCFCFD;--surface:#F4F5F8;--surface-2:#EBEDF2;--line:#DBDFE7;--ink:#16181D;--ink-dim:#59606C;--ink-faint:#9198A4;--accent:#7C3AED;--accent-deep:#5B21B6;--warn:#E11D48;--accent-soft:rgba(124,58,237,.12);--on-accent:#ffffff;--on-warn:#ffffff}
+html[data-theme="autumn"]{--bg:#F6EFE4;--surface:#FCF7EE;--surface-2:#EFE3D1;--line:#DCC9AE;--ink:#2B1E14;--ink-dim:#5F4A36;--ink-faint:#8C7860;--accent:#9C4416;--accent-deep:#7A3410;--warn:#A32C2C;--accent-soft:rgba(156,68,22,.13);--on-accent:#FFFFFF;--on-warn:#FFFFFF}
+html[data-theme="pumpkin"]{--bg:#14101A;--surface:#1D1726;--surface-2:#271F33;--line:#3A2E4A;--ink:#F1EBF6;--ink-dim:#A79AB6;--ink-faint:#736781;--accent:#F58024;--accent-deep:#FF9B4D;--warn:#D9534F;--accent-soft:rgba(245,128,36,.13);--on-accent:#17110A;--on-warn:#17110A}
+html[data-theme="crimson"]{--bg:#A11225;--surface:#8A0F20;--surface-2:#760F1C;--line:#B63546;--ink:#FFF4F2;--ink-dim:#F4BEC3;--ink-faint:#D2949B;--accent:#F0C85E;--accent-deep:#FBDE95;--warn:#FFC0AC;--accent-soft:rgba(240,200,94,.15);--on-accent:#3A1A02;--on-warn:#3A1A02}
+html[data-theme="crimson"] .topbar{background:#C8102E;margin:0 -16px;padding-left:16px;padding-right:16px}
+html[data-theme="crimson"] .topbar .brand-mark,html[data-theme="crimson"] .topbar .brand-name{color:#FFFFFF}
+html[data-theme="crimson"] .topbar .save-btn{background:#F0C85E;color:#3A1A02}
+html[data-theme="crimson"] .topbar .save-btn.saved{background:transparent;color:#FFFFFF;border:1px solid rgba(255,255,255,.75)}
+html[data-theme="crimson"] .section-head::before{content:"\00BB";color:#F0C85E;margin-right:6px;font-weight:800}
+html[data-theme="crimson"] .milestone{background:#F0C85E;border-color:#FBDE95;color:#3A1A02}
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg)}
@@ -83,7 +92,7 @@ html,body{background:var(--bg)}
 .note-card{margin:0 0 8px}
 .note-area{width:100%;min-height:44px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);color:var(--ink);font-family:'Barlow',sans-serif;font-size:.92rem;line-height:1.45;padding:11px 13px;resize:vertical}
 .note-area::placeholder{color:var(--ink-faint)}
-.gymcode{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;cursor:pointer}
+.gymcode{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px 14px;margin:12px 0;cursor:pointer}
 .gc-label{font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.7rem;color:var(--ink-dim);font-weight:600}
 .gc-val{font-weight:700;font-size:1.05rem;color:var(--ink);letter-spacing:.12em}
 .bw-row .btn-solid{padding:8px 14px;font-size:.85rem}
@@ -451,7 +460,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.75";
+var APP_VERSION = "3.79";
 var STORE_KEY = "block-tracker";
 
 /* ---------------------------------------------------------------
@@ -482,6 +491,8 @@ var LIBRARY = [
   { name:"Lying leg press", type:"log", unit:"kg", step:2.5, equip:"Machine", group:"Main", on:false },
   { name:"Hamstring curl", type:"log", unit:"lb", step:10, equip:"Machine", group:"Main", on:true },
   { name:"Lunge walk", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:true },
+  { name:"Lunges", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Reverse lunges", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:false },
 
   { name:"Dead hang", type:"log", unit:"kg", step:2.5, body:true, timed:true, repLabel:"secs", repWord:"s", equip:"Bodyweight", group:"Main", on:false },
   { name:"Chin-ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, assist:true, equip:"Bodyweight", group:"Main", on:true },
@@ -545,6 +556,10 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.79", items:["Three seasonal colour schemes in Setup: Autumn \u0026 Ember, Pumpkin \u0026 Pitch, and Pine \u0026 Gold.","All three are contrast-checked like the rest \u2014 no squinting at the gym in November."]},
+  {v:"3.78", items:["Niten now genuinely works offline \u2014 once you\u2019ve opened it, it keeps working with no signal at all.","You still get the newest version the moment you\u2019re back online; nothing gets stuck on an old copy."]},
+  {v:"3.77", items:["Android phones can now install Niten properly from the shared link, instead of getting a browser shortcut."]},
+  {v:"3.76", items:["Two new bodyweight moves: Lunges and Reverse lunges, alongside the walking version you already had.","Switch them on in Setup \u2014 reverse lunges count towards glutes first, forward lunges towards quads.","Fixed: adding exercises used to make your saved routine look \u201cedited\u201d when you hadn\u2019t touched it."]},
   {v:"3.75", items:["Setup is in a more sensible order \u2014 who you are and how it looks first, then how your training is organised, then your exercises.","Sessions now sits above the exercise list, so you can name them before you assign anything to them.","Backup \u0026 restore and the full guide have moved from Trends into Setup, where you\u2019d look for them."]},
   {v:"3.74", items:["Warm-up and cool-down now suggest the same options \u2014 and both mention the elliptical and the stair stepper, which the app has had all along."]},
   {v:"3.73", items:["A quiet Ko-fi link now sits at the foot of every tab, next to the version \u2014 rather than hiding in Setup."]},
@@ -699,7 +714,7 @@ function toggleDayMember(name,label){
   data.dayPlan[name]=mem;
   commit();
 }
-var SETUP_SCHEMA = 1, MAX_SETUPS = 3;
+var SETUP_SCHEMA = 2, MAX_SETUPS = 3;
 var PRESETS = [
   { key:"pushpull", name:"Push / Pull", meta:"Push \u00b7 Pull", labels:["Push","Pull"],
     sessions:[
@@ -740,10 +755,14 @@ function snapshotConfig(){
   var pc=planCfg();
   return { enabled:en, dayPlan:dp, plan:{mode:pc.mode,count:pc.count,labels:labels.slice()}, exOrder:(data.exOrder||[]).slice() };
 }
+/* Fingerprint only what a routine actually defines: which exercises are ON,
+   which sessions they sit in, the labels and the order. Exercises that are off
+   contribute nothing, so adding new built-ins to the catalogue can never make a
+   saved routine look edited. */
 function cfgKey(c){
   var en=c.enabled||{}, dp=c.dayPlan||{}, p=c.plan||{};
-  var names=Object.keys(en).sort();
-  var s=names.map(function(n){ return n+":"+(en[n]?1:0)+":"+((dp[n]||[]).slice().sort().join("/")); }).join("|");
+  var names=Object.keys(en).filter(function(n){ return !!en[n]; }).sort();
+  var s=names.map(function(n){ return n+":"+((dp[n]||[]).slice().sort().join("/")); }).join("|");
   return s+"||"+((p.mode||"letters")+","+(p.count||2)+","+((p.labels||[]).join(",")))+"||"+((c.exOrder||[]).join(","));
 }
 function markSnap(){ data.activeSnap=cfgKey(snapshotConfig()); }
@@ -799,8 +818,10 @@ function ensureSetups(){
     snap.name="My setup";
     data.setups=[snap];
     data.activeSetup=0;
-    data.activeSnap=cfgKey(snap);
   }
+  /* re-fingerprint under the current key format, so an upgrade that adds
+     exercises never shows an untouched routine as edited */
+  if(data.activeSetup!=null) data.activeSnap=cfgKey(snapshotConfig());
   data.schema=SETUP_SCHEMA;
   save();
 }
@@ -921,6 +942,7 @@ var MUSCLE_MAP = {
   "Dumbbell press":{p:"Chest",s:"Triceps"}, "Seated dumbbell curl":{p:"Biceps"},
   "Upright row (dumbbells)":{p:"Shoulders",s:"Biceps"}, "Leg press":{p:"Quads",s:"Glutes"}, "Lying leg press":{p:"Quads",s:"Glutes"},
   "Hamstring curl":{p:"Hamstrings"}, "Lunge walk":{p:"Quads",s:"Glutes"},
+  "Lunges":{p:"Quads",s:"Glutes"}, "Reverse lunges":{p:"Glutes",s:"Quads"},
   "Dead hang":{p:"Forearms",s:"Back"}, "Chin-ups":{p:"Back",s:"Biceps"}, "Pull-ups":{p:"Back",s:"Biceps"},
   "Hip thrusters":{p:"Glutes",s:"Hamstrings"}, "Leg raises":{p:"Core"},
   "Cable crossovers":{p:"Chest"}, "Pec deck":{p:"Chest"}, "Dumbbell flys":{p:"Chest"},
@@ -943,10 +965,10 @@ function muscleOf(name){
   if(c && c.muscle) return {p:c.muscle, s:c.muscle2||null};
   return null;
 }
-var FRESH_SCALES={charcoal:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],pink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],putty:["#636F65","#6E7A63","#8A8A5C","#B07C34","#A96A4A","#A85D5A","#8F4038","#7C2E2C"],slate:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],puregym:["#E0AC46","#CBA75E","#AE9E7E","#8B9698","#5E8388","#3B6B73","#1E555F","#0B3A42"],sage:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],ink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],military:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],midnight:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],graphite:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],violet:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"]};
-var THEMES=[{k:"auto",name:"Auto (match phone)"},{k:"charcoal",name:"Charcoal & Amber"},{k:"pink",name:"Bubblegum"},{k:"putty",name:"Putty & Rose"},{k:"slate",name:"Petrol & Aqua"},{k:"puregym",name:"Pure"},{k:"sage",name:"Sage & Chalk"},{k:"ink",name:"Ink & Electric"},{k:"military",name:"Olive & Brass"},{k:"midnight",name:"Midnight & Gold"},{k:"graphite",name:"Graphite & Silver"},{k:"violet",name:"Violet & Snow"}];
-var THEME_ACCENT={charcoal:"#F2A93B",pink:"#DA1884",putty:"#7E5B58",slate:"#1FB9AB",puregym:"#0B6470",sage:"#3E8E63",ink:"#2563EB",military:"#C2A24E",midnight:"#E0B24C",graphite:"#B0B0B6",violet:"#7C3AED"};
-var THEME_BG={charcoal:"#14171A",pink:"#FFD9EE",putty:"#EDE4D6",slate:"#052526",puregym:"#EBE8E0",sage:"#F3F5F1",ink:"#FFFFFF",military:"#15180F",midnight:"#0E1220",graphite:"#131313",violet:"#FCFCFD"};
+var FRESH_SCALES={charcoal:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],pink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],putty:["#636F65","#6E7A63","#8A8A5C","#B07C34","#A96A4A","#A85D5A","#8F4038","#7C2E2C"],slate:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],puregym:["#E0AC46","#CBA75E","#AE9E7E","#8B9698","#5E8388","#3B6B73","#1E555F","#0B3A42"],sage:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],ink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],military:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],midnight:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],graphite:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],violet:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],autumn:["#6E8C2E","#868F2A","#A88329","#C4711F","#B4541E","#96401C","#75311B","#4E2417"],pumpkin:["#FFD166","#F5A623","#F27318","#E85D2A","#DE4A55","#C94A80","#A6459A","#94429C"],crimson:["#DD8894","#E1969B","#E5A8A4","#EBC1AF","#F1D8BB","#F5E7C9","#F8F0D8","#F9F7E9"]};
+var THEMES=[{k:"auto",name:"Auto (match phone)"},{k:"charcoal",name:"Charcoal & Amber"},{k:"pink",name:"Bubblegum"},{k:"putty",name:"Putty & Rose"},{k:"slate",name:"Petrol & Aqua"},{k:"puregym",name:"Pure"},{k:"sage",name:"Sage & Chalk"},{k:"ink",name:"Ink & Electric"},{k:"military",name:"Olive & Brass"},{k:"midnight",name:"Midnight & Gold"},{k:"graphite",name:"Graphite & Silver"},{k:"violet",name:"Violet & Snow"},{k:"autumn",name:"Autumn & Ember"},{k:"pumpkin",name:"Pumpkin & Pitch"},{k:"crimson",name:"Crimson & Gold"}];
+var THEME_ACCENT={charcoal:"#F2A93B",pink:"#DA1884",putty:"#7E5B58",slate:"#1FB9AB",puregym:"#0B6470",sage:"#3E8E63",ink:"#2563EB",military:"#C2A24E",midnight:"#E0B24C",graphite:"#B0B0B6",violet:"#7C3AED",autumn:"#9C4416",pumpkin:"#F58024",crimson:"#F0C85E"};
+var THEME_BG={charcoal:"#14171A",pink:"#FFD9EE",putty:"#EDE4D6",slate:"#052526",puregym:"#EBE8E0",sage:"#F3F5F1",ink:"#FFFFFF",military:"#15180F",midnight:"#0E1220",graphite:"#131313",violet:"#FCFCFD",autumn:"#F6EFE4",pumpkin:"#14101A",crimson:"#A11225"};
 var THEME_KEY=STORE_KEY+"-theme";
 var currentTheme=(function(){try{return localStorage.getItem(THEME_KEY)||"charcoal";}catch(e){return "charcoal";}})();
 var FRESH=FRESH_SCALES.charcoal;
@@ -2526,6 +2548,14 @@ document.title = appTitle().replace(/\u2019/g,"'");
 (function(){ if(data.lastBackupWO==null||data.backupSnoozeWO==null){ var _w=woCount(); if(data.lastBackupWO==null) data.lastBackupWO=_w; if(data.backupSnoozeWO==null) data.backupSnoozeWO=_w; } })();
 (function(){ if(data.advanced==null){ data.advanced = ((data.sessions&&data.sessions.length)||(data.custom&&data.custom.length)) ? true : false; } })();
 render();
+
+/* Offline support: see sw.js. Registered after load so it never delays first paint,
+   and swallowed entirely on file:// or any browser without service workers. */
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function(){
+    try { navigator.serviceWorker.register("sw.js").catch(function(){}); } catch (e) {}
+  });
+}
 </script>
 </body>
 </html>
