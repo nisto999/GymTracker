@@ -32,13 +32,21 @@ html[data-theme="graphite"]{--bg:#131313;--surface:#1C1C1D;--surface-2:#262627;-
 html[data-theme="violet"]{--bg:#FCFCFD;--surface:#F4F5F8;--surface-2:#EBEDF2;--line:#DBDFE7;--ink:#16181D;--ink-dim:#59606C;--ink-faint:#9198A4;--accent:#7C3AED;--accent-deep:#5B21B6;--warn:#E11D48;--accent-soft:rgba(124,58,237,.12);--on-accent:#ffffff;--on-warn:#ffffff}
 html[data-theme="autumn"]{--bg:#F6EFE4;--surface:#FCF7EE;--surface-2:#EFE3D1;--line:#DCC9AE;--ink:#2B1E14;--ink-dim:#5F4A36;--ink-faint:#8C7860;--accent:#9C4416;--accent-deep:#7A3410;--warn:#A32C2C;--accent-soft:rgba(156,68,22,.13);--on-accent:#FFFFFF;--on-warn:#FFFFFF}
 html[data-theme="pumpkin"]{--bg:#14101A;--surface:#1D1726;--surface-2:#271F33;--line:#3A2E4A;--ink:#F1EBF6;--ink-dim:#A79AB6;--ink-faint:#736781;--accent:#F58024;--accent-deep:#FF9B4D;--warn:#D9534F;--accent-soft:rgba(245,128,36,.13);--on-accent:#17110A;--on-warn:#17110A}
-html[data-theme="crimson"]{--bg:#A11225;--surface:#8A0F20;--surface-2:#760F1C;--line:#B63546;--ink:#FFF4F2;--ink-dim:#F4BEC3;--ink-faint:#D2949B;--accent:#F0C85E;--accent-deep:#FBDE95;--warn:#FFC0AC;--accent-soft:rgba(240,200,94,.15);--on-accent:#3A1A02;--on-warn:#3A1A02}
-html[data-theme="crimson"] .topbar{background:#C8102E;margin:0 -16px;padding-left:16px;padding-right:16px}
+html[data-theme="crimson"]{--bg:#AE1124;--surface:#FFF8F4;--surface-2:#F5E7E3;--line:#E6CFCF;--ink:#1E1113;--ink-dim:#5C464A;--ink-faint:#6E585C;--accent:#A00E22;--accent-deep:#7C0A1A;--warn:#8A3412;--accent-soft:rgba(255,255,255,.14);--on-accent:#FFF8F4;--on-warn:#FFF8F4}
+html[data-theme="crimson"] .topbar{background:#8E0B1C;margin:0 -16px;padding-left:16px;padding-right:16px}
 html[data-theme="crimson"] .topbar .brand-mark,html[data-theme="crimson"] .topbar .brand-name{color:#FFFFFF}
-html[data-theme="crimson"] .topbar .save-btn{background:#F0C85E;color:#3A1A02}
+html[data-theme="crimson"] .topbar .save-btn{background:#E9C25C;color:#3A1A02}
 html[data-theme="crimson"] .topbar .save-btn.saved{background:transparent;color:#FFFFFF;border:1px solid rgba(255,255,255,.75)}
-html[data-theme="crimson"] .section-head::before{content:"\00BB";color:#F0C85E;margin-right:6px;font-weight:800}
-html[data-theme="crimson"] .milestone{background:#F0C85E;border-color:#FBDE95;color:#3A1A02}
+html[data-theme="crimson"] main > .section-head{color:#FFE4E4}
+html[data-theme="crimson"] main > .section-head::before{content:"\00BB";color:#E9C25C;margin-right:6px;font-weight:800}
+html[data-theme="crimson"] main > .section-head .help-chip{color:#FFE4E4;border-color:rgba(255,255,255,.45)}
+html[data-theme="crimson"] main > .setup-note,html[data-theme="crimson"] main > .metric-caption,html[data-theme="crimson"] main > .version,html[data-theme="crimson"] main > .day-cheer,html[data-theme="crimson"] main > .e1rm-intro,html[data-theme="crimson"] main > .guide-p,html[data-theme="crimson"] main > .backup-cheer{color:#F3C4C4}
+html[data-theme="crimson"] main > .reset-link{color:#FFE4E4}
+html[data-theme="crimson"] .app-foot .foot-kofi,html[data-theme="crimson"] .app-foot .foot-ver{color:#F3C4C4}
+html[data-theme="crimson"] .backup-banner{border-color:rgba(255,255,255,.55)}
+html[data-theme="crimson"] .backup-banner,html[data-theme="crimson"] .backup-banner .backup-cheer{color:#FFE4E4}
+html[data-theme="crimson"] .backup-count{color:#FFE4E4}
+html[data-theme="crimson"] .milestone{background:#E9C25C;border-color:#CFA22B;color:#3A1A02}
 
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html,body{background:var(--bg)}
@@ -115,15 +123,16 @@ html,body{background:var(--bg)}
 .step-log.open{border-color:var(--accent-deep)}
 .fresh-bar{position:absolute;left:0;top:0;bottom:0;width:4px}
 .sl-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;background:none;border:none;padding:14px 13px 14px 17px;cursor:pointer;text-align:left}
-.sl-name{font-weight:600;font-size:1rem;color:var(--ink)}
+.sl-name{font-weight:600;font-size:1rem;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .sl-name em{font-style:normal;color:var(--ink-faint);font-weight:400}
-.sl-right{display:flex;align-items:center;gap:9px}
+.sl-right{display:flex;align-items:center;gap:9px;flex:0 0 auto}
 .sl-days{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:600}
 .sl-count{font-family:'JetBrains Mono',monospace;font-size:.74rem;color:var(--accent)}
 .sl-chev{color:var(--ink-faint);font-size:.8rem}
 .sl-body{padding:13px;border-top:1px solid var(--line)}
 
 .last-ref{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:11px 13px;background:var(--surface-2);border-radius:9px}
+.sl-spark{display:block;flex:0 0 auto;opacity:.9}
 .last-label{font-family:'Barlow Semi Condensed',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.72rem;color:var(--ink-dim)}
 .last-sets{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.95rem;color:var(--ink)}
 .last-ref-empty{justify-content:flex-start;color:var(--ink-faint);font-size:.85rem;font-family:'Barlow',sans-serif}
@@ -460,7 +469,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.79";
+var APP_VERSION = "3.82";
 var STORE_KEY = "block-tracker";
 
 /* ---------------------------------------------------------------
@@ -556,6 +565,9 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.82", items:["Every exercise on the Log now carries a small trend line \u2014 your estimated 1-rep max across every session you\u2019ve logged it.","It appears once you\u2019ve logged something twice, and skips timed holds where the number wouldn\u2019t mean anything."]},
+  {v:"3.81", items:["Crimson \u0026 Gold is now the suit and the fur \u2014 a red page with cream cards, a deep red header and a gold Save."]},
+  {v:"3.80", items:["Crimson \u0026 Gold is snow-white now, with a Santa-red header and a gold Save button \u2014 rather less haunted-hotel than before."]},
   {v:"3.79", items:["Three seasonal colour schemes in Setup: Autumn \u0026 Ember, Pumpkin \u0026 Pitch, and Pine \u0026 Gold.","All three are contrast-checked like the rest \u2014 no squinting at the gym in November."]},
   {v:"3.78", items:["Niten now genuinely works offline \u2014 once you\u2019ve opened it, it keeps working with no signal at all.","You still get the newest version the moment you\u2019re back online; nothing gets stuck on an old copy."]},
   {v:"3.77", items:["Android phones can now install Niten properly from the shared link, instead of getting a browser shortcut."]},
@@ -965,10 +977,10 @@ function muscleOf(name){
   if(c && c.muscle) return {p:c.muscle, s:c.muscle2||null};
   return null;
 }
-var FRESH_SCALES={charcoal:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],pink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],putty:["#636F65","#6E7A63","#8A8A5C","#B07C34","#A96A4A","#A85D5A","#8F4038","#7C2E2C"],slate:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],puregym:["#E0AC46","#CBA75E","#AE9E7E","#8B9698","#5E8388","#3B6B73","#1E555F","#0B3A42"],sage:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],ink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],military:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],midnight:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],graphite:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],violet:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],autumn:["#6E8C2E","#868F2A","#A88329","#C4711F","#B4541E","#96401C","#75311B","#4E2417"],pumpkin:["#FFD166","#F5A623","#F27318","#E85D2A","#DE4A55","#C94A80","#A6459A","#94429C"],crimson:["#DD8894","#E1969B","#E5A8A4","#EBC1AF","#F1D8BB","#F5E7C9","#F8F0D8","#F9F7E9"]};
+var FRESH_SCALES={charcoal:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],pink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],putty:["#636F65","#6E7A63","#8A8A5C","#B07C34","#A96A4A","#A85D5A","#8F4038","#7C2E2C"],slate:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],puregym:["#E0AC46","#CBA75E","#AE9E7E","#8B9698","#5E8388","#3B6B73","#1E555F","#0B3A42"],sage:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],ink:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],military:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],midnight:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],graphite:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],violet:["#8B5CF6","#6366F1","#3B82F6","#22C55E","#A3C412","#EAB308","#F97316","#EF4444"],autumn:["#6E8C2E","#868F2A","#A88329","#C4711F","#B4541E","#96401C","#75311B","#4E2417"],pumpkin:["#FFD166","#F5A623","#F27318","#E85D2A","#DE4A55","#C94A80","#A6459A","#94429C"],crimson:["#936B0C","#8B550E","#84420F","#7D2D0F","#7C160B","#77090E","#6E0A1A","#650A22"]};
 var THEMES=[{k:"auto",name:"Auto (match phone)"},{k:"charcoal",name:"Charcoal & Amber"},{k:"pink",name:"Bubblegum"},{k:"putty",name:"Putty & Rose"},{k:"slate",name:"Petrol & Aqua"},{k:"puregym",name:"Pure"},{k:"sage",name:"Sage & Chalk"},{k:"ink",name:"Ink & Electric"},{k:"military",name:"Olive & Brass"},{k:"midnight",name:"Midnight & Gold"},{k:"graphite",name:"Graphite & Silver"},{k:"violet",name:"Violet & Snow"},{k:"autumn",name:"Autumn & Ember"},{k:"pumpkin",name:"Pumpkin & Pitch"},{k:"crimson",name:"Crimson & Gold"}];
-var THEME_ACCENT={charcoal:"#F2A93B",pink:"#DA1884",putty:"#7E5B58",slate:"#1FB9AB",puregym:"#0B6470",sage:"#3E8E63",ink:"#2563EB",military:"#C2A24E",midnight:"#E0B24C",graphite:"#B0B0B6",violet:"#7C3AED",autumn:"#9C4416",pumpkin:"#F58024",crimson:"#F0C85E"};
-var THEME_BG={charcoal:"#14171A",pink:"#FFD9EE",putty:"#EDE4D6",slate:"#052526",puregym:"#EBE8E0",sage:"#F3F5F1",ink:"#FFFFFF",military:"#15180F",midnight:"#0E1220",graphite:"#131313",violet:"#FCFCFD",autumn:"#F6EFE4",pumpkin:"#14101A",crimson:"#A11225"};
+var THEME_ACCENT={charcoal:"#F2A93B",pink:"#DA1884",putty:"#7E5B58",slate:"#1FB9AB",puregym:"#0B6470",sage:"#3E8E63",ink:"#2563EB",military:"#C2A24E",midnight:"#E0B24C",graphite:"#B0B0B6",violet:"#7C3AED",autumn:"#9C4416",pumpkin:"#F58024",crimson:"#A00E22"};
+var THEME_BG={charcoal:"#14171A",pink:"#FFD9EE",putty:"#EDE4D6",slate:"#052526",puregym:"#EBE8E0",sage:"#F3F5F1",ink:"#FFFFFF",military:"#15180F",midnight:"#0E1220",graphite:"#131313",violet:"#FCFCFD",autumn:"#F6EFE4",pumpkin:"#14101A",crimson:"#AE1124"};
 var THEME_KEY=STORE_KEY+"-theme";
 var currentTheme=(function(){try{return localStorage.getItem(THEME_KEY)||"charcoal";}catch(e){return "charcoal";}})();
 var FRESH=FRESH_SCALES.charcoal;
@@ -1163,6 +1175,54 @@ function setsSummary(name,sets){
 function topSet(sets){ return (!sets||!sets.length)?null:sets.reduce(function(m,s){return s.w>m?s.w:m;},0); }
 function baseOf(name){ return Number((data.baseWeight||{})[name])||0; }
 function e1rm(w,r){ return w*(1+r/30); }
+/* Tiny e1RM trend shown at the top of an open exercise, Stocks-style.
+   Deliberately narrow: Advanced only, never for timed holds, and nothing at all
+   until there are two logged sessions to draw a line between. A single wild
+   reading is clipped to 1.5x the median so one mis-typed set can't flatten the
+   whole shape. */
+/* Tiny e1RM trend that rides in the exercise row, Stocks-style — present whether
+   the row is open or shut. Deliberately narrow: Advanced only, never for timed
+   holds, and nothing at all until there are two logged sessions to draw between.
+   Outliers are clipped on median absolute deviation rather than a ratio of the
+   median: a heavy bar or sled inflates every reading, which makes a ratio rule
+   miss the very spike it exists to catch. */
+function trendSpark(name, col){
+  if(!data.advanced) return "";
+  var e=exOf(name);
+  if(!e || e.type!=="log" || e.timed) return "";
+  var isBody=!!e.body, base=baseOf(name);
+  var pts=(data.sessions||[]).filter(function(s){ return s.exercise===name && s.sets && s.sets.length; })
+    .sort(function(a,b){ return a.date.localeCompare(b.date); })
+    .map(function(s){ return isBody ? bestReps(s.sets) : Math.round(bestE1RM(s.sets,base)*10)/10; })
+    .filter(function(v){ return v>0; });
+  if(pts.length<2) return "";
+  function median(a){ var s=a.slice().sort(function(x,y){return x-y;}), m=s.length>>1;
+    return s.length%2 ? s[m] : (s[m-1]+s[m])/2; }
+  var med=median(pts);
+  var mad=median(pts.map(function(v){ return Math.abs(v-med); }));
+  var clipped=false, pl=pts;
+  if(mad>0){
+    var hiCap=med+3*mad, loCap=med-3*mad;
+    pl=pts.map(function(v){
+      if(v>hiCap){ clipped=true; return hiCap; }
+      if(v<loCap){ clipped=true; return loCap; }
+      return v; });
+  }
+  var lo=Math.min.apply(null,pl), hi=Math.max.apply(null,pl), flat=(hi-lo)<1e-9, rng=(hi-lo)||1;
+  var W=54, H=20, n=pl.length, PAD=2.5, stepX=(W-PAD*2)/(n-1);
+  var xy=pl.map(function(v,i){ return [PAD+i*stepX, flat ? H/2 : H-2.5-((v-lo)/rng)*(H-5)]; });
+  var d=xy.map(function(p,i){ return (i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1); }).join(" ");
+  var area=d+" L"+xy[n-1][0].toFixed(1)+" "+H+" L"+xy[0][0].toFixed(1)+" "+H+" Z";
+  var end=xy[n-1];
+  var unit=isBody ? (e.repLabel||"reps") : unitOf(name)+" 1RM";
+  return '<svg class="sl-spark" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'
+    +esc(name)+' trend, latest '+esc(String(pts[pts.length-1]))+' '+esc(unit)
+    +(clipped?", one outlying reading clipped":"")+'">'
+    +'<path d="'+area+'" fill="'+col+'" opacity=".14"/>'
+    +'<path d="'+d+'" fill="none" stroke="'+col+'" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>'
+    +'<circle cx="'+end[0].toFixed(1)+'" cy="'+end[1].toFixed(1)+'" r="1.9" fill="'+col+'"/>'
+    +'</svg>';
+}
 function bestE1RM(sets,base){ base=base||0; return (!sets||!sets.length)?0:sets.reduce(function(m,s){var v=e1rm(s.w+base,s.r);return v>m?v:m;},0); }
 function bestReps(sets){ return (!sets||!sets.length)?0:sets.reduce(function(m,s){return s.r>m?s.r:m;},0); }
 
@@ -1877,7 +1937,7 @@ function logView(){
       html+='<div class="step-log'+(open?" open":"")+'">';
       html+='<div class="fresh-bar" style="background:'+col+'"></div>';
       html+='<button class="sl-head" data-action="expand" data-arg="'+nm+'"><span class="sl-name">'+nm+noteHtml+'</span>'
-        +'<span class="sl-right"><span class="sl-days" style="color:'+col+'">'+dsLabel+'</span>'
+        +'<span class="sl-right">'+trendSpark(step.name, col)+'<span class="sl-days" style="color:'+col+'">'+dsLabel+'</span>'
         +(doneSets>0?'<span class="sl-count">'+doneSets+' set'+(doneSets>1?"s":"")+'</span>':'')
         +'<span class="sl-chev">'+(open?"\u25be":"\u25b8")+'</span></span></button>';
       if(open){
