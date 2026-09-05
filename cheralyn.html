@@ -441,6 +441,11 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .gs-txt{flex:1}
 .gs-title{font-size:.9rem;font-weight:600;color:var(--ink)}
 .gs-hint{font-size:.76rem;color:var(--ink-dim);line-height:1.45;margin-top:1px}
+.gs-hint em,.pin-hint em{font-style:normal;color:var(--accent-deep);font-weight:600}
+.pin{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 38px 12px 14px;margin:8px 0 4px;position:relative}
+.pin-title{font-size:.9rem;font-weight:600;color:var(--ink)}
+.pin-hint{font-size:.76rem;color:var(--ink-dim);line-height:1.45;margin-top:1px}
+.pin-x{position:absolute;top:6px;right:6px;width:30px;height:30px;background:transparent;border:none;color:var(--ink-dim);font-size:1.25rem;font-weight:600;line-height:1;cursor:pointer;padding:0}
 .gs-foot{color:var(--ink-faint);font-size:.76rem;margin-top:2px}
 .milestone{font-size:.86rem;color:var(--ink);background:var(--accent-soft);border:1px solid var(--accent);border-radius:10px;padding:12px 36px 12px 14px;margin:8px 0 4px;line-height:1.5;position:relative}
 .mile-x{position:absolute;top:7px;right:7px;width:26px;height:26px;background:transparent;border:none;color:var(--ink-dim);font-size:1.2rem;line-height:1;cursor:pointer;padding:0}
@@ -469,7 +474,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.82";
+var APP_VERSION = "3.85";
 var STORE_KEY = "gym-tracker-shared";
 var FILE_NAME = "Cheralyn";
 
@@ -492,7 +497,7 @@ var LIBRARY = [
   { name:"Bench press", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:true },
   { name:"Preacher curl", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:true },
   { name:"Barbell curl", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
-  { name:"Dumbbell curl reversed bench", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Spider curl", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
   { name:"Skullcrushers", type:"log", unit:"kg", step:2, equip:"Barbell", group:"Main", on:false },
   { name:"Dumbbell press", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:true },
   { name:"Seated dumbbell curl", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
@@ -566,6 +571,9 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.85", items:["Niten now asks your browser to hold on to your data rather than clearing it out to reclaim space \u2014 phones can be ruthless about that if you go a few weeks without training. It\u2019s a request rather than a promise, so keep taking backups."]},
+  {v:"3.84", items:["The home-screen tip now sticks around after your first workout instead of vanishing with the welcome card \u2014 it waits on the Log page until you\u2019ve done it, or until you tap the \u00d7 to send it away for good."]},
+  {v:"3.83", items:["\u201cDumbbell curl reversed bench\u201d is now called \u201cSpider curl\u201d \u2014 the usual name for it, and a good deal easier to read. Everything you\u2019ve logged comes with it.","Renaming an exercise now carries custom exercises across too, not just built-in ones \u2014 nothing gets orphaned.","The welcome card now shows how to keep Niten on your home screen, with the right steps for your phone."]},
   {v:"3.82", items:["Every exercise on the Log now carries a small trend line \u2014 your estimated 1-rep max across every session you\u2019ve logged it.","It appears once you\u2019ve logged something twice, and skips timed holds where the number wouldn\u2019t mean anything."]},
   {v:"3.81", items:["Crimson \u0026 Gold is now the suit and the fur \u2014 a red page with cream cards, a deep red header and a gold Save."]},
   {v:"3.80", items:["Crimson \u0026 Gold is snow-white now, with a Santa-red header and a gold Save button \u2014 rather less haunted-hotel than before."]},
@@ -960,7 +968,7 @@ var MUSCLE_MAP = {
   "Squats":{p:"Quads",s:"Glutes"}, "Squat jumps":{p:"Quads",s:"Glutes"},
   "Sit-ups":{p:"Core"}, "Crunches":{p:"Core"}, "Plank":{p:"Core"},
   "Cable reverse fly":{p:"Shoulders",s:"Back"}, "Barbell curl":{p:"Biceps"},
-  "Dumbbell curl reversed bench":{p:"Biceps"}, "Cable pull-through":{p:"Glutes",s:"Hamstrings"},
+  "Spider curl":{p:"Biceps"}, "Cable pull-through":{p:"Glutes",s:"Hamstrings"},
   "Kettlebell swing":{p:"Glutes",s:"Hamstrings"}, "Goblet squat":{p:"Quads",s:"Glutes"},
   "Kettlebell clean":{p:"Shoulders",s:"Back"}, "Kettlebell press":{p:"Shoulders",s:"Triceps"},
   "Kettlebell row":{p:"Back",s:"Biceps"}
@@ -1018,7 +1026,7 @@ function seed(){
     miles: {wo:0,ton:0,streak:0,cardio:0},
     height: null,
     userName: null,
-    sessions: [], habits: {}, checks: {}, cardio: {}, conditioning: {}, lastBackupWO: null, backupSnoozeWO: null, advanced: null, cardioUnit: "kcal",
+    sessions: [], habits: {}, checks: {}, cardio: {}, conditioning: {}, lastBackupWO: null, backupSnoozeWO: null, installDismissed: false, advanced: null, cardioUnit: "kcal",
     enabled: (function(){ var e={}; LIBRARY.forEach(function(x){ if(x.group==="Main"&&x.type==="log") e[x.name]=STARTERS.indexOf(x.name)>=0; }); return e; })(), metricsOn: {}, custom: [], baseWeight: {}, stepOverride: {}, exOrder: [], dayPlan: {}, notes: {}, notesOn: true, gymCode: "", setups: [], activeSetup: null, activeSnap: null, schema: 0, plan: {mode:"letters",count:2}, pairs: DEFAULT_PAIRS.slice(), lastSeenVersion: null,
     admin: { bloodwork: false },
     metrics: {
@@ -1027,7 +1035,7 @@ function seed(){
   };
 }
 
-var RENAMES={ "Seated row (light)":"Seated row", "Warm-up · elliptical":"Warm-up cardio", "Barbell Curl":"Barbell curl", "Cable Pull Through":"Cable pull-through", "Dumbell Curl Reversed Bench":"Dumbbell curl reversed bench", "Seated Row Plates":"Seated row (plates)", "Stair Stepper":"Stair stepper", "Sit ups":"Sit-ups", "Chin ups":"Chin-ups", "Pull ups":"Pull-ups" };
+var RENAMES={ "Seated row (light)":"Seated row", "Warm-up · elliptical":"Warm-up cardio", "Barbell Curl":"Barbell curl", "Cable Pull Through":"Cable pull-through", "Dumbell Curl Reversed Bench":"Spider curl", "Dumbbell curl reversed bench":"Spider curl", "Seated Row Plates":"Seated row (plates)", "Stair Stepper":"Stair stepper", "Sit ups":"Sit-ups", "Chin ups":"Chin-ups", "Pull ups":"Pull-ups", "Dumbell Press Incline 1":"Dumbbell press (incline)" };
 function migrateRenames(s){
   if(!s) return s;
   function rn(n){ return RENAMES[n]||n; }
@@ -1040,6 +1048,10 @@ function migrateRenames(s){
   ["enabled","baseWeight","stepOverride","dayPlan"].forEach(function(k){
     var o=s[k]; if(o && typeof o==="object"){ Object.keys(o).forEach(function(n){ if(RENAMES[n] && RENAMES[n]!==n){ o[RENAMES[n]]=o[n]; delete o[n]; } }); }
   });
+  /* Custom exercises live in data.custom[] with their name as the key, so a
+     RENAMES entry has to move the definition too — otherwise the history moves
+     to the new name and the exercise keeps the old one, orphaning both. */
+  (s.custom||[]).forEach(function(c){ if(c && RENAMES[c.name]) c.name=RENAMES[c.name]; });
   if(Array.isArray(s.exOrder)) s.exOrder=s.exOrder.map(rn);
   return s;
 }
@@ -1066,7 +1078,7 @@ function load(){
       miles: Object.assign({wo:0,ton:0,streak:0,cardio:0}, s.miles||{}),
       height: (s.height!=null? s.height : base.height),
       userName: (s.userName!=null? s.userName : base.userName),
-      sessions: s.sessions||[], habits: s.habits||{}, checks: s.checks||{}, cardio: s.cardio||{}, conditioning: s.conditioning||{}, lastBackupWO: (s.lastBackupWO!=null?s.lastBackupWO:null), backupSnoozeWO: (s.backupSnoozeWO!=null?s.backupSnoozeWO:null), advanced: (s.advanced!=null?s.advanced:null), cardioUnit: s.cardioUnit||"kcal",
+      sessions: s.sessions||[], habits: s.habits||{}, checks: s.checks||{}, cardio: s.cardio||{}, conditioning: s.conditioning||{}, lastBackupWO: (s.lastBackupWO!=null?s.lastBackupWO:null), backupSnoozeWO: (s.backupSnoozeWO!=null?s.backupSnoozeWO:null), installDismissed: !!s.installDismissed, advanced: (s.advanced!=null?s.advanced:null), cardioUnit: s.cardioUnit||"kcal",
       enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, exOrder: s.exOrder||[], dayPlan: s.dayPlan||{}, notes: s.notes||{}, notesOn: (s.notesOn!==false), gymCode: s.gymCode||"", setups: (Array.isArray(s.setups)?s.setups:[]), activeSetup: (s.activeSetup!==undefined?s.activeSetup:null), activeSnap: (s.activeSnap||null), schema: (typeof s.schema==="number"?s.schema:0), plan: s.plan||{mode:"letters",count:2}, pairs: (s.pairs&&s.pairs.length?s.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: s.lastSeenVersion||null,
       admin: Object.assign({},base.admin,s.admin||{}),
       metrics: _mw
@@ -1748,7 +1760,7 @@ function applyRestore(text){
     miles: Object.assign({wo:0,ton:0,streak:0,cardio:0}, parsed.miles||{}),
     height:(parsed.height!=null?parsed.height:base.height),
     userName:(parsed.userName!=null?parsed.userName:base.userName),
-    sessions: parsed.sessions||[], habits: parsed.habits||{}, checks: parsed.checks||{}, cardio: parsed.cardio||{}, conditioning: parsed.conditioning||{}, lastBackupWO: (parsed.lastBackupWO!=null?parsed.lastBackupWO:null), backupSnoozeWO: (parsed.backupSnoozeWO!=null?parsed.backupSnoozeWO:null), advanced: (parsed.advanced!=null?parsed.advanced:null), cardioUnit: parsed.cardioUnit||"kcal",
+    sessions: parsed.sessions||[], habits: parsed.habits||{}, checks: parsed.checks||{}, cardio: parsed.cardio||{}, conditioning: parsed.conditioning||{}, lastBackupWO: (parsed.lastBackupWO!=null?parsed.lastBackupWO:null), backupSnoozeWO: (parsed.backupSnoozeWO!=null?parsed.backupSnoozeWO:null), installDismissed: !!parsed.installDismissed, advanced: (parsed.advanced!=null?parsed.advanced:null), cardioUnit: parsed.cardioUnit||"kcal",
     enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, exOrder: parsed.exOrder||[], dayPlan: parsed.dayPlan||{}, notes: parsed.notes||{}, notesOn: (parsed.notesOn!==false), gymCode: parsed.gymCode||"", setups: (Array.isArray(parsed.setups)?parsed.setups:[]), activeSetup: (parsed.activeSetup!==undefined?parsed.activeSetup:null), activeSnap: (parsed.activeSnap||null), schema: (typeof parsed.schema==="number"?parsed.schema:0), plan: parsed.plan||{mode:"letters",count:2}, pairs: (parsed.pairs&&parsed.pairs.length?parsed.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: parsed.lastSeenVersion||APP_VERSION,
     admin: Object.assign({},base.admin,parsed.admin||{}),
     metrics: Object.assign({},base.metrics,parsed.metrics||{})
@@ -1800,6 +1812,51 @@ function weekStreak(){
     if(has) streak++; else break; }
   return streak;
 }
+/* Ask the browser to keep this data rather than evicting it under storage
+   pressure or after a stretch of not training. Chrome grants it to installed
+   apps; Safari 17+ weighs whether we are a Home Screen app. Best-effort by
+   design: a refusal changes nothing, and it is never a substitute for a backup. */
+function requestPersistence(){
+  try{
+    if(!navigator.storage || !navigator.storage.persist || !navigator.storage.persisted) return;
+    navigator.storage.persisted().then(function(already){
+      if(already){ ui.storagePersisted=true; return null; }
+      return navigator.storage.persist().then(function(granted){ ui.storagePersisted=!!granted; });
+    }).catch(function(){});
+  }catch(e){}
+}
+/* Nothing logged yet means nothing to protect. Firefox raises a permission
+   prompt for this, and prompting over an empty app would just be noise. */
+function worthPersisting(){
+  return isInstalled() || (data.sessions||[]).some(function(s){ return s.sets && s.sets.length; });
+}
+/* Home-screen install advice for the welcome card. Hidden once the app is
+   actually installed — telling someone to install what they're already running
+   is noise. Platform is sniffed only to pick the wording; when it can't be
+   told, both routes are shown rather than guessing wrong. */
+function isInstalled(){
+  try{
+    if(window.navigator.standalone===true) return true;
+    if(window.matchMedia){
+      if(window.matchMedia("(display-mode: standalone)").matches) return true;
+      if(window.matchMedia("(display-mode: minimal-ui)").matches) return true;
+      if(window.matchMedia("(display-mode: fullscreen)").matches) return true;
+    }
+  }catch(e){}
+  return false;
+}
+function installHint(){
+  var ua=navigator.userAgent||"";
+  /* iPadOS reports itself as a Mac, so touch points are what give it away */
+  var iOS=/iPad|iPhone|iPod/.test(ua) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  var android=/Android/.test(ua);
+  if(iOS) return "Tap <em>Share</em>, then <em>Add to Home Screen</em>. It opens like a proper app after that — no address bar, and it works with no signal.";
+  if(android) return "Tap the <em>⋮</em> menu, then <em>Install app</em> (or <em>Add to Home screen</em>). It opens like a proper app after that — no address bar, and it works with no signal.";
+  return "On iPhone: <em>Share</em> → <em>Add to Home Screen</em>. On Android: <em>⋮</em> → <em>Install app</em>. It opens like a proper app after that, and works with no signal.";
+}
+/* One gate for both places the advice can appear. Dismissing is permanent:
+   someone who has decided against it should not be asked again. */
+function showPin(){ return !data.installDismissed && !isInstalled(); }
 function gsItem(done,title,hint){ return '<div class="gs-item"><span class="gs-check'+(done?" on":"")+'">'+(done?"\u2713":"")+'</span><div class="gs-txt"><div class="gs-title">'+title+'</div><div class="gs-hint">'+hint+'</div></div></div>'; }
 function woCount(){ var _d={}; (data.sessions||[]).forEach(function(x){ if(x.sets.length) _d[x.date]=1; }); return Object.keys(_d).length; }
 function logView(){
@@ -1850,10 +1907,15 @@ function logView(){
   if(mPend) html+='<div class="milestone"><button class="mile-x" data-action="miledismiss" data-arg="'+mPend.cat+'" data-ms="'+mPend.n+'" aria-label="Dismiss">\u00d7</button><strong>'+mPend.lab+'</strong>'+mPend.m+'</div>';
   if(!data.sessions.some(function(s){return s.sets.length;})){
     html+='<div class="gs"><div class="gs-head">Getting started</div>';
+    if(showPin()) html+=gsItem(false,"Keep it on your home screen",installHint());
     html+=gsItem(enabledLogExercises().length>0,"Turn on your exercises","Fine-tune the list in Setup \u2014 switch off what you don\u2019t do.");
     html+=gsItem(currentWeight()>0,"Add your weight","In Trends \u2014 it powers bodyweight moves and your weight trend.");
     html+=gsItem(false,"Log your first workout","Tap an exercise below and add a set.");
     html+='<div class="gs-foot">Nothing you enter leaves this device.</div></div>';
+  } else if(showPin()){
+    html+='<div class="pin"><button class="pin-x" data-action="pindismiss" aria-label="Dismiss">\u00d7</button>'
+      +'<div class="pin-title">Keep it on your home screen</div>'
+      +'<div class="pin-hint">'+installHint()+'</div></div>';
   }
 
 
@@ -2535,6 +2597,7 @@ appEl.addEventListener("click",function(e){
     case "download": downloadBackup(); data.lastBackupWO=woCount(); data.backupSnoozeWO=woCount(); commit(); break;
     case "setmode": data.advanced=(arg==="advanced"); commit(); break;
     case "backuplater": data.backupSnoozeWO=woCount(); commit(); break;
+    case "pindismiss": data.installDismissed=true; commit(); break;
     case "copy": copyBackup(); break;
     case "emailsummary": emailSummary(); break;
     case "copysummary": copySummary(); break;
@@ -2610,6 +2673,7 @@ if ("serviceWorker" in navigator) {
     try { navigator.serviceWorker.register("sw.js").catch(function(){}); } catch (e) {}
   });
 }
+window.addEventListener("load", function(){ if(worthPersisting()) requestPersistence(); });
 </script>
 </body>
 </html>
