@@ -497,35 +497,35 @@ var LIBRARY = [
   { name:"Cable external rotation", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
   { name:"Cable internal rotation", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
   { name:"Cable front raise", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
-  { name:"Seated row", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:true },
-  { name:"Seated row (plates)", type:"log", unit:"kg", step:2.5, equip:"Machine", group:"Main", on:false },
+  { name:"Seated row (cable)", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:true },
+  { name:"Seated row (machine)", type:"log", unit:"kg", step:2.5, equip:"Machine", group:"Main", on:false },
   { name:"Cable reverse fly", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
   { name:"Bench press", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:true },
   { name:"Preacher curl", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:true },
   { name:"Barbell curl", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
   { name:"Spider curl", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
   { name:"Skullcrushers", type:"log", unit:"kg", step:2, equip:"Barbell", group:"Main", on:false },
-  { name:"Dumbbell press", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:true },
+  { name:"Dumbbell bench press", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:true },
   { name:"Seated dumbbell curl", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
-  { name:"Upright row (dumbbells)", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Dumbbell upright row", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
   { name:"Leg press", type:"log", unit:"kg", step:2.5, equip:"Machine", group:"Main", on:true },
   { name:"Lying leg press", type:"log", unit:"kg", step:2.5, equip:"Machine", group:"Main", on:false },
   { name:"Hamstring curl", type:"log", unit:"lb", step:10, equip:"Machine", group:"Main", on:true },
-  { name:"Lunge walk", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:true },
+  { name:"Walking lunges", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:true },
   { name:"Lunges", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:false },
   { name:"Reverse lunges", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:false },
 
   { name:"Dead hang", type:"log", unit:"kg", step:2.5, body:true, timed:true, repLabel:"secs", repWord:"s", equip:"Bodyweight", group:"Main", on:false },
   { name:"Chin-ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, assist:true, equip:"Bodyweight", group:"Main", on:true },
   { name:"Pull-ups", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, assist:true, equip:"Bodyweight", group:"Main", on:false },
-  { name:"Hip thrusters", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
+  { name:"Hip thrust", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
   { name:"Cable pull-through", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
   { name:"Leg raises", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.5, equip:"Bodyweight", group:"Main", on:false },
 
   /* available, off by default */
   { name:"Cable crossovers", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
   { name:"Pec deck", type:"log", unit:"lb", step:5, equip:"Machine", group:"Main", on:false },
-  { name:"Dumbbell flys", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Dumbbell fly", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
   { name:"Decline bench press", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
   { name:"Incline bench press", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
   { name:"Shoulder press", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:true },
@@ -546,7 +546,7 @@ var LIBRARY = [
   { name:"Rear delt fly", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
   { name:"Tricep pushdown", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:true },
   { name:"Pallof press", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
-  { name:"Farmer carry", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Farmer's carry", type:"log", unit:"kg", step:2, timed:true, repLabel:"secs", repWord:"s", equip:"Dumbbell", group:"Main", on:false },
   { name:"Step-ups", type:"log", unit:"kg", step:2, body:true, bwFactor:0.85, equip:"Bodyweight", group:"Main", on:false },
   { name:"Cable step-ups", type:"log", unit:"lb", step:5, equip:"Cable", group:"Main", on:false },
 
@@ -555,6 +555,26 @@ var LIBRARY = [
   { name:"Kettlebell clean", type:"log", unit:"kg", step:4, equip:"Kettlebell", group:"Main", on:false },
   { name:"Kettlebell press", type:"log", unit:"kg", step:4, equip:"Kettlebell", group:"Main", on:false },
   { name:"Kettlebell row", type:"log", unit:"kg", step:4, equip:"Kettlebell", group:"Main", on:true },
+  { name:"Barbell squat", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
+  { name:"Bent-over row", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
+  { name:"Romanian deadlift", type:"log", unit:"kg", step:2.5, equip:"Barbell", group:"Main", on:false },
+  { name:"Dumbbell row", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Incline dumbbell press", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Lateral raise", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Hammer curl", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Bulgarian split squat", type:"log", unit:"kg", step:2, equip:"Dumbbell", group:"Main", on:false },
+  { name:"Leg extension", type:"log", unit:"lb", step:5, equip:"Machine", group:"Main", on:false },
+  { name:"Chest press (machine)", type:"log", unit:"lb", step:5, equip:"Machine", group:"Main", on:false },
+  { name:"Shoulder press (machine)", type:"log", unit:"lb", step:5, equip:"Machine", group:"Main", on:false },
+  { name:"Hip abduction", type:"log", unit:"lb", step:5, equip:"Machine", group:"Main", on:false },
+  { name:"Hip adduction", type:"log", unit:"lb", step:5, equip:"Machine", group:"Main", on:false },
+  { name:"Tricep dips", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, assist:true, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Burpees", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.65, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Glute bridges", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.5, equip:"Bodyweight", group:"Main", on:false },
+  { name:"High knees", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.3, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Jumping jacks", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.25, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Mountain climbers", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.4, equip:"Bodyweight", group:"Main", on:false },
+  { name:"Wall sit", type:"log", unit:"kg", step:2.5, body:true, timed:true, bwFactor:0.85, repLabel:"secs", repWord:"s", equip:"Bodyweight", group:"Main", on:false },
 
   { name:"Treadmill", type:"cardio", group:"Cardio", on:false },
   { name:"Exercise bike", type:"cardio", group:"Cardio", on:false },
@@ -575,9 +595,9 @@ var GROUPS = [
 var EQUIP_ORDER = ["Bodyweight","Dumbbell","Kettlebell","Barbell","Cable","Machine","Other"];
 var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kettlebells",Barbell:"Barbell",Cable:"Cables",Machine:"Machines",Other:"Other"};
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
-var STARTERS=["Bench press","Shoulder press","Seated row","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
+var STARTERS=["Bench press","Shoulder press","Seated row (cable)","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
-  {v:"3.87", items:["Every exercise can now be logged in kg or lb, set one at a time. In Setup, tap the kg/lb switch on an exercise \u2014 or the one on an equipment heading to change a whole group at once. Handy if the cable stack is marked in pounds and the barbell isn\u2019t.","Everything you\u2019ve already logged keeps the units you logged it in, so your history stays honest. Only the bar weight and the increment convert when you switch. Your totals and trends work it all out behind the scenes."]},
+  {v:"3.87", items:["Every exercise can now be logged in kg or lb, set one at a time. In Setup, tap the kg/lb switch on an exercise \u2014 or the one on an equipment heading to change a whole group at once. Handy if the cable stack is marked in pounds and the barbell isn\u2019t.","Everything you\u2019ve already logged keeps the units you logged it in, so your history stays honest. Only the bar weight and the increment convert when you switch. Your totals and trends work it all out behind the scenes.","Twenty new exercises: barbell squat, bent-over row, Romanian deadlift, dumbbell row, incline dumbbell press, lateral raise, hammer curl, Bulgarian split squat, leg extension, machine chest and shoulder press, hip abduction and adduction, tricep dips, and the conditioning moves that were only in the interval timer before \u2014 burpees, glute bridges, high knees, jumping jacks, mountain climbers and the wall sit. All switched off to start with; turn on what you use in Setup.","A few names tidied up. \u201cHip thrusters\u201d is now \u201cHip thrust\u201d \u2014 a thruster is a different lift entirely. \u201cDumbbell press\u201d is now \u201cDumbbell bench press\u201d, \u201cLunge walk\u201d is \u201cWalking lunges\u201d, and the two seated rows say plainly which is the cable and which is the machine. Everything you have logged under the old names comes with them."]},
   {v:"3.85", items:["Niten now asks your browser to hold on to your data rather than clearing it out to reclaim space \u2014 phones can be ruthless about that if you go a few weeks without training. It\u2019s a request rather than a promise, so keep taking backups."]},
   {v:"3.84", items:["The home-screen tip now sticks around after your first workout instead of vanishing with the welcome card \u2014 it waits on the Log page until you\u2019ve done it, or until you tap the \u00d7 to send it away for good."]},
   {v:"3.83", items:["\u201cDumbbell curl reversed bench\u201d is now called \u201cSpider curl\u201d \u2014 the usual name for it, and a good deal easier to read. Everything you\u2019ve logged comes with it.","Renaming an exercise now carries custom exercises across too, not just built-in ones \u2014 nothing gets orphaned.","The welcome card now shows how to keep Niten on your home screen, with the right steps for your phone."]},
@@ -691,10 +711,10 @@ var METRICS = [
 var DEFAULTS = {};
 
 var DAY_DEFAULT = {
-  "Bench press":"A", "Pec deck":"A", "Skullcrushers":"A", "Leg press":"A", "Pallof press":"A", "Dumbbell press":"A",
-  "Seated Row Plates":"B", "Seated row":"B", "Rear delt fly":"B", "Face pulls":"B", "Barbell Curl":"B",
+  "Bench press":"A", "Pec deck":"A", "Skullcrushers":"A", "Leg press":"A", "Pallof press":"A", "Dumbbell bench press":"A",
+  "Seated Row Plates":"B", "Seated row (cable)":"B", "Rear delt fly":"B", "Face pulls":"B", "Barbell Curl":"B",
   "Preacher curl":"B", "Seated dumbbell curl":"B", "Dumbell Curl Reversed Bench":"B",
-  "Cable Pull Through":"B", "Hamstring curl":"B", "Leg raises":"B", "Lunge walk":"B",
+  "Cable Pull Through":"B", "Hamstring curl":"B", "Leg raises":"B", "Walking lunges":"B",
   "Cable external rotation":"both", "Cable internal rotation":"both", "Cable front raise":"both",
   "Cable reverse fly":"both", "Calf raises":"both"
 };
@@ -742,32 +762,32 @@ function toggleDayMember(name,label){
   data.dayPlan[name]=mem;
   commit();
 }
-var SETUP_SCHEMA = 2, MAX_SETUPS = 3;
+var SETUP_SCHEMA = 3, MAX_SETUPS = 3;
 var PRESETS = [
   { key:"pushpull", name:"Push / Pull", meta:"Push \u00b7 Pull", labels:["Push","Pull"],
     sessions:[
-      ["Bench press","Incline bench press","Shoulder press","Dumbbell press","Pec deck","Cable crossovers","Tricep pushdown","Squats","Leg press","Calf raises"],
-      ["Lat pulldown","Seated row","Chin-ups","Face pulls","Rear delt fly","Barbell curl","Seated dumbbell curl","Hamstring curl","Deadlift"]
+      ["Bench press","Incline bench press","Shoulder press","Dumbbell bench press","Pec deck","Cable crossovers","Tricep pushdown","Squats","Leg press","Calf raises"],
+      ["Lat pulldown","Seated row (cable)","Chin-ups","Face pulls","Rear delt fly","Barbell curl","Seated dumbbell curl","Hamstring curl","Deadlift"]
     ], all:["Plank"] },
   { key:"ppl", name:"Push / Pull / Legs", meta:"Push \u00b7 Pull \u00b7 Legs", labels:["Push","Pull","Legs"],
     sessions:[
-      ["Bench press","Incline bench press","Shoulder press","Dumbbell press","Pec deck","Cable crossovers","Tricep pushdown","Skullcrushers"],
-      ["Lat pulldown","Seated row","Chin-ups","Pull-ups","Face pulls","Rear delt fly","Barbell curl","Seated dumbbell curl"],
-      ["Squats","Leg press","Hamstring curl","Deadlift","Hip thrusters","Calf raises","Lunge walk","Leg raises"]
+      ["Bench press","Incline bench press","Shoulder press","Dumbbell bench press","Pec deck","Cable crossovers","Tricep pushdown","Skullcrushers"],
+      ["Lat pulldown","Seated row (cable)","Chin-ups","Pull-ups","Face pulls","Rear delt fly","Barbell curl","Seated dumbbell curl"],
+      ["Squats","Leg press","Hamstring curl","Deadlift","Hip thrust","Calf raises","Walking lunges","Leg raises"]
     ], all:["Plank"] },
   { key:"upperlower", name:"Upper / Lower", meta:"Upper \u00b7 Lower", labels:["Upper","Lower"],
     sessions:[
-      ["Bench press","Shoulder press","Lat pulldown","Seated row","Dumbbell press","Face pulls","Barbell curl","Tricep pushdown","Rear delt fly"],
-      ["Squats","Leg press","Hamstring curl","Deadlift","Hip thrusters","Calf raises","Lunge walk"]
+      ["Bench press","Shoulder press","Lat pulldown","Seated row (cable)","Dumbbell bench press","Face pulls","Barbell curl","Tricep pushdown","Rear delt fly"],
+      ["Squats","Leg press","Hamstring curl","Deadlift","Hip thrust","Calf raises","Walking lunges"]
     ], all:["Plank"] },
   { key:"bodyweight", name:"Bodyweight", meta:"Upper \u00b7 Lower", labels:["Upper","Lower"],
     sessions:[
       ["Press-ups","Chin-ups","Pull-ups","Dead hang","Sit-ups"],
-      ["Squats","Squat jumps","Lunge walk","Step-ups","Crunches","Leg raises"]
+      ["Squats","Squat jumps","Walking lunges","Step-ups","Crunches","Leg raises"]
     ], all:["Plank"] },
   { key:"fullbody", name:"Full body", meta:"One list, no sessions", labels:["A","B"],
     sessions:[[],[]],
-    all:["Squats","Deadlift","Bench press","Seated row","Shoulder press","Lat pulldown","Leg press","Hamstring curl","Barbell curl","Tricep pushdown","Plank"] }
+    all:["Squats","Deadlift","Bench press","Seated row (cable)","Shoulder press","Lat pulldown","Leg press","Hamstring curl","Barbell curl","Tricep pushdown","Plank"] }
 ];
 function presetOf(key){ for(var i=0;i<PRESETS.length;i++){ if(PRESETS[i].key===key) return PRESETS[i]; } return null; }
 
@@ -965,19 +985,19 @@ function setPlan(mode,count){
 var MUSCLES = ["Chest","Back","Shoulders","Biceps","Triceps","Forearms","Quads","Hamstrings","Glutes","Calves","Core"];
 var MUSCLE_MAP = {
   "Cable external rotation":{p:"Shoulders"}, "Cable internal rotation":{p:"Shoulders"}, "Cable front raise":{p:"Shoulders"},
-  "Seated row":{p:"Back",s:"Biceps"}, "Seated row (plates)":{p:"Back",s:"Biceps"},
+  "Seated row (cable)":{p:"Back",s:"Biceps"}, "Seated row (machine)":{p:"Back",s:"Biceps"},
   "Bench press":{p:"Chest",s:"Triceps"}, "Preacher curl":{p:"Biceps"}, "Skullcrushers":{p:"Triceps"},
-  "Dumbbell press":{p:"Chest",s:"Triceps"}, "Seated dumbbell curl":{p:"Biceps"},
-  "Upright row (dumbbells)":{p:"Shoulders",s:"Biceps"}, "Leg press":{p:"Quads",s:"Glutes"}, "Lying leg press":{p:"Quads",s:"Glutes"},
-  "Hamstring curl":{p:"Hamstrings"}, "Lunge walk":{p:"Quads",s:"Glutes"},
+  "Dumbbell bench press":{p:"Chest",s:"Triceps"}, "Seated dumbbell curl":{p:"Biceps"},
+  "Dumbbell upright row":{p:"Shoulders",s:"Biceps"}, "Leg press":{p:"Quads",s:"Glutes"}, "Lying leg press":{p:"Quads",s:"Glutes"},
+  "Hamstring curl":{p:"Hamstrings"}, "Walking lunges":{p:"Quads",s:"Glutes"},
   "Lunges":{p:"Quads",s:"Glutes"}, "Reverse lunges":{p:"Glutes",s:"Quads"},
   "Dead hang":{p:"Forearms",s:"Back"}, "Chin-ups":{p:"Back",s:"Biceps"}, "Pull-ups":{p:"Back",s:"Biceps"},
-  "Hip thrusters":{p:"Glutes",s:"Hamstrings"}, "Leg raises":{p:"Core"},
-  "Cable crossovers":{p:"Chest"}, "Pec deck":{p:"Chest"}, "Dumbbell flys":{p:"Chest"},
+  "Hip thrust":{p:"Glutes",s:"Hamstrings"}, "Leg raises":{p:"Core"},
+  "Cable crossovers":{p:"Chest"}, "Pec deck":{p:"Chest"}, "Dumbbell fly":{p:"Chest"},
   "Decline bench press":{p:"Chest",s:"Triceps"}, "Incline bench press":{p:"Chest",s:"Triceps"},
   "Shoulder press":{p:"Shoulders",s:"Triceps"}, "Lat pulldown":{p:"Back",s:"Biceps"}, "Deadlift":{p:"Back",s:"Hamstrings"},
   "Calf raises":{p:"Calves"}, "Face pulls":{p:"Shoulders",s:"Back"}, "Rear delt fly":{p:"Shoulders",s:"Back"},
-  "Tricep pushdown":{p:"Triceps"}, "Pallof press":{p:"Core"}, "Farmer carry":{p:"Forearms",s:"Core"},
+  "Tricep pushdown":{p:"Triceps"}, "Pallof press":{p:"Core"}, "Farmer's carry":{p:"Forearms",s:"Core"},
   "Step-ups":{p:"Quads",s:"Glutes"}, "Cable step-ups":{p:"Quads",s:"Glutes"}, "Press-ups":{p:"Chest",s:"Triceps"},
   "Squats":{p:"Quads",s:"Glutes"}, "Squat jumps":{p:"Quads",s:"Glutes"},
   "Sit-ups":{p:"Core"}, "Crunches":{p:"Core"}, "Plank":{p:"Core"},
@@ -985,7 +1005,17 @@ var MUSCLE_MAP = {
   "Spider curl":{p:"Biceps"}, "Cable pull-through":{p:"Glutes",s:"Hamstrings"},
   "Kettlebell swing":{p:"Glutes",s:"Hamstrings"}, "Goblet squat":{p:"Quads",s:"Glutes"},
   "Kettlebell clean":{p:"Shoulders",s:"Back"}, "Kettlebell press":{p:"Shoulders",s:"Triceps"},
-  "Kettlebell row":{p:"Back",s:"Biceps"}
+  "Kettlebell row":{p:"Back",s:"Biceps"},
+  "Barbell squat":{p:"Quads",s:"Glutes"}, "Bent-over row":{p:"Back",s:"Biceps"},
+  "Romanian deadlift":{p:"Hamstrings",s:"Glutes"}, "Dumbbell row":{p:"Back",s:"Biceps"},
+  "Incline dumbbell press":{p:"Chest",s:"Shoulders"}, "Lateral raise":{p:"Shoulders"},
+  "Hammer curl":{p:"Biceps",s:"Forearms"}, "Bulgarian split squat":{p:"Quads",s:"Glutes"},
+  "Leg extension":{p:"Quads"}, "Chest press (machine)":{p:"Chest",s:"Triceps"},
+  "Shoulder press (machine)":{p:"Shoulders",s:"Triceps"}, "Hip abduction":{p:"Glutes"},
+  "Hip adduction":{p:"Quads",s:"Glutes"}, "Tricep dips":{p:"Triceps",s:"Chest"},
+  "Burpees":{p:"Quads",s:"Chest"}, "Glute bridges":{p:"Glutes",s:"Hamstrings"},
+  "High knees":{p:"Quads",s:"Core"}, "Jumping jacks":{p:"Calves",s:"Shoulders"},
+  "Mountain climbers":{p:"Core",s:"Quads"}, "Wall sit":{p:"Quads"}
 };
 function muscleOf(name){
   if(MUSCLE_MAP[name]) return MUSCLE_MAP[name];
@@ -1049,7 +1079,7 @@ function seed(){
   };
 }
 
-var RENAMES={ "Seated row (light)":"Seated row", "Warm-up · elliptical":"Warm-up cardio", "Barbell Curl":"Barbell curl", "Cable Pull Through":"Cable pull-through", "Dumbell Curl Reversed Bench":"Spider curl", "Dumbbell curl reversed bench":"Spider curl", "Seated Row Plates":"Seated row (plates)", "Stair Stepper":"Stair stepper", "Sit ups":"Sit-ups", "Chin ups":"Chin-ups", "Pull ups":"Pull-ups", "Dumbell Press Incline 1":"Dumbbell press (incline)" };
+var RENAMES={ "Hip thrusters":"Hip thrust", "Dumbbell press":"Dumbbell bench press", "Dumbbell flys":"Dumbbell fly", "Lunge walk":"Walking lunges", "Upright row (dumbbells)":"Dumbbell upright row", "Seated row":"Seated row (cable)", "Seated row (plates)":"Seated row (machine)", "Farmer carry":"Farmer's carry", "Cable Face Pull":"Face pulls", "Seated row (light)":"Seated row (cable)", "Warm-up · elliptical":"Warm-up cardio", "Barbell Curl":"Barbell curl", "Cable Pull Through":"Cable pull-through", "Dumbell Curl Reversed Bench":"Spider curl", "Dumbbell curl reversed bench":"Spider curl", "Seated Row Plates":"Seated row (machine)", "Stair Stepper":"Stair stepper", "Sit ups":"Sit-ups", "Chin ups":"Chin-ups", "Pull ups":"Pull-ups", "Dumbell Press Incline 1":"Incline dumbbell press" };
 function migrateRenames(s){
   if(!s) return s;
   function rn(n){ return RENAMES[n]||n; }
@@ -1066,6 +1096,17 @@ function migrateRenames(s){
      RENAMES entry has to move the definition too — otherwise the history moves
      to the new name and the exercise keeps the old one, orphaning both. */
   (s.custom||[]).forEach(function(c){ if(c && RENAMES[c.name]) c.name=RENAMES[c.name]; });
+  /* Saved routines are name-keyed too - enabled/dayPlan maps and exOrder inside
+     each setup. Missed here, a rename leaves a routine pointing at a name that no
+     longer exists, and it reads as "edited" for ever after. */
+  (Array.isArray(s.setups)?s.setups:[]).forEach(function(st){
+    if(!st) return;
+    ["enabled","dayPlan"].forEach(function(k){
+      var o=st[k];
+      if(o && typeof o==="object"){ Object.keys(o).forEach(function(n){ if(RENAMES[n] && RENAMES[n]!==n){ o[RENAMES[n]]=o[n]; delete o[n]; } }); }
+    });
+    if(Array.isArray(st.exOrder)) st.exOrder=st.exOrder.map(rn);
+  });
   if(Array.isArray(s.exOrder)) s.exOrder=s.exOrder.map(rn);
   return s;
 }
