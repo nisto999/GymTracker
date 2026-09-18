@@ -409,6 +409,10 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .au-inp:focus{outline:none;border-color:var(--accent)}
 .au-num{flex:0 0 100px}
 .au-unit{font-size:.86rem;color:var(--ink-dim);flex:0 0 auto}
+.au-num2{flex:0 0 56px;padding-left:8px;padding-right:8px}
+.au-units{flex-wrap:wrap;row-gap:6px}
+.au-seg .unit-b{padding:5px 9px;font-size:.72rem}
+.ma-half{min-width:0}
 .rt-row{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:8px}
 .rt-row.on{border-color:var(--accent)}
 .rt-name{width:auto;flex:1;text-align:left;min-width:0}
@@ -502,7 +506,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.87";
+var APP_VERSION = "3.88";
 var STORE_KEY = "gym-tracker-shared";
 
 /* ---------------------------------------------------------------
@@ -618,6 +622,7 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row (cable)","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.88", items:["Height, weight and waist can now be shown in feet and inches, pounds, or stones and pounds. Pick them under Units in Setup \u2014 About you. Everything you\u2019ve already logged converts on screen; nothing stored is rewritten.","Simple mode now shows your weight in Trends, so the \u201cAdd your weight\u201d step has somewhere to go."]},
   {v:"3.87", items:["Every exercise can now be logged in kg or lb, set one at a time. In Setup, tap the kg/lb switch on an exercise \u2014 or the one on an equipment heading to change a whole group at once. Handy if the cable stack is marked in pounds and the barbell isn\u2019t.","Everything you\u2019ve already logged keeps the units you logged it in, so your history stays honest. Only the bar weight and the increment convert when you switch. Your totals and trends work it all out behind the scenes.","Twenty new exercises: barbell squat, bent-over row, Romanian deadlift, dumbbell row, incline dumbbell press, lateral raise, hammer curl, Bulgarian split squat, leg extension, machine chest and shoulder press, hip abduction and adduction, tricep dips, and the conditioning moves that were only in the interval timer before \u2014 burpees, glute bridges, high knees, jumping jacks, mountain climbers and the wall sit. All switched off to start with; turn on what you use in Setup.","A few names tidied up. \u201cHip thrusters\u201d is now \u201cHip thrust\u201d \u2014 a thruster is a different lift entirely. \u201cDumbbell press\u201d is now \u201cDumbbell bench press\u201d, \u201cLunge walk\u201d is \u201cWalking lunges\u201d, and the two seated rows say plainly which is the cable and which is the machine. Everything you have logged under the old names comes with them."]},
   {v:"3.85", items:["Niten now asks your browser to hold on to your data rather than clearing it out to reclaim space \u2014 phones can be ruthless about that if you go a few weeks without training. It\u2019s a request rather than a promise, so keep taking backups."]},
   {v:"3.84", items:["The home-screen tip now sticks around after your first workout instead of vanishing with the welcome card \u2014 it waits on the Log page until you\u2019ve done it, or until you tap the \u00d7 to send it away for good."]},
@@ -1083,6 +1088,7 @@ function seed(){
     blockStart: todayISO(),
     miles: {wo:0,ton:0,streak:0,cardio:0},
     height: null,
+    bodyUnits: {height:"cm", weight:"kg"},
     userName: null,
     sessions: [], habits: {}, checks: {}, cardio: {}, conditioning: {}, lastBackupWO: null, backupSnoozeWO: null, installDismissed: false, advanced: null, cardioUnit: "kcal",
     enabled: (function(){ var e={}; LIBRARY.forEach(function(x){ if(x.group==="Main"&&x.type==="log") e[x.name]=STARTERS.indexOf(x.name)>=0; }); return e; })(), metricsOn: {}, custom: [], baseWeight: {}, stepOverride: (function(){ var o={}; LIBRARY.forEach(function(x){ if(x.type==="log"&&!x.timed&&x.unit==="lb") o[x.name]=2.5; }); return o; })(), unitOverride: (function(){ var o={}; LIBRARY.forEach(function(x){ if(x.type==="log"&&!x.timed&&x.unit==="lb") o[x.name]="kg"; }); return o; })(), exOrder: [], dayPlan: {}, notes: {}, notesOn: true, gymCode: "", setups: [], activeSetup: null, activeSnap: null, schema: 0, plan: {mode:"letters",count:2}, pairs: DEFAULT_PAIRS.slice(), lastSeenVersion: null,
@@ -1146,6 +1152,7 @@ function load(){
       blockStart: s.blockStart||base.blockStart,
       miles: Object.assign({wo:0,ton:0,streak:0,cardio:0}, s.miles||{}),
       height: (s.height!=null? s.height : base.height),
+      bodyUnits: Object.assign({}, base.bodyUnits, (s.bodyUnits&&typeof s.bodyUnits==="object")?s.bodyUnits:{}),
       userName: (s.userName!=null? s.userName : base.userName),
       sessions: s.sessions||[], habits: s.habits||{}, checks: s.checks||{}, cardio: s.cardio||{}, conditioning: s.conditioning||{}, lastBackupWO: (s.lastBackupWO!=null?s.lastBackupWO:null), backupSnoozeWO: (s.backupSnoozeWO!=null?s.backupSnoozeWO:null), installDismissed: !!s.installDismissed, advanced: (s.advanced!=null?s.advanced:null), cardioUnit: s.cardioUnit||"kcal",
       enabled: s.enabled||{}, metricsOn: s.metricsOn||{}, custom: s.custom||[], baseWeight: s.baseWeight||{}, stepOverride: s.stepOverride||{}, unitOverride: s.unitOverride||{}, exOrder: s.exOrder||[], dayPlan: s.dayPlan||{}, notes: s.notes||{}, notesOn: (s.notesOn!==false), gymCode: s.gymCode||"", setups: (Array.isArray(s.setups)?s.setups:[]), activeSetup: (s.activeSetup!==undefined?s.activeSetup:null), activeSnap: (s.activeSnap||null), schema: (typeof s.schema==="number"?s.schema:0), plan: s.plan||{mode:"letters",count:2}, pairs: (s.pairs&&s.pairs.length?s.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: s.lastSeenVersion||null,
@@ -1205,6 +1212,63 @@ function isEnabled(name){
   if(!e) return false;
   if(data.enabled && data.enabled.hasOwnProperty(name)) return !!data.enabled[name];
   return !!e.on;
+}
+/* ---- body units (v3.88). Height, weight and waist are always STORED in cm / kg.
+   These helpers convert only at entry and on screen, so no reading is ever rewritten. ---- */
+var KG_PER_LB=0.45359237, CM_PER_IN=2.54;
+function bodyU(){ var b=(data.bodyUnits&&typeof data.bodyUnits==="object")?data.bodyUnits:{}; return { h:(b.height==="ftin"?"ftin":"cm"), w:((b.weight==="lb"||b.weight==="st")?b.weight:"kg") }; }
+function setBodyUnit(k,v){ if(!data.bodyUnits||typeof data.bodyUnits!=="object") data.bodyUnits={}; data.bodyUnits[k]=v; }
+function isBodyMetric(key){ return key==="weight"||key==="waist"; }
+function r1(v){ return Math.round(v*10)/10; }
+function trim1(v){ return String(+(+v).toFixed(1)); }
+function stLbParts(lb){ var t=r1(Math.abs(lb)), s=Math.floor(t/14), l=r1(t-s*14); if(l>=14){ s++; l=0; } return {s:s,l:l}; }
+function ftInParts(cm){ var t=r1(cm/CM_PER_IN), f=Math.floor(t/12), i=r1(t-f*12); if(i>=12){ f++; i=0; } return {f:f,i:i}; }
+function metricDispVal(m,v){ var u=bodyU(); if(m.key==="weight"&&u.w!=="kg") return v/KG_PER_LB; if(m.key==="waist"&&u.h==="ftin") return v/CM_PER_IN; return v; }
+function metricUnit(m){ var u=bodyU(); if(m.key==="weight") return u.w==="st"?"st lb":u.w; if(m.key==="waist") return u.h==="ftin"?"in":m.unit; return m.unit; }
+function metricText(m,v){
+  var u=bodyU();
+  if(m.key==="weight"&&u.w==="st"){ var p=stLbParts(v/KG_PER_LB); return p.s+" st "+p.l.toFixed(1); }
+  if(isBodyMetric(m.key)) return metricDispVal(m,v).toFixed(1);
+  return v.toFixed(m.dp);
+}
+function metricDelta(m,a,b){
+  var d=+(metricDispVal(m,b)-metricDispVal(m,a)).toFixed(1), txt=(d>0?"+":"")+d;
+  if(m.key==="weight"&&bodyU().w==="st"&&d!==0){ var p=stLbParts(d); txt=(d>0?"+":"-")+(p.s?p.s+" st ":"")+p.l.toFixed(1)+" lb"; }
+  return {n:d, txt:txt};
+}
+function metricEntry(key){
+  var u=bodyU(), raw=ui.metricInputs[key];
+  if(key==="weight"&&u.w==="lb") return (Number(raw)||0)*KG_PER_LB;
+  if(key==="weight"&&u.w==="st") return ((Number(raw)||0)*14+(Number(ui.metricInputs["weight-lb"])||0))*KG_PER_LB;
+  if(key==="waist"&&u.h==="ftin") return (Number(raw)||0)*CM_PER_IN;
+  return Number(raw);
+}
+function metricChartOpts(m){
+  if(m.key==="weight"&&bodyU().w==="st") return { minSpan:4, fmt:function(v){ var t=Math.round(v), s=Math.floor(t/14); return s+"st"+(t-s*14); } };
+  return null;
+}
+function metricAddHTML(m){
+  var inp;
+  if(m.key==="weight"&&bodyU().w==="st"){
+    inp='<input class="text-input ma-half" id="metric-weight" inputmode="decimal" placeholder="st" aria-label="Today\u2019s weight, stones" value="'+esc(ui.metricInputs.weight||"")+'">'
+      +'<input class="text-input ma-half" id="metric-weight-lb" inputmode="decimal" placeholder="lb" aria-label="Today\u2019s weight, pounds" value="'+esc(ui.metricInputs["weight-lb"]||"")+'">';
+  } else {
+    inp='<input class="text-input" id="metric-'+m.key+'" inputmode="decimal" placeholder="Add today\u2019s '+esc(m.label.toLowerCase())+(isBodyMetric(m.key)?' ('+esc(metricUnit(m))+')':'')+'" value="'+esc(ui.metricInputs[m.key]||"")+'">';
+  }
+  return '<div class="metric-add">'+inp+'<button class="btn-solid" data-action="metric" data-arg="'+m.key+'">Save</button></div>';
+}
+function unitSeg(action,cur,opts,label){ return '<span class="unit-seg au-seg" role="group" aria-label="'+label+'">'+opts.map(function(o){ return '<button class="unit-b'+(cur===o[0]?" on":"")+'" data-action="'+action+'" data-arg="'+o[0]+'" aria-pressed="'+(cur===o[0])+'">'+o[1]+'</button>'; }).join("")+'</span>'; }
+function aboutBodyRows(){
+  var u=bodyU(), h=Number(data.height)||0, row;
+  if(u.h==="ftin"){
+    var p=h?ftInParts(h):null;
+    row='<input class="au-inp au-num2" id="height-ft" data-action="saveaufield" data-field="heightft" inputmode="numeric" placeholder="5" value="'+(p?p.f:"")+'" aria-label="Your height, feet"><span class="au-unit">ft</span>'
+      +'<input class="au-inp au-num2" id="height-in" data-action="saveaufield" data-field="heightin" inputmode="decimal" placeholder="10" value="'+(p?trim1(p.i):"")+'" aria-label="Your height, inches"><span class="au-unit">in</span>';
+  } else {
+    row='<input class="au-inp au-num" id="height-input" data-action="saveaufield" data-field="height" inputmode="decimal" placeholder="178" value="'+(h?trim1(h):"")+'" aria-label="Your height in centimetres"><span class="au-unit">cm</span>';
+  }
+  return '<div class="au-row"><span class="au-lbl">Height</span>'+row+'</div>'
+    +'<div class="au-row au-units"><span class="au-lbl">Units</span>'+unitSeg("bodyh",u.h,[["cm","cm"],["ftin","ft in"]],"Height and waist units")+unitSeg("bodyw",u.w,[["kg","kg"],["lb","lb"],["st","st"]],"Body weight units")+'</div>';
 }
 function isMetricOn(key){
   var m=METRICS.filter(function(x){return x.key===key;})[0];
@@ -1453,7 +1517,7 @@ function weekSummary(){
     var prior=pts.filter(function(p){return p.date<start;});
     var from=(prior.length?prior[prior.length-1]:win[0]).v, to=win[win.length-1].v;
     if(from===to) return;
-    moves.push({ label:m.label, from:from.toFixed(m.dp), to:to.toFixed(m.dp), unit:m.unit,
+    moves.push({ label:m.label, from:metricText(m,from), to:metricText(m,to), unit:((m.key==="weight"&&bodyU().w==="st")?"lb":metricUnit(m)),
                  good:(m.good==="up"? to>from : to<from) });
   });
 
@@ -1539,7 +1603,7 @@ function niceScale(mn,mx,ticks){
 }
 function chMs(iso){ return new Date(iso+"T00:00:00").getTime(); }
 function chIso(ms){ var d=new Date(ms); return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
-function sparkline(series, good, key){
+function sparkline(series, good, key, opts){
   if(!ui.chartWin) ui.chartWin={};
   var win = ui.chartWin[key] || "month";
   var WINS=[["week","W"],["month","M"],["year","Y"],["max","Max"]];
@@ -1555,13 +1619,14 @@ function sparkline(series, good, key){
   var W=328,H=150,padL=36,padR=10,padT=10,padB=22, plotW=W-padL-padR, plotH=H-padT-padB;
   var ys=pts.map(function(p){return p.v;}), dmin=Math.min.apply(null,ys), dmax=Math.max.apply(null,ys);
   if(dmin===dmax){ dmin-=1; dmax+=1; }
+  if(opts&&opts.minSpan&&dmax-dmin<opts.minSpan){ var _mid=(dmin+dmax)/2; dmin=_mid-opts.minSpan/2; dmax=_mid+opts.minSpan/2; }
   var sc=niceScale(dmin,dmax,4);
   function y(v){ return padT+(1-(v-sc.min)/(sc.max-sc.min))*plotH; }
   function x(ms){ return padL+((ms-xMin)/(xMax-xMin))*plotW; }
   var dp = sc.step<1?(sc.step<0.1?2:1):0, grid="", ylab="", nT=Math.round((sc.max-sc.min)/sc.step);
   for(var i=0;i<=nT;i++){ var v=sc.min+i*sc.step, yy=y(v);
     grid+='<line x1="'+padL+'" y1="'+yy.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+yy.toFixed(1)+'" class="grid-line"/>';
-    ylab+='<text x="'+(padL-5)+'" y="'+(yy+3).toFixed(1)+'" class="axis-lbl" text-anchor="end">'+v.toFixed(dp)+'</text>';
+    ylab+='<text x="'+(padL-5)+'" y="'+(yy+3).toFixed(1)+'" class="axis-lbl" text-anchor="end">'+(opts&&opts.fmt?opts.fmt(v):v.toFixed(dp))+'</text>';
   }
   var xlab='<text x="'+padL+'" y="'+(H-6)+'" class="axis-lbl" text-anchor="start">'+fmtDate(chIso(xMin))+'</text>'
     +'<text x="'+((padL+W-padR)/2).toFixed(1)+'" y="'+(H-6)+'" class="axis-lbl" text-anchor="middle">'+fmtDate(chIso((xMin+xMax)/2))+'</text>'
@@ -1693,6 +1758,7 @@ function saveAboutField(f,v){
   if(f==="name"){ data.userName=v||null; setDocTitle(); re=true; }
   else if(f==="gymcode"){ var had=!!(data.gymCode||"").trim(); data.gymCode=v; re=(had!==!!v); }
   else if(f==="height"){ var n=Number(v); data.height=(!v||!n||n<=0)?null:n; }
+  else if(f==="heightft"||f==="heightin"){ var _fe=document.getElementById("height-ft"), _ie=document.getElementById("height-in"); var _t=(Number(_fe?_fe.value:0)||0)*12+(Number(_ie?_ie.value:0)||0); data.height=(!_t||_t<=0)?null:_t*CM_PER_IN; }
   save();
   if(re) render();
 }
@@ -1794,10 +1860,11 @@ function currentWeight(){
   return s[s.length-1].v;
 }
 function addMetric(key){
-  var v=Number(ui.metricInputs[key]);
-  if(!v) return;
+  var v=metricEntry(key);
+  if(!v||v<0) return;
   data.metrics[key]=data.metrics[key].filter(function(p){return p.date!==todayISO();}).concat([{date:todayISO(),v:v}]);
   ui.metricInputs[key]="";
+  if(key==="weight") ui.metricInputs["weight-lb"]="";
   commit();
 }
 function armReset(){ ui.resetArmed=true; render(); }
@@ -1835,7 +1902,7 @@ function parseBackup(text){
   catch(e){ return {ok:false,msg:"That doesn\u2019t look like a backup \u2014 the file isn\u2019t readable data."}; }
   if(!parsed || typeof parsed!=="object" || Array.isArray(parsed)) return {ok:false,msg:"That file isn\u2019t a Niten backup."};
   if(!Array.isArray(parsed.sessions)) return {ok:false,msg:"That backup is missing its training data."};
-  var _objs=["habits","checks","cardio","conditioning","enabled","baseWeight","stepOverride","unitOverride","dayPlan"];
+  var _objs=["habits","checks","cardio","conditioning","enabled","baseWeight","stepOverride","unitOverride","dayPlan","bodyUnits"];
   for(var _i=0;_i<_objs.length;_i++){ var _k=_objs[_i]; if(parsed[_k]!=null && (typeof parsed[_k]!=="object"||Array.isArray(parsed[_k]))) return {ok:false,msg:"That backup looks corrupted \u2014 leaving your current data untouched."}; }
   var _dt=parsed.sessions.map(function(s){return s&&s.date;}).filter(Boolean).sort();
   var _n=parsed.sessions.length;
@@ -1854,6 +1921,7 @@ function applyRestore(text){
     blockStart: parsed.blockStart||base.blockStart,
     miles: Object.assign({wo:0,ton:0,streak:0,cardio:0}, parsed.miles||{}),
     height:(parsed.height!=null?parsed.height:base.height),
+    bodyUnits: Object.assign({}, base.bodyUnits, (parsed.bodyUnits&&typeof parsed.bodyUnits==="object")?parsed.bodyUnits:{}),
     userName:(parsed.userName!=null?parsed.userName:base.userName),
     sessions: parsed.sessions||[], habits: parsed.habits||{}, checks: parsed.checks||{}, cardio: parsed.cardio||{}, conditioning: parsed.conditioning||{}, lastBackupWO: (parsed.lastBackupWO!=null?parsed.lastBackupWO:null), backupSnoozeWO: (parsed.backupSnoozeWO!=null?parsed.backupSnoozeWO:null), installDismissed: !!parsed.installDismissed, advanced: (parsed.advanced!=null?parsed.advanced:null), cardioUnit: parsed.cardioUnit||"kcal",
     enabled: parsed.enabled||{}, metricsOn: parsed.metricsOn||{}, custom: parsed.custom||[], baseWeight: parsed.baseWeight||{}, stepOverride: parsed.stepOverride||{}, unitOverride: parsed.unitOverride||{}, exOrder: parsed.exOrder||[], dayPlan: parsed.dayPlan||{}, notes: parsed.notes||{}, notesOn: (parsed.notesOn!==false), gymCode: parsed.gymCode||"", setups: (Array.isArray(parsed.setups)?parsed.setups:[]), activeSetup: (parsed.activeSetup!==undefined?parsed.activeSetup:null), activeSnap: (parsed.activeSnap||null), schema: (typeof parsed.schema==="number"?parsed.schema:0), plan: parsed.plan||{mode:"letters",count:2}, pairs: (parsed.pairs&&parsed.pairs.length?parsed.pairs:DEFAULT_PAIRS.slice()), lastSeenVersion: parsed.lastSeenVersion||APP_VERSION,
@@ -2195,8 +2263,8 @@ function setupView(){
   html+='<div class="section-head">About you</div><div class="add-form">'
     +'<div class="au-row"><span class="au-lbl">Name</span><input class="au-inp" id="name-input" data-action="saveaufield" data-field="name" placeholder="e.g. Nick" value="'+esc(data.userName||"")+'" aria-label="Your name"></div>'
     +'<div class="au-row"><span class="au-lbl">Gym code</span><input class="au-inp" id="gymcode-input" data-action="saveaufield" data-field="gymcode" inputmode="text" placeholder="e.g. 4821" value="'+esc(data.gymCode||"")+'" aria-label="Gym entry code"></div>'
-    +'<div class="au-row"><span class="au-lbl">Height</span><input class="au-inp au-num" id="height-input" data-action="saveaufield" data-field="height" inputmode="decimal" placeholder="178" value="'+esc(data.height||"")+'" aria-label="Your height in centimetres"><span class="au-unit">cm</span></div>'
-    +'<div class="metric-caption" style="margin-top:2px">Saved as you type them, and only on this device. Your name goes in the title, the gym code sits masked at the top until you tap it, and your height powers the waist-to-height guide. Clear a box to forget it.</div></div>';
+    +aboutBodyRows()
+    +'<div class="metric-caption" style="margin-top:2px">Saved as you type them, and only on this device. Your name goes in the title, the gym code sits masked at the top until you tap it, and your height powers the waist-to-height guide. Units change how height, weight and waist are shown and entered \u2014 nothing you\u2019ve logged is rewritten. Clear a box to forget it.</div></div>';
   html+='<div class="section-head">Mode</div><div class="cu-toggle">'
     +'<button class="cu-btn'+(!data.advanced?" on":"")+'" data-action="setmode" data-arg="simple">Simple</button>'
     +'<button class="cu-btn'+(data.advanced?" on":"")+'" data-action="setmode" data-arg="advanced">Advanced</button></div>'
@@ -2308,7 +2376,7 @@ function setupView(){
   METRICS.forEach(function(m){
     var on=isMetricOn(m.key);
     html+='<div class="lib-row adv-only"><div class="lib-main"><div class="lib-name">'+esc(m.label)+'</div>'
-      +'<div class="lib-meta">'+esc(m.unit)+(m.hint?' \u00b7 '+esc(m.hint):'')+'</div></div>'
+      +'<div class="lib-meta">'+esc(metricUnit(m))+(m.hint?' \u00b7 '+esc(m.hint):'')+'</div></div>'
       +'<button class="toggle'+(on?" on":"")+'" data-action="togglemetric" data-arg="'+m.key+'" aria-pressed="'+on+'"><span class="toggle-knob"></span></button></div>';
   });
   if(data.custom && data.custom.length){ var _eb="My custom exercises for Niten:\n\n"; data.custom.forEach(function(c){ _eb+="\u2022 "+c.name+(c.type==="cardio"?" \u2014 cardio":" \u2014 "+c.unit+", steps of "+c.step+(c.body?", bodyweight":"")+(c.muscle?", primary: "+c.muscle:"")+(c.muscle2?", secondary: "+c.muscle2:""))+"\n"; }); _eb+="\n(sent from Niten v"+APP_VERSION+")"; html+='<a class="fb-btn" style="margin-top:10px" href="mailto:Niten.fitness@gmail.com?subject=Niten%20custom%20exercises&body='+encodeURIComponent(_eb)+'">Email my custom exercises</a>'; }
@@ -2389,20 +2457,19 @@ function trendsView(){
   if(msW.untagged) html+='<div class="metric-caption">'+msW.untagged+' set(s) from untagged custom exercises aren\u2019t counted \u2014 set a muscle for them when adding.</div>';
   html+='<div class="metric-caption">Effort-weighted sets, last 7 days \u2014 swipe each set: green easy (\u00d7\u00bd), amber moderate (\u00d71), red to failure (\u00d71.2). A supporting muscle counts half. Brighter = more, faded = a gap \u2014 a sanity-check, not a target.</div></div>';
 
-  var shownMetrics=METRICS.filter(function(m){return isMetricOn(m.key);});
-  if(shownMetrics.length) html+='<div class="section-head adv-only">Metrics</div>';
+  var shownMetrics=METRICS.filter(function(m){return isMetricOn(m.key) || (m.key==="weight" && !data.advanced);});
+  if(shownMetrics.length) html+='<div class="section-head'+(shownMetrics.some(function(m){return m.key==="weight";})?'':' adv-only')+'">Metrics</div>';
   shownMetrics.forEach(function(m){
     var series=data.metrics[m.key]||(data.metrics[m.key]=[]);
     var sorted=series.slice().sort(function(a,b){return a.date.localeCompare(b.date);});
     var latest=sorted[sorted.length-1], first=sorted[0];
-    var delta=(latest&&first)?+(latest.v-first.v).toFixed(1):0;
+    var _md=(latest&&first)?metricDelta(m,first.v,latest.v):{n:0,txt:""}, delta=_md.n;
     var improving=delta===0?null:(m.good==="up"?delta>0:delta<0);
-    html+='<div class="card metric adv-only"><div class="metric-head"><span class="metric-label">'+esc(m.label)+'</span><span class="metric-unit">'+esc(m.unit)+'</span></div>';
-    html+='<div class="metric-value-row"><span class="metric-value">'+(latest?latest.v.toFixed(m.dp):"\u2014")+'</span>';
-    if(delta!==0) html+='<span class="metric-delta '+(improving?"good":"bad")+'">'+(delta>0?"+":"")+delta+' since start</span>';
-    html+='</div>'+sparkline(series,m.good,m.key);
-    html+='<div class="metric-add"><input class="text-input" id="metric-'+m.key+'" inputmode="decimal" placeholder="Add today\u2019s '+esc(m.label.toLowerCase())+'" value="'+esc(ui.metricInputs[m.key])+'">'
-      +'<button class="btn-solid" data-action="metric" data-arg="'+m.key+'">Save</button></div>';
+    html+='<div class="card metric'+(m.key==="weight"?'':' adv-only')+'"><div class="metric-head"><span class="metric-label">'+esc(m.label)+'</span><span class="metric-unit">'+esc(metricUnit(m))+'</span></div>';
+    html+='<div class="metric-value-row"><span class="metric-value">'+(latest?metricText(m,latest.v):"\u2014")+'</span>';
+    if(delta!==0) html+='<span class="metric-delta '+(improving?"good":"bad")+'">'+_md.txt+' since start</span>';
+    html+='</div>'+sparkline(isBodyMetric(m.key)?series.map(function(p){return {date:p.date,v:metricDispVal(m,p.v)};}):series,m.good,m.key,metricChartOpts(m));
+    html+=metricAddHTML(m);
     if(sorted.length){
       if(!ui.dataOpen) ui.dataOpen={};
       var dOpen=ui.dataOpen[m.key];
@@ -2411,7 +2478,7 @@ function trendsView(){
         html+='<ul class="metric-log scroll">';
         sorted.slice().reverse().forEach(function(p){
           var td=p.date===todayISO();
-          html+='<li><span class="mlog-date">'+(td?"Today":fmtDate(p.date))+'</span><span class="mlog-val">'+p.v.toFixed(m.dp)+'</span><button class="mlog-del" data-action="delmetric" data-arg="'+m.key+'" data-date="'+p.date+'" aria-label="Delete reading from '+(td?"today":fmtDate(p.date))+'">\u00d7</button></li>';
+          html+='<li><span class="mlog-date">'+(td?"Today":fmtDate(p.date))+'</span><span class="mlog-val">'+metricText(m,p.v)+'</span><button class="mlog-del" data-action="delmetric" data-arg="'+m.key+'" data-date="'+p.date+'" aria-label="Delete reading from '+(td?"today":fmtDate(p.date))+'">\u00d7</button></li>';
         });
         html+='</ul>';
       }
@@ -2421,7 +2488,7 @@ function trendsView(){
       if(hgt && latest){
         var whr=latest.v/hgt;
         var ok=whr<0.5;
-        html+='<div class="metric-caption">Waist-to-height <strong style="color:'+(ok?'var(--accent)':'var(--warn)')+'">'+whr.toFixed(2)+'</strong> \u00b7 under 0.50 is the usual healthy guide (that\u2019s a waist under '+Math.round(hgt*0.5)+' cm for you)</div>';
+        html+='<div class="metric-caption">Waist-to-height <strong style="color:'+(ok?'var(--accent)':'var(--warn)')+'">'+whr.toFixed(2)+'</strong> \u00b7 under 0.50 is the usual healthy guide (that\u2019s a waist under '+(bodyU().h==="ftin"?Math.round(hgt*0.5/CM_PER_IN)+' in':Math.round(hgt*0.5)+' cm')+' for you)</div>';
       } else if(!hgt){
         html+='<div class="metric-caption">Set your height in Setup to see your waist-to-height ratio.</div>';
       }
@@ -2671,6 +2738,8 @@ appEl.addEventListener("click",function(e){
     case "togglenotes": data.notesOn=!(data.notesOn!==false); commit(); break;
     case "toggleex": toggleEnabled(arg); break;
     case "unitkg": setUnit(arg,"kg"); commit(); break;
+    case "bodyh": setBodyUnit("height",arg==="ftin"?"ftin":"cm"); ui.metricInputs.waist=""; commit(); break;
+    case "bodyw": setBodyUnit("weight",(arg==="lb"||arg==="st")?arg:"kg"); ui.metricInputs.weight=""; ui.metricInputs["weight-lb"]=""; commit(); break;
     case "unitlb": setUnit(arg,"lb"); commit(); break;
     case "gunitkg": setUnitGroup(arg,"kg"); break;
     case "gunitlb": setUnitGroup(arg,"lb"); break;
