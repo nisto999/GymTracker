@@ -406,6 +406,12 @@ button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid 
 .rt-row{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:9px 10px;margin-bottom:8px}
 .rt-row.on{border-color:var(--accent)}
 .rt-name{width:auto;flex:1;text-align:left;min-width:0}
+.rt-import{background:var(--surface);border:1px solid var(--accent);border-radius:10px;padding:11px 12px;margin:4px 0 10px}
+.rt-imp-title{font-weight:700;color:var(--ink);margin-bottom:4px}
+.rt-imp-meta{font-size:.8rem;color:var(--ink);line-height:1.4;margin-top:3px}
+.rt-imp-btns{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.rt-impbtn{margin-top:8px}
+.rt-msg{margin:8px 0 0;color:var(--ink)}
 .rt-tag{font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);white-space:nowrap}
 .rt-head{font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:8px}
 .root.simple .adv-only{display:none}
@@ -489,7 +495,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.90";
+var APP_VERSION = "3.92";
 var STORE_KEY = "gym-tracker-shared";
 var FILE_NAME = "Caitlyn";
 
@@ -577,6 +583,7 @@ var LIBRARY = [
   { name:"Shoulder press (machine)", type:"log", unit:"lb", step:5, equip:"Machine", group:"Main", on:false },
   { name:"Hip abduction", type:"log", unit:"lb", step:5, equip:"Machine", group:"Main", on:false },
   { name:"Hip adduction", type:"log", unit:"lb", step:5, equip:"Machine", group:"Main", on:false },
+  { name:"Hip thrust (machine)", type:"log", unit:"kg", step:2.5, equip:"Machine", group:"Main", on:false },
   { name:"Tricep dips", type:"log", unit:"kg", step:2.5, body:true, bwFactor:1, assist:true, equip:"Bodyweight", group:"Main", on:false },
   { name:"Burpees", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.65, equip:"Bodyweight", group:"Main", on:false },
   { name:"Glute bridges", type:"log", unit:"kg", step:2.5, body:true, bwFactor:0.5, equip:"Bodyweight", group:"Main", on:false },
@@ -606,6 +613,8 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row (cable)","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.92", items:["Share a routine with another Niten user. In Setup \u2014 Routines, tap Share on one of your routines and send it by AirDrop, Messages or email. It sends the exercises and how they\u2019re split into sessions \u2014 never your weights or history.","To use a routine someone has sent you, save the file, then tap \u201cImport a routine\u201d in Setup \u2014 Routines. You see what\u2019s in it before it\u2019s saved, and nothing you\u2019ve logged is touched."]},
+  {v:"3.91", items:["New exercise: Hip thrust (machine), under Machines in Setup \u2014 for gyms with a plate-loaded hip thrust machine. The barbell version stays as Hip thrust, so anything you\u2019ve logged there is untouched."]},
   {v:"3.90", items:["New ready-made routine: Full body \u00b7 H/M/L. Three whole-body sessions a week \u2014 one heavy day for strength, one moderate and one light day for muscle \u2014 built on the strength and hypertrophy guidance Dr Andy Galpin gives on the Huberman Lab podcast. Find it under Routines in Setup.","Sessions called Heavy, Moderate or Light now show a one-line guide to reps and rest on the Log. It\u2019s a guide, not a target.","If you pick a session on the Log before you start, each exercise remembers which session it was done in. Next time you pick that session, the weights start from the last time you did that session \u2014 not your light day when you\u2019re about to go heavy.","In Trends, the estimated 1-rep max chart can be split by session, so a light day can\u2019t drag your heavy-day line around."]},
   {v:"3.89", items:["Changing an exercise\u2019s bar or base weight no longer rewrites your history. Each set now remembers the bar it was logged with, and anything you logged before setting a bar counts as the full weight you lifted.","If you\u2019d made your own version of an exercise that\u2019s now built in \u2014 incline dumbbell press, lateral raise, spider curl \u2014 it\u2019s been merged into the built-in one. Every logged set came across."]},
   {v:"3.88", items:["Height, weight and waist can now be shown in feet and inches, pounds, or stones and pounds. Pick them under Units in Setup \u2014 About you. Everything you\u2019ve already logged converts on screen; nothing stored is rewritten.","Simple mode now shows your weight in Trends, so the \u201cAdd your weight\u201d step has somewhere to go."]},
@@ -913,6 +922,109 @@ function newSetup(){
   var snap=snapshotConfig(); snap.name="Routine "+(data.setups.length+1);
   data.setups.push(snap); data.activeSetup=data.setups.length-1; markSnap(); commit();
 }
+/* v3.92: share a saved routine as a small file, and import one from another Niten user.
+   The file carries only the arrangement - which main exercises are on, their sessions and
+   order, and any custom exercises they need. Never weights, history or personal settings. */
+function routineSlug(s){ return String(s||"routine").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,30)||"routine"; }
+function isShareable(n){ var e=EX_CACHE[n]; return !!e && e.group==="Main" && e.type==="log"; }
+function routinePayload(st){
+  var pl=st.plan||{}, labels=(Array.isArray(pl.labels)&&pl.labels.length)?pl.labels.slice():[];
+  if(labels.length<2){ labels=[]; for(var q=0;q<Math.max(2,pl.count||2);q++) labels.push(String.fromCharCode(65+q)); }
+  var en=st.enabled||{}, dp=st.dayPlan||{}, order=(st.exOrder||[]), li={};
+  allExercises().forEach(function(e,i){ li[e.name]=i; });
+  var names=Object.keys(en).filter(function(n){ return en[n] && isShareable(n); });
+  names.sort(function(a,b){ var i=order.indexOf(a), j=order.indexOf(b); i=i<0?1e4+(li[a]||0):i; j=j<0?1e4+(li[b]||0):j; return i-j; });
+  var exs=names.map(function(n){ var m=dp[n]; m=Array.isArray(m)?m:[]; return {name:n, sessions:m.filter(function(x){ return labels.indexOf(x)>=0; })}; });
+  var cus=(data.custom||[]).filter(function(c){ return c.type!=="cardio" && names.indexOf(c.name)>=0; })
+    .map(function(c){ return {name:c.name, unit:c.unit, step:c.step, body:!!c.body, muscle:c.muscle||null, muscle2:c.muscle2||null}; });
+  return {niten:"routine", v:1, app:APP_VERSION, name:String(st.name||"Routine").slice(0,20),
+    plan:{mode:pl.mode==="weekdays"?"weekdays":"letters", labels:labels}, exercises:exs, custom:cus};
+}
+function dlRoutine(txt,fn){
+  try{ var blob=new Blob([txt],{type:"application/json"}), url=URL.createObjectURL(blob), a=document.createElement("a");
+    a.href=url; a.download=fn; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); },1500);
+  }catch(e){ ui.rtMsg="Couldn\u2019t make the file on this device."; }
+  render();
+}
+function shareSetup(i){
+  var st=(data.setups||[])[i]; if(!st) return;
+  if(data.activeSetup===i && configDirty() && !confirm("This shares the saved version of \u201c"+(st.name||"this routine")+"\u201d. Tap Save first if you want your latest changes included.\n\nShare the saved version?")) return;
+  var p=routinePayload(st), txt=JSON.stringify(p), fn="niten-routine-"+routineSlug(p.name)+".json", file=null;
+  try{ file=new File([txt],fn,{type:"application/json"}); }catch(e){}
+  if(file && navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+    navigator.share({files:[file], title:"Niten routine: "+p.name})
+      .then(function(){ ui.rtMsg="Sent \u201c"+p.name+"\u201d. They import it in Setup \u2014 Routines."; render(); })
+      .catch(function(err){ if(err && err.name==="AbortError") return; ui.rtMsg="Sharing didn\u2019t work here, so the file has been downloaded instead."; dlRoutine(txt,fn); });
+    return;
+  }
+  ui.rtMsg="Routine file downloaded. Send it to the other person \u2014 they import it in Setup \u2014 Routines.";
+  dlRoutine(txt,fn);
+}
+function parseRoutine(text){
+  var p; try{ p=JSON.parse(text); }catch(e){ return {ok:false,msg:"That file isn\u2019t a Niten routine."}; }
+  if(p && typeof p==="object" && Array.isArray(p.sessions) && !p.exercises) return {ok:false,msg:"That\u2019s a backup, not a routine \u2014 use Restore under Backup & restore instead."};
+  if(!p || p.niten!=="routine" || !Array.isArray(p.exercises)) return {ok:false,msg:"That file isn\u2019t a Niten routine."};
+  var pl=(p.plan&&typeof p.plan==="object")?p.plan:{}, seen={};
+  var labels=(Array.isArray(pl.labels)?pl.labels:[]).map(function(x){ return String(x==null?"":x).trim().slice(0,8); })
+    .filter(function(x){ if(!x||seen[x]) return false; seen[x]=1; return true; }).slice(0,7);
+  if(labels.length<2) labels=["A","B"];
+  var cdefs={};
+  (Array.isArray(p.custom)?p.custom:[]).forEach(function(c){
+    if(!c || typeof c.name!=="string") return; var nm=c.name.trim().slice(0,40); if(!nm) return;
+    var u=c.unit==="lb"?"lb":"kg", stp=Number(c.step); if(!(stp>0 && stp<=50)) stp=(u==="lb"?5:2.5);
+    cdefs[nm]={name:nm, unit:u, step:stp, body:!!c.body, muscle:MUSCLES.indexOf(c.muscle)>=0?c.muscle:null, muscle2:MUSCLES.indexOf(c.muscle2)>=0?c.muscle2:null};
+  });
+  var names=[], dp={}, add=[], skipped=[];
+  p.exercises.forEach(function(x){
+    if(!x || typeof x.name!=="string") return;
+    var raw=x.name.trim().slice(0,40), n=raw; if(!n) return;
+    if(!EX_CACHE[n]){ if(RENAMES.hasOwnProperty(n)) n=RENAMES[n]; if(!EX_CACHE[n] && ABSORB.hasOwnProperty(n)) n=ABSORB[n]; }
+    if(names.indexOf(n)>=0) return;
+    if(EX_CACHE[n]){ if(!isShareable(n)){ skipped.push(raw); return; } }
+    else if(cdefs[raw]){ add.push(cdefs[raw]); n=raw; }
+    else { skipped.push(raw); return; }
+    names.push(n);
+    dp[n]=(Array.isArray(x.sessions)?x.sessions:[]).map(function(m){ return String(m); })
+      .filter(function(m,i,a){ return labels.indexOf(m)>=0 && a.indexOf(m)===i; });
+  });
+  if(!names.length) return {ok:false,msg:"Nothing in that routine matches exercises in this app."};
+  var base=snapshotConfig(), en=Object.assign({},base.enabled), dpl={};
+  Object.keys(base.dayPlan||{}).forEach(function(k){ dpl[k]=(base.dayPlan[k]||[]).filter(function(m){ return labels.indexOf(m)>=0; }); });
+  allExercises().forEach(function(e){ if(e.group==="Main" && e.type==="log"){ en[e.name]=false; dpl[e.name]=[]; } });
+  names.forEach(function(n){ en[n]=true; dpl[n]=dp[n]; });
+  var nm=String(p.name==null?"":p.name).trim().slice(0,20)||"Shared routine";
+  return {ok:true, cfg:{enabled:en, dayPlan:dpl, plan:{mode:pl.mode==="weekdays"?"weekdays":"letters", count:labels.length, labels:labels}, exOrder:names.slice(), name:nm},
+    add:add, skipped:skipped, n:names.length, labels:labels};
+}
+function importRoutineText(text){
+  var r=parseRoutine(text);
+  if(!r.ok){ ui.importRt=null; ui.rtMsg=r.msg; render(); return; }
+  ui.importRt=r; ui.rtMsg=""; render();
+}
+function importSave(replaceIdx){
+  var r=ui.importRt; if(!r) return;
+  if(!Array.isArray(data.setups)) data.setups=[];
+  var rep=(typeof replaceIdx==="number" && data.setups[replaceIdx]);
+  if(rep && !confirm("Replace \u201c"+(data.setups[replaceIdx].name||"that routine")+"\u201d with \u201c"+r.cfg.name+"\u201d?\n\nOnly the routine is replaced \u2014 your exercises and everything you\u2019ve logged stay as they are.")) return;
+  if(!rep && data.setups.length>=MAX_SETUPS) return;
+  var cfg=JSON.parse(JSON.stringify(r.cfg)), base=cfg.name, k=2;
+  var taken=data.setups.filter(function(s,i){ return !(rep && i===replaceIdx); }).map(function(s){ return s.name; });
+  while(taken.indexOf(cfg.name)>=0){ cfg.name=base.slice(0,17)+" "+k; k++; }
+  var fresh=r.add.filter(function(c){ return !EX_CACHE[c.name]; });
+  if(fresh.length){
+    data.custom=data.custom||[]; if(!data.enabled) data.enabled={};
+    fresh.forEach(function(c){
+      data.custom.push({name:c.name, unit:c.unit, step:c.step, body:c.body, muscle:c.muscle, muscle2:c.muscle2});
+      data.enabled[c.name]=false;
+      data.setups.forEach(function(s){ if(s.enabled && !s.enabled.hasOwnProperty(c.name)) s.enabled[c.name]=false; });
+    });
+    refreshCache();
+  }
+  if(rep){ data.setups[replaceIdx]=cfg; if(data.activeSetup===replaceIdx){ data.activeSetup=null; data.activeSnap=null; } }
+  else data.setups.push(cfg);
+  ui.importRt=null; ui.rtMsg="Saved \u201c"+cfg.name+"\u201d. Tap Use on it to switch over.";
+  commit();
+}
 function delSetup(i){
   var st=(data.setups||[])[i]; if(!st) return;
   if(!confirm("Delete the routine \u201c"+(st.name||"")+"\u201d?\n\nYour exercises and everything you\u2019ve logged stay exactly as they are.")) return;
@@ -946,10 +1058,26 @@ function routinesSection(){
       +(on?'<span class="rt-tag">'+(dirty?"Edited":"In use")+'</span>':'')
       +(on?(dirty?'<button class="seg-btn" data-action="savesetup" data-idx="'+i+'">Save</button>':'')
           :'<button class="seg-btn" data-action="usesetup" data-idx="'+i+'">Use</button>')
+      +'<button class="seg-btn rt-share" data-action="sharesetup" data-idx="'+i+'" aria-label="Share this routine">Share</button>'
       +'<button class="lib-del" data-action="delsetup" data-idx="'+i+'" aria-label="Delete routine">\u00d7</button>'
       +'</div>';
   });
+  if(ui.importRt){ var _r=ui.importRt;
+    h+='<div class="rt-import"><div class="rt-imp-title">Import \u201c'+esc(_r.cfg.name)+'\u201d</div>'
+      +'<div class="rt-imp-meta">'+_r.labels.length+' sessions ('+_r.labels.map(esc).join(' \u00b7 ')+') \u00b7 '+_r.n+' exercise'+(_r.n===1?'':'s')+'</div>'
+      +(_r.add.length?'<div class="rt-imp-meta">Adds '+(_r.add.length===1?'a custom exercise':_r.add.length+' custom exercises')+': '+_r.add.map(function(c){ return esc(c.name); }).join(', ')+'</div>':'')
+      +(_r.skipped.length?'<div class="rt-imp-meta">Left out \u2014 not in this app: '+_r.skipped.map(esc).join(', ')+'</div>':'')
+      +'<div class="rt-imp-meta">Nothing you\u2019ve logged is touched.</div>';
+    if(sets.length<MAX_SETUPS) h+='<div class="rt-imp-btns"><button class="seg-btn on" data-action="impsave">Save as a routine</button><button class="seg-btn" data-action="impcancel">Cancel</button></div>';
+    else { h+='<div class="rt-imp-meta">You already have '+MAX_SETUPS+' routines \u2014 pick one to replace:</div><div class="rt-imp-btns">';
+      sets.forEach(function(st,i){ h+='<button class="seg-btn" data-action="impreplace" data-idx="'+i+'">Replace \u201c'+esc(st.name||("Routine "+(i+1)))+'\u201d</button>'; });
+      h+='<button class="seg-btn" data-action="impcancel">Cancel</button></div>'; }
+    h+='</div>';
+  }
   if(sets.length<MAX_SETUPS) h+='<button class="btn-solid full" data-action="newsetup">\uff0b Save how it\u2019s set up now as a routine</button>';
+  if(!ui.importRt) h+='<button class="btn-solid full rt-impbtn" data-action="importroutine">Import a routine</button>';
+  h+='<input type="file" id="routine-file" accept="application/json,.json" style="display:none">';
+  if(ui.rtMsg) h+='<div class="setup-note rt-msg">'+esc(ui.rtMsg)+'</div>';
   h+='</div>';
   h+='<div class="setup-note adv-only" style="margin-top:14px">Ready-made splits. Tapping one switches its exercises on, groups them into sessions, and switches the other main lifts off \u2014 warm-up, cardio and cool-down stay as you have them.</div>';
   h+='<div class="adv-only">';
@@ -1038,7 +1166,7 @@ var MUSCLE_MAP = {
   "Incline dumbbell press":{p:"Chest",s:"Shoulders"}, "Lateral raise":{p:"Shoulders"},
   "Hammer curl":{p:"Biceps",s:"Forearms"}, "Bulgarian split squat":{p:"Quads",s:"Glutes"},
   "Leg extension":{p:"Quads"}, "Chest press (machine)":{p:"Chest",s:"Triceps"},
-  "Shoulder press (machine)":{p:"Shoulders",s:"Triceps"}, "Hip abduction":{p:"Glutes"},
+  "Shoulder press (machine)":{p:"Shoulders",s:"Triceps"}, "Hip abduction":{p:"Glutes"}, "Hip thrust (machine)":{p:"Glutes",s:"Hamstrings"},
   "Hip adduction":{p:"Quads",s:"Glutes"}, "Tricep dips":{p:"Triceps",s:"Chest"},
   "Burpees":{p:"Quads",s:"Chest"}, "Glute bridges":{p:"Glutes",s:"Hamstrings"},
   "High knees":{p:"Quads",s:"Core"}, "Jumping jacks":{p:"Calves",s:"Shoulders"},
@@ -1247,7 +1375,7 @@ var ui = {
   tab:"log", expanded:null, logDate: todayISO(), timer:{active:false}, dayFilter:"all", trendSess:"all", reorder:false, ivNewA:"", ivNewB:"", woScope:"all",
   weight:20, reps:8,
   metricInputs:{},
-  restoreText:"", backupOpen:false, backupMsg:"",
+  restoreText:"", backupOpen:false, backupMsg:"", importRt:null, rtMsg:"",
   saveState:"idle", progEx:null, cal:0, guideOpen:false, help:{}, flash:null, resetArmed:false, newMuscle:-1, newMuscle2:-1,
   newName:"", newKind:0, newCardioName:"", pendingCond:null, editCustom:null, showWhatsNew:false
 };
@@ -2865,6 +2993,11 @@ appEl.addEventListener("click",function(e){
     case "savesetup": saveSetup(Number(el.dataset.idx)); break;
     case "newsetup": newSetup(); break;
     case "delsetup": delSetup(Number(el.dataset.idx)); break;
+    case "sharesetup": shareSetup(Number(el.dataset.idx)); break;
+    case "importroutine": var _rf=document.getElementById("routine-file"); if(_rf){ _rf.value=""; _rf.click(); } break;
+    case "impsave": importSave(); break;
+    case "impreplace": importSave(Number(el.dataset.idx)); break;
+    case "impcancel": ui.importRt=null; ui.rtMsg=""; render(); break;
     case "usepreset": usePreset(arg); break;
     case "togglemetric": toggleMetric(arg); break;
     case "addcustom": addCustom(); break;
@@ -2917,6 +3050,7 @@ appEl.addEventListener("input",function(e){
 });
 appEl.addEventListener("change",function(e){
   if(e.target && e.target.id==="wo-note"){ if(!data.notes) data.notes={}; var _v=e.target.value; _v=(_v==null?"":String(_v)).trim(); if(_v){ data.notes[ui.logDate]=_v; } else { delete data.notes[ui.logDate]; } save(); return; }
+  if(e.target && e.target.id==="routine-file"){ var _rt=e.target.files&&e.target.files[0]; if(_rt){ var _rr=new FileReader(); _rr.onload=function(){ importRoutineText(String(_rr.result)); }; _rr.onerror=function(){ ui.rtMsg="Couldn\u2019t read that file."; render(); }; _rr.readAsText(_rt); } return; }
   if(e.target && e.target.id==="restore-file"){ var _f=e.target.files&&e.target.files[0]; if(_f){ var _fr=new FileReader(); _fr.onload=function(){ applyRestore(String(_fr.result)); }; _fr.onerror=function(){ ui.backupMsg="Couldn\u2019t read that file."; render(); }; _fr.readAsText(_f); } return; }
   var _st=e.target; if(_st&&_st.dataset&&_st.dataset.action==="setupname"){ setSetupName(Number(_st.dataset.idx),_st.value); return; }
   var _au=e.target; if(_au&&_au.dataset&&_au.dataset.action==="saveaufield"){ saveAboutField(_au.dataset.field,_au.value); return; }
