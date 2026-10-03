@@ -287,6 +287,10 @@ html,body{background:var(--bg)}
 .day-filter{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
 .df-btn{flex:1;min-width:44px;background:var(--surface);border:1px solid var(--line);color:var(--ink-dim);font-family:'Barlow Semi Condensed',sans-serif;font-weight:600;font-size:.78rem;letter-spacing:.04em;padding:9px 4px;border-radius:9px;cursor:pointer}
 .df-btn.on{background:var(--surface-2);border-color:var(--accent);color:var(--accent)}
+.sess-guide{font-size:.8rem;color:var(--ink);margin:-2px 2px 12px;line-height:1.4}
+.trend-sess{margin:10px 0 12px}
+.lib-row.has-desc{flex-wrap:wrap}
+.rt-desc{flex-basis:100%;font-size:.8rem;color:var(--ink);line-height:1.45;margin-top:2px}
 .day-pills{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
 .day-pill{min-width:30px;padding:5px 6px;border-radius:7px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink-faint);font-family:'JetBrains Mono',monospace;font-weight:700;font-size:.7rem;cursor:pointer}
 .day-pill.on{background:var(--surface-2);border-color:var(--accent);color:var(--accent)}
@@ -506,7 +510,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.89";
+var APP_VERSION = "3.90";
 var STORE_KEY = "gym-tracker-shared";
 
 /* ---------------------------------------------------------------
@@ -622,6 +626,7 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row (cable)","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.90", items:["New ready-made routine: Full body \u00b7 H/M/L. Three whole-body sessions a week \u2014 one heavy day for strength, one moderate and one light day for muscle \u2014 built on the strength and hypertrophy guidance Dr Andy Galpin gives on the Huberman Lab podcast. Find it under Routines in Setup.","Sessions called Heavy, Moderate or Light now show a one-line guide to reps and rest on the Log. It\u2019s a guide, not a target.","If you pick a session on the Log before you start, each exercise remembers which session it was done in. Next time you pick that session, the weights start from the last time you did that session \u2014 not your light day when you\u2019re about to go heavy.","In Trends, the estimated 1-rep max chart can be split by session, so a light day can\u2019t drag your heavy-day line around."]},
   {v:"3.89", items:["Changing an exercise\u2019s bar or base weight no longer rewrites your history. Each set now remembers the bar it was logged with, and anything you logged before setting a bar counts as the full weight you lifted.","If you\u2019d made your own version of an exercise that\u2019s now built in \u2014 incline dumbbell press, lateral raise, spider curl \u2014 it\u2019s been merged into the built-in one. Every logged set came across."]},
   {v:"3.88", items:["Height, weight and waist can now be shown in feet and inches, pounds, or stones and pounds. Pick them under Units in Setup \u2014 About you. Everything you\u2019ve already logged converts on screen; nothing stored is rewritten.","Simple mode now shows your weight in Trends, so the \u201cAdd your weight\u201d step has somewhere to go."]},
   {v:"3.87", items:["Every exercise can now be logged in kg or lb, set one at a time. In Setup, tap the kg/lb switch on an exercise \u2014 or the one on an equipment heading to change a whole group at once. Handy if the cable stack is marked in pounds and the barbell isn\u2019t.","Everything you\u2019ve already logged keeps the units you logged it in, so your history stays honest. Only the bar weight and the increment convert when you switch. Your totals and trends work it all out behind the scenes.","Twenty new exercises: barbell squat, bent-over row, Romanian deadlift, dumbbell row, incline dumbbell press, lateral raise, hammer curl, Bulgarian split squat, leg extension, machine chest and shoulder press, hip abduction and adduction, tricep dips, and the conditioning moves that were only in the interval timer before \u2014 burpees, glute bridges, high knees, jumping jacks, mountain climbers and the wall sit. All switched off to start with; turn on what you use in Setup.","A few names tidied up. \u201cHip thrusters\u201d is now \u201cHip thrust\u201d \u2014 a thruster is a different lift entirely. \u201cDumbbell press\u201d is now \u201cDumbbell bench press\u201d, \u201cLunge walk\u201d is \u201cWalking lunges\u201d, and the two seated rows say plainly which is the cable and which is the machine. Everything you have logged under the old names comes with them."]},
@@ -763,7 +768,7 @@ function sessionDaysSince(label){
   (data.sessions||[]).forEach(function(s){
     if(!s.sets || !s.sets.length) return;
     var mem=dayMembership(s.exercise);
-    if(mem && mem.length && mem.indexOf(label)>=0){ if(last===null || s.date>last) last=s.date; }
+    if(s.lbl ? s.lbl===label : (mem && mem.length && mem.indexOf(label)>=0)){ if(last===null || s.date>last) last=s.date; }
   });
   if(last===null) return null;
   return Math.round((Date.parse(todayISO())-Date.parse(last))/86400000);
@@ -807,8 +812,27 @@ var PRESETS = [
     ], all:["Plank"] },
   { key:"fullbody", name:"Full body", meta:"One list, no sessions", labels:["A","B"],
     sessions:[[],[]],
-    all:["Squats","Deadlift","Bench press","Seated row (cable)","Shoulder press","Lat pulldown","Leg press","Hamstring curl","Barbell curl","Tricep pushdown","Plank"] }
+    all:["Squats","Deadlift","Bench press","Seated row (cable)","Shoulder press","Lat pulldown","Leg press","Hamstring curl","Barbell curl","Tricep pushdown","Plank"] },
+  /* v3.90 Galpin-style H/M/L: Heavy = his strength template (squat, press, pull, hinge; 3-5 reps),
+     Moderate/Light = hypertrophy. Each session mixes bilateral and unilateral work;
+     Pallof press (anti-rotation) in every session. */
+  { key:"fullbodyhml", name:"Full body \u00b7 H/M/L", meta:"Heavy \u00b7 Moderate \u00b7 Light", labels:["Heavy","Moderate","Light"],
+    desc:"Three whole-body sessions a week, one of each. Heavy builds strength; Moderate and Light build muscle. Every day mixes two-sided and one-sided lifts and includes an anti-rotation exercise. Based on Dr Andy Galpin\u2019s guidance on the Huberman Lab podcast.",
+    sessions:[
+      ["Barbell squat","Bench press","Dumbbell row","Deadlift"],
+      ["Barbell squat","Bench press","Seated row (cable)","Romanian deadlift","Lat pulldown","Shoulder press","Reverse lunges"],
+      ["Leg press","Incline dumbbell press","Seated row (cable)","Lat pulldown","Hip thrust","Bulgarian split squat","Barbell curl","Tricep pushdown"]
+    ], all:["Pallof press"] }
 ];
+/* v3.90: a one-line guide shown on the Log when a session with one of these names is picked.
+   Keyed by session name, so it follows a saved copy of the H/M/L routine too. Guidance only. */
+var SESS_GUIDE = {
+  "Heavy":"Strength \u2014 3\u20135 reps, 3\u20135 sets, 3\u20135 min rest. Heavy, but leave a rep or two in the tank.",
+  "Moderate":"Muscle \u2014 8\u201312 reps, about 3 sets, 2\u20133 min rest. Finish each set 1\u20132 reps short of failure.",
+  "Light":"Muscle \u2014 15\u201320 reps, 2\u20133 sets, 1\u20132 min rest. Lighter weight, but still finish 1\u20132 reps short of failure."
+};
+/* v3.90: the session picked on the Log, or "" for All. A logged row carries it as s.lbl. */
+function curSessLabel(){ return (ui.dayFilter && ui.dayFilter!=="all" && planLabels().indexOf(ui.dayFilter)>=0) ? ui.dayFilter : ""; }
 function presetOf(key){ for(var i=0;i<PRESETS.length;i++){ if(PRESETS[i].key===key) return PRESETS[i]; } return null; }
 
 /* A snapshot records the arrangement only: which exercises are on, which session
@@ -950,12 +974,13 @@ function routinesSection(){
   h+='<div class="setup-note adv-only" style="margin-top:14px">Ready-made splits. Tapping one switches its exercises on, groups them into sessions, and switches the other main lifts off \u2014 warm-up, cardio and cool-down stay as you have them.</div>';
   h+='<div class="adv-only">';
   PRESETS.forEach(function(p){
-    var pon=(act==="preset:"+p.key), n=(p.all||[]).length;
-    p.sessions.forEach(function(l){ n+=l.length; });
-    h+='<div class="lib-row"><div class="lib-main"><div class="lib-name">'+esc(p.name)+'</div>'
+    var pon=(act==="preset:"+p.key), _u={};
+    (p.all||[]).forEach(function(x){ _u[x]=1; }); p.sessions.forEach(function(l){ l.forEach(function(x){ _u[x]=1; }); });
+    var n=Object.keys(_u).length;
+    h+='<div class="lib-row'+(p.desc?' has-desc':'')+'"><div class="lib-main"><div class="lib-name">'+esc(p.name)+'</div>'
       +'<div class="lib-meta">'+esc(p.meta)+' \u00b7 '+n+' exercises</div></div>'
       +(pon?'<span class="rt-tag">'+(dirty?"Edited":"In use")+'</span>':'')
-      +'<button class="seg-btn" data-action="usepreset" data-arg="'+p.key+'">'+(pon?"Reapply":"Use")+'</button></div>';
+      +'<button class="seg-btn" data-action="usepreset" data-arg="'+p.key+'">'+(pon?"Reapply":"Use")+'</button>'+(p.desc?'<div class="rt-desc">'+esc(p.desc)+'</div>':'')+'</div>';
   });
   h+='</div>';
   return h;
@@ -971,6 +996,8 @@ function migrateLabels(oldL,newL){
     var seen={},out=[]; arr.forEach(function(x){ if(!seen[x]){seen[x]=1;out.push(x);} });
     data.dayPlan[ex]=out;
   });
+  /* v3.90: a renamed session takes its logged rows with it. Dropped labels keep their stamp. */
+  (data.sessions||[]).forEach(function(s){ if(s.lbl && ren.hasOwnProperty(s.lbl)) s.lbl=ren[s.lbl]; });
 }
 function setLabel(i,val){
   val=(val||"").trim();
@@ -1237,7 +1264,7 @@ function save(){
 
 var data = load() || seed();
 var ui = {
-  tab:"log", expanded:null, logDate: todayISO(), timer:{active:false}, dayFilter:"all", reorder:false, ivNewA:"", ivNewB:"", woScope:"all",
+  tab:"log", expanded:null, logDate: todayISO(), timer:{active:false}, dayFilter:"all", trendSess:"all", reorder:false, ivNewA:"", ivNewB:"", woScope:"all",
   weight:20, reps:8,
   metricInputs:{},
   restoreText:"", backupOpen:false, backupMsg:"",
@@ -1437,7 +1464,9 @@ function trendSpark(name, col){
   var e=exOf(name);
   if(!e || e.type!=="log" || e.timed) return "";
   var isBody=!!e.body;
-  var pts=(data.sessions||[]).filter(function(s){ return s.exercise===name && s.sets && s.sets.length; })
+  var _tr=(data.sessions||[]).filter(function(s){ return s.exercise===name && s.sets && s.sets.length; }), _tl=curSessLabel();
+  if(_tl){ var _tf=_tr.filter(function(s){ return s.lbl===_tl; }); if(_tf.length>=2) _tr=_tf; }
+  var pts=_tr
     .sort(function(a,b){ return a.date.localeCompare(b.date); })
     .map(function(s){ return isBody ? bestReps(s.sets) : Math.round(fromKg(name,bestE1RM(name,s.sets))*10)/10; })
     .filter(function(v){ return v>0; });
@@ -1473,7 +1502,9 @@ function bestE1RM(name,sets){ return (!sets||!sets.length)?0:sets.reduce(functio
 function bestReps(sets){ return (!sets||!sets.length)?0:sets.reduce(function(m,s){return s.r>m?s.r:m;},0); }
 
 function getLast(name){
-  return data.sessions.filter(function(s){return s.exercise===name && s.date < ui.logDate;})
+  var _a=data.sessions.filter(function(s){return s.exercise===name && s.date < ui.logDate;}), _l=curSessLabel();
+  if(_l){ var _f=_a.filter(function(s){return s.lbl===_l;}); if(_f.length) _a=_f; }
+  return _a
     .sort(function(a,b){return b.date.localeCompare(a.date);})[0];
 }
 function cardioUnit(){ return data.cardioUnit==="min"?"min":"kcal"; }
@@ -1760,7 +1791,9 @@ function removeCustom(name){
 }
 
 function recentEntry(name){
-  var s=data.sessions.filter(function(x){return x.exercise===name && x.sets.length && x.date <= ui.logDate;})
+  var _a=data.sessions.filter(function(x){return x.exercise===name && x.sets.length && x.date <= ui.logDate;}), _l=curSessLabel();
+  if(_l){ var _f=_a.filter(function(x){return x.lbl===_l;}); if(_f.length) _a=_f; }
+  var s=_a
     .sort(function(a,b){return b.date.localeCompare(a.date);})[0];
   if(!s) return null;
   var tw=topSet(s.sets);
@@ -1809,6 +1842,7 @@ function logSet(name){
   var t=ui.logDate;
   var sess=data.sessions.filter(function(s){return s.date===t&&s.exercise===name;})[0];
   if(!sess){ sess={id:t+"-"+name+"-"+Date.now(),date:t,exercise:name,sets:[]}; data.sessions.push(sess); }
+  if(!sess.lbl && curSessLabel()) sess.lbl=curSessLabel();
   var _ns={w:w,r:r,rag:"a"}, _lu=unitOf(name);
   if(_lu!==nativeUnitOf(name)) _ns.u=_lu;
   if(!e.body && !e.timed) _ns.b=baseOf(name);
@@ -2178,6 +2212,7 @@ function logView(){
   });
   html+='</div>';
   } else if(!anyDayAssigned()){ ui.dayFilter="all"; }
+  if(!ui.reorder && curSessLabel() && SESS_GUIDE.hasOwnProperty(curSessLabel())) html+='<div class="sess-guide">'+esc(SESS_GUIDE[curSessLabel()])+'</div>';
 
   GROUPS.forEach(function(g){
     var steps=stepsForGroup(g.key);
@@ -2250,7 +2285,7 @@ function logView(){
         var u=unitOf(step.name), st=stepOf(step.name);
         var rLabel = step.repLabel || "Reps";
         html+='<div class="sl-body">';
-        html+= last ? '<div class="last-ref"><span class="last-label">Last \u00b7 '+fmtDate(last.date)+'</span><span class="last-sets">'+setsSummaryRAG(step.name,last.sets)+'</span></div>'
+        html+= last ? '<div class="last-ref"><span class="last-label">Last'+(last.lbl&&last.lbl===curSessLabel()?' '+esc(last.lbl):'')+' \u00b7 '+fmtDate(last.date)+'</span><span class="last-sets">'+setsSummaryRAG(step.name,last.sets)+'</span></div>'
                     : '<div class="last-ref last-ref-empty">No prior log \u2014 set your baseline</div>';
         if(step.timed){
           var lastSecs = (recentEntry(step.name)||{}).r || 30;
@@ -2593,7 +2628,13 @@ function trendsView(){
     html+='<select class="ex-select full" data-action="progex">';
     opts.forEach(function(ex){ html+='<option value="'+esc(ex)+'"'+(ex===ui.progEx?" selected":"")+'>'+esc(ex)+'</option>'; });
     html+='</select>';
-    var prog=data.sessions.filter(function(s){return s.exercise===ui.progEx&&s.sets.length;})
+    var _pl=[], _po=planLabels();
+    data.sessions.forEach(function(s){ if(s.exercise===ui.progEx && s.sets.length && s.lbl && _pl.indexOf(s.lbl)<0) _pl.push(s.lbl); });
+    _pl.sort(function(a,b){ var i=_po.indexOf(a), j=_po.indexOf(b); return ((i<0?99:i)-(j<0?99:j)) || a.localeCompare(b); });
+    if(_pl.indexOf(ui.trendSess)<0) ui.trendSess="all";
+    if(_pl.length){ html+='<div class="day-filter trend-sess"><button class="df-btn'+(ui.trendSess==="all"?" on":"")+'" data-action="trendsess" data-arg="all">All</button>';
+      _pl.forEach(function(lb){ html+='<button class="df-btn'+(ui.trendSess===lb?" on":"")+'" data-action="trendsess" data-arg="'+esc(lb)+'">'+esc(lb)+'</button>'; }); html+='</div>'; }
+    var prog=data.sessions.filter(function(s){return s.exercise===ui.progEx&&s.sets.length&&(ui.trendSess==="all"||s.lbl===ui.trendSess);})
       .map(function(s){ return {date:s.date, v: isBody ? bestReps(s.sets) : Math.round(fromKg(ui.progEx,bestE1RM(ui.progEx,s.sets))*10)/10}; })
       .sort(function(a,b){return a.date.localeCompare(b.date);});
     var latestE=prog.length?prog[prog.length-1].v:0;
@@ -2831,6 +2872,7 @@ appEl.addEventListener("click",function(e){
     case "gunitkg": setUnitGroup(arg,"kg"); break;
     case "gunitlb": setUnitGroup(arg,"lb"); break;
     case "dayfilter": ui.dayFilter=arg; ui.expanded=null; render(); break;
+    case "trendsess": ui.trendSess=arg; render(); break;
     case "reorder": ui.reorder=!ui.reorder; if(ui.reorder) ui.dayFilter="all"; ui.expanded=null; render(); break;
     case "exup": moveEx(arg,-1); break;
     case "exdown": moveEx(arg,1); break;
