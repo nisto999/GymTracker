@@ -506,7 +506,7 @@ html[data-theme="puregym"] .iv-stop{background:#0B2F35;color:#FFFFFF}
 <script>
 "use strict";
 
-var APP_VERSION = "3.88";
+var APP_VERSION = "3.89";
 var STORE_KEY = "gym-tracker-shared";
 
 /* ---------------------------------------------------------------
@@ -622,6 +622,7 @@ var EQUIP_LABEL = {Bodyweight:"Bodyweight",Dumbbell:"Dumbbells",Kettlebell:"Kett
 var DEFAULT_PAIRS = [{a:"Press-ups",b:"Squats"},{a:"Sit-ups",b:"Jumping jacks"},{a:"Lunges",b:"Plank"},{a:"Burpees",b:"Glute bridges"},{a:"Mountain climbers",b:"Wall sit"},{a:"High knees",b:"Tricep dips"}];
 var STARTERS=["Bench press","Shoulder press","Seated row (cable)","Lat pulldown","Squats","Deadlift","Barbell curl","Plank"];
 var CHANGELOG = [
+  {v:"3.89", items:["Changing an exercise\u2019s bar or base weight no longer rewrites your history. Each set now remembers the bar it was logged with, and anything you logged before setting a bar counts as the full weight you lifted.","If you\u2019d made your own version of an exercise that\u2019s now built in \u2014 incline dumbbell press, lateral raise, spider curl \u2014 it\u2019s been merged into the built-in one. Every logged set came across."]},
   {v:"3.88", items:["Height, weight and waist can now be shown in feet and inches, pounds, or stones and pounds. Pick them under Units in Setup \u2014 About you. Everything you\u2019ve already logged converts on screen; nothing stored is rewritten.","Simple mode now shows your weight in Trends, so the \u201cAdd your weight\u201d step has somewhere to go."]},
   {v:"3.87", items:["Every exercise can now be logged in kg or lb, set one at a time. In Setup, tap the kg/lb switch on an exercise \u2014 or the one on an equipment heading to change a whole group at once. Handy if the cable stack is marked in pounds and the barbell isn\u2019t.","Everything you\u2019ve already logged keeps the units you logged it in, so your history stays honest. Only the bar weight and the increment convert when you switch. Your totals and trends work it all out behind the scenes.","Twenty new exercises: barbell squat, bent-over row, Romanian deadlift, dumbbell row, incline dumbbell press, lateral raise, hammer curl, Bulgarian split squat, leg extension, machine chest and shoulder press, hip abduction and adduction, tricep dips, and the conditioning moves that were only in the interval timer before \u2014 burpees, glute bridges, high knees, jumping jacks, mountain climbers and the wall sit. All switched off to start with; turn on what you use in Setup.","A few names tidied up. \u201cHip thrusters\u201d is now \u201cHip thrust\u201d \u2014 a thruster is a different lift entirely. \u201cDumbbell press\u201d is now \u201cDumbbell bench press\u201d, \u201cLunge walk\u201d is \u201cWalking lunges\u201d, and the two seated rows say plainly which is the cable and which is the machine. Everything you have logged under the old names comes with them."]},
   {v:"3.85", items:["Niten now asks your browser to hold on to your data rather than clearing it out to reclaim space \u2014 phones can be ruthless about that if you go a few weeks without training. It\u2019s a request rather than a promise, so keep taking backups."]},
@@ -1130,6 +1131,74 @@ function migrateRenames(s){
   if(Array.isArray(s.exOrder)) s.exOrder=s.exOrder.map(rn);
   return s;
 }
+/* v3.89: customs that a built-in now covers. Not a RENAMES entry - migrateRenames
+   walks custom[] too, so it would rename the custom itself and leave a custom and
+   a built-in sharing one name. This moves the history AND deletes the custom.
+   Runs on every load and restore; once absorbed it is a no-op. */
+var ABSORB={
+  "Dumbbell press (incline)":    "Incline dumbbell press",
+  "Dumbbell Lateral Raise":      "Lateral raise",
+  "Incline 2 Dumbell Press":     "Incline dumbbell press",
+  "Dumbbell Curl Reversed Seat": "Spider curl"
+};
+function absorbCustoms(){
+  var lib={}; LIBRARY.forEach(function(e){ lib[e.name]=e; });
+  var todo=Object.keys(ABSORB).filter(function(src){
+    var t=lib[ABSORB[src]];
+    if(!t || t.type!=="log" || t.group!=="Main" || t.timed) return false;
+    return (data.custom||[]).some(function(c){ return c && c.name===src && c.type!=="cardio" && !!c.body===!!t.body; });
+  });
+  if(!todo.length) return false;
+  var wasDirty=configDirty();
+  todo.forEach(function(src){ absorbOne(src, ABSORB[src], lib[ABSORB[src]]); });
+  refreshCache();
+  if(data.activeSnap && !wasDirty) markSnap();
+  save();
+  return true;
+}
+function absorbOne(src,tg,t){
+  var c=(data.custom||[]).filter(function(x){ return x && x.name===src; })[0];
+  /* 1. freeze base weights under the old names, before anything moves */
+  freezeBase(src); freezeBase(tg);
+  var srcNative=c.unit||"kg", tgNative=t.unit||"kg";
+  var srcUnit=unitOf(src), srcStep=stepOf(src), srcBase=baseOf(src);
+  /* 2. unit-stamp: an unstamped set means "native unit", and native changes here */
+  var drop=[];
+  data.sessions.forEach(function(x){
+    if(x.exercise!==src) return;
+    (x.sets||[]).forEach(function(s){ if(s.u!=="kg" && s.u!=="lb" && srcNative!==tgNative) s.u=srcNative; });
+    /* 3. move - a same-day row under the target takes the sets */
+    var hit=data.sessions.filter(function(y){ return y!==x && y.exercise===tg && y.date===x.date; })[0];
+    if(hit){ hit.sets=(hit.sets||[]).concat(x.sets||[]); drop.push(x); }
+    else { x.exercise=tg; x.id=String(x.id).split("-"+src+"-").join("-"+tg+"-"); }
+  });
+  if(drop.length) data.sessions=data.sessions.filter(function(x){ return drop.indexOf(x)<0; });
+  function mergeMaps(en,dp){
+    if(en){ if(en.hasOwnProperty(src)){ en[tg]=!!(en[src]||en[tg]); delete en[src]; } }
+    if(dp){ if(dp.hasOwnProperty(src)){ dp[tg]=dp[src]; delete dp[src]; } }
+  }
+  function mergeOrder(a){
+    if(!Array.isArray(a) || a.indexOf(src)<0) return a;
+    var o=a.filter(function(n){ return n!==tg; });
+    o[o.indexOf(src)]=tg; return o;
+  }
+  mergeMaps(data.enabled, data.dayPlan);
+  data.exOrder=mergeOrder(data.exOrder);
+  (Array.isArray(data.setups)?data.setups:[]).forEach(function(st){
+    if(!st) return; mergeMaps(st.enabled, st.dayPlan); st.exOrder=mergeOrder(st.exOrder);
+  });
+  /* 4. settings: the custom's effective values carry to the built-in */
+  if(!data.unitOverride) data.unitOverride={};
+  if(!data.stepOverride) data.stepOverride={};
+  if(!data.baseWeight) data.baseWeight={};
+  if(srcUnit===tgNative) delete data.unitOverride[tg]; else data.unitOverride[tg]=srcUnit;
+  if(srcStep===(t.step||2)) delete data.stepOverride[tg]; else data.stepOverride[tg]=srcStep;
+  if(srcBase>0) data.baseWeight[tg]=srcBase; else delete data.baseWeight[tg];
+  delete data.unitOverride[src]; delete data.stepOverride[src]; delete data.baseWeight[src];
+  /* 5. delete the custom - not removeCustom(), which exists to keep orphans */
+  data.custom=data.custom.filter(function(x){ return x!==c; });
+  refreshCache();
+}
 function load(){
   try{
     var raw=localStorage.getItem(STORE_KEY);
@@ -1204,6 +1273,7 @@ function allExercises(){
 var EX_CACHE = {};
 function refreshCache(){ EX_CACHE={}; allExercises().forEach(function(e){ EX_CACHE[e.name]=e; }); }
 refreshCache();
+absorbCustoms();
 ensureSetups();
 
 function exOf(name){ return EX_CACHE[name] || {unit:"kg",step:2.5,type:"log"}; }
@@ -1297,12 +1367,26 @@ function setUnitOf(name,s){ return (s&&(s.u==="kg"||s.u==="lb")) ? s.u : nativeU
 function cvt(v,from,to){ if(from===to) return v; return from==="lb" ? v*0.45359237 : v/0.45359237; }
 function setKg(name,s){ return setUnitOf(name,s)==="lb" ? s.w*0.45359237 : s.w; }
 function baseKg(name){ return unitOf(name)==="lb" ? baseOf(name)*0.45359237 : baseOf(name); }
+/* v3.89: a set carries the base (bar) weight it was logged with as s.b, in the
+   set's own unit. An unstamped set means "the current base" - and freezeBase()
+   stamps every unstamped set before any base change, so changing the bar can
+   never rewrite history. A base of zero means the set was logged as the full
+   weight lifted. */
+function setBaseKg(name,s){ return (s && typeof s.b==="number") ? (setUnitOf(name,s)==="lb" ? s.b*0.45359237 : s.b) : baseKg(name); }
+function freezeBase(name){
+  var b=baseOf(name), cu=unitOf(name);
+  (data.sessions||[]).forEach(function(x){
+    if(x.exercise!==name || !x.sets) return;
+    x.sets.forEach(function(s){ if(typeof s.b!=="number") s.b=+cvt(b,cu,setUnitOf(name,s)).toFixed(3); });
+  });
+}
 function fromKg(name,v){ return unitOf(name)==="lb" ? v/0.45359237 : v; }
 function nearestStep(v,u){ var o=(u==="lb")?[2.5,5,10]:[1,2,2.5,5]; return o.reduce(function(b,x){ return Math.abs(x-v)<Math.abs(b-v)?x:b; }, o[0]); }
 function setUnit(name,u){
   if(u!=="kg"&&u!=="lb") return;
   var e=exOf(name); if(!e||e.type!=="log"||e.timed) return;
   var cur=unitOf(name); if(cur===u) return;
+  if(baseOf(name)>0) freezeBase(name);
   if(!data.unitOverride) data.unitOverride={};
   if(u===nativeUnitOf(name)) delete data.unitOverride[name]; else data.unitOverride[name]=u;
   var b=Number((data.baseWeight||{})[name])||0;
@@ -1385,7 +1469,7 @@ function trendSpark(name, col){
     +'<circle cx="'+end[0].toFixed(1)+'" cy="'+end[1].toFixed(1)+'" r="1.9" fill="'+col+'"/>'
     +'</svg>';
 }
-function bestE1RM(name,sets){ var base=baseKg(name); return (!sets||!sets.length)?0:sets.reduce(function(m,s){var v=e1rm(setKg(name,s)+base,s.r);return v>m?v:m;},0); }
+function bestE1RM(name,sets){ return (!sets||!sets.length)?0:sets.reduce(function(m,s){var v=e1rm(setKg(name,s)+setBaseKg(name,s),s.r);return v>m?v:m;},0); }
 function bestReps(sets){ return (!sets||!sets.length)?0:sets.reduce(function(m,s){return s.r>m?s.r:m;},0); }
 
 function getLast(name){
@@ -1464,7 +1548,7 @@ function backupJSON(){ return JSON.stringify(data,null,2); }
 function setVolume(name,s){
   var e=exOf(name);
   if(e.timed) return 0;
-  var added=setKg(name,s) + baseKg(name);
+  var added=setKg(name,s) + setBaseKg(name,s);
   var base= e.body ? currentWeight()*(e.bwFactor!=null?e.bwFactor:1) : 0;
   return (base+added)*s.r;
 }
@@ -1682,7 +1766,8 @@ function recentEntry(name){
   var tw=topSet(s.sets);
   var st=s.sets.filter(function(x){return x.w===tw;})[0]||s.sets[s.sets.length-1];
   var _cu=unitOf(name), _su=setUnitOf(name,st), _w=st.w;
-  if(_su!==_cu){ var _sp=stepOf(name)||1; _w=+(Math.round(cvt(_w,_su,_cu)/_sp)*_sp).toFixed(2); }
+  var _sb=setBaseKg(name,st), _cb=baseKg(name);
+  if(_su!==_cu || Math.abs(_sb-_cb)>1e-6){ var _sp=stepOf(name)||1; _w=+(Math.round(fromKg(name,setKg(name,st)+_sb-_cb)/_sp)*_sp).toFixed(2); if(_w<0 && !exOf(name).assist) _w=0; }
   return {w:_w, r:st.r};
 }
 function toggleExpand(name){
@@ -1726,6 +1811,7 @@ function logSet(name){
   if(!sess){ sess={id:t+"-"+name+"-"+Date.now(),date:t,exercise:name,sets:[]}; data.sessions.push(sess); }
   var _ns={w:w,r:r,rag:"a"}, _lu=unitOf(name);
   if(_lu!==nativeUnitOf(name)) _ns.u=_lu;
+  if(!e.body && !e.timed) _ns.b=baseOf(name);
   sess.sets.push(_ns);
   commit();
 }
@@ -1849,6 +1935,7 @@ function tgtStep(d){
 function saveBase(name){
   var el=document.getElementById("base-input");
   var v=Math.max(0, Number(el?el.value:NaN)||0);
+  if(v!==baseOf(name)) freezeBase(name);
   if(!data.baseWeight) data.baseWeight={};
   if(v>0) data.baseWeight[name]=v; else delete data.baseWeight[name];
   commit();
@@ -1929,7 +2016,7 @@ function applyRestore(text){
     metrics: Object.assign({},base.metrics,parsed.metrics||{})
   };
   if((!data.metrics.weight||!data.metrics.weight.length) && parsed.bodyweight!=null && Number(parsed.bodyweight)>0) data.metrics.weight=[{date:todayISO(),v:Number(parsed.bodyweight)}];
-  ui.restoreText=""; ui.backupMsg="Restored \u2713"; refreshCache(); ensureSetups(); save(); render();
+  ui.restoreText=""; ui.backupMsg="Restored \u2713"; refreshCache(); absorbCustoms(); ensureSetups(); save(); render();
 }
 
 /* ---- views ---- */
@@ -2192,7 +2279,7 @@ function logView(){
         if(!step.body && !step.timed){
           var bw0=baseOf(step.name);
           html+='<div class="base-row">'
-            +'<span class="base-lbl">Base / bar weight'+(bw0?' \u00b7 adds to every set':'')+'</span>'
+            +'<span class="base-lbl">Base / bar weight'+(bw0?' \u00b7 adds to each set you log':'')+'</span>'
             +'<span class="base-entry"><input id="base-input" inputmode="decimal" class="base-input" value="'+(bw0||"")+'" placeholder="0"><span class="base-unit">'+u+'</span>'
             +'<button class="btn-solid" data-action="savebase" data-arg="'+nm+'">Set</button></span></div>';
         }
